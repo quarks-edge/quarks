@@ -1,0 +1,28 @@
+<project name="quarks.samples.topology" default="all" xmlns:jacoco="antlib:org.jacoco.ant">
+    <description>
+        Build samples demonstrating add-on functionality.
+    </description>
+
+  <property name="component.path" value="samples"/>
+  <import file="../../common-build.xml"/>
+  <property name="ext" location="../../ext"/>
+
+  <path id="compile.classpath">
+    <path refid="quarks.samples.classpath"/>
+    <pathelement location="${quarks.analytics}/math3/lib/quarks.analytics.math3.jar"/>
+    <pathelement location="${lib}/quarks.samples.utils.jar"/>
+    <path refid="quarks.ext.classpath" />
+  </path>
+
+  <path id="test.compile.classpath">
+    <pathelement location="${jar}" />
+    <path refid="compile.classpath"/>
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${test.classes}" />
+    <path refid="test.compile.classpath"/>
+  </path>
+
+
+</project>

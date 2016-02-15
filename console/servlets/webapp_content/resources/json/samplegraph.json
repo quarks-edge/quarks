@@ -1,0 +1,26 @@
+{
+    "nodes": [
+    {"name": "Stats"},
+    {"name": "Filter"},
+    {"name": "Filter2"},
+    {"name": "Sink"},
+    {"name": "Source2"},
+    {"name" : "OperatorB"},
+    {"name": "OperatorC"},
+    {"name": "Sink2"}
+   ],
+   "links": [
+   {"source": 0, "target": 1, "value": 80},
+   {"source": 0, "target": 2, "value": 60},
+   {"source": 1, "target": 3, "value": 50},
+   {"source": 2, "target": 3, "value": 30},
+   {"source": 4, "target": 5, "value": 100.5},
+   {"source": 5, "target": 6, "value": 100.5},
+   {"source": 5, "target": 7, "value": 100.5},
+   {"source": 6, "target": 7, "value": 50}
+   ],
+    "health": "healthy",
+    "status": "running",
+    "deviceID": "streamsvm2.torolab.ibm.com",
+    "name": "sample::VMStat_0"
+    }

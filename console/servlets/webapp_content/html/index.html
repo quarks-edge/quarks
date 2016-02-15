@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Quarks Console</title>
+<link rel="stylesheet" type="text/css" href="resources/css/main.css">
+<link rel="stylesheet" type="text/css" href="resources/css/metrics.css">
+<link rel="shortcut icon" href="resources/images/favicon.png" />
+</head>
+
+<body>
+<div style='margin-left:15px; float:left;'>
+<img height='95' width='178' src="resources/images/small_quarks.png"/>
+</div>
+<div style='float:left;margin-top: 30px; font-size: 1.2em; margin-left: 320px;'>
+<label>Topology Graph</label>
+</div>
+<div class="topControls" style='margin-left: 30px;clear:both;'>
+<label class="jobsLabel">Job:</label>
+<select id="jobs"></select>
+</div>
+<div style="float:left;">
+<img id="stateImg" width="28" height="28" style="display:none;" src="resources/images/state.png"/>
+</div>
+<div class="topControls">
+<label class="layersLabel">View by:</label>
+<select id="layers">
+<option value="static">Static flow</option>
+<option value="flow">Tuple count</option>
+<option value="opletColor">Oplet kind</option>
+<option value='stags' disabled>Stream tags</option>
+</select>
+
+<div id="tagsDiv" style="display:none;margin-top: 10px;">
+<label class="tagsLabel">Tag:</label>
+<select id="tags"></select>
+</div>
+</div>
+<div class="topControls">
+<label for="refreshInterval" class="refreshLabel">Refresh interval:</label>
+<input id="refreshInterval" style='width: 40px;' type="number" min="3" max="20" step="1" value="5"/>
+<label style='margin-left: 5px; margin-right: 10px;'>seconds</label>
+<button id="toggleTimer" type="button" class="stop">Pause graph</button>
+</div>
+
+<div style='width: 300px; margin-left: 30px; clear:both;'>
+	<div id="showAll">View all oplet properties</div>
+	<div id="graphLegend" style='height: 600px;'></div>
+</div>
+	<div id="chart" style="float:right; margin-right: 100px; margin-top: -600px;"><div id="loading">Loading graph ...</div></div>
+
+
+<div id="metricsDiv" style="clear:both;display:none;margin-left: 30px;">
+<div>
+<label class="metricsTitle">Metrics</label>
+</div>
+<div class="metricsControls">
+<label class="metricsLabel">Metrics:</label>
+<select id="metrics"></select>
+<span id="rateUnit"></span>
+</div>
+
+<div class="metricsControls" style='width:250px;'>
+<label class="chartTypeLabel">Chart type:</label>
+<select id="mChartType">
+<option value='barChart' selected>Bar chart</option>
+<option value='lineChart' selected>Line chart</option>
+</select>
+<span id="noLineChartWarning" style="visibility:hidden;" class="warningLabel">*Line charts are not available when you select a metric containing multiple oplets</span>
+</div>
+
+<div id="metricsChart" style="clear:left;"></div>
+</div>
+
+<script src="js/ext/d3.min.js" charset="utf-8"></script>
+<script src="js/ext/sankey_quarks.js"></script>
+<script src="js/ext/d3.legend.js"></script>
+<script src="js/graph.js"></script>
+<script src="js/metrics.js"></script>
+<script src="js/index.js"></script>
+
+</body>
+</html>

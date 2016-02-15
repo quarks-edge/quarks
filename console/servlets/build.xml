@@ -1,0 +1,48 @@
+<project name="quarks.console.servlets" default="all" xmlns:jacoco="antlib:org.jacoco.ant">
+  <description>
+    Build the console servlet classes.
+  </description>
+
+  <property name="component.path" value="console/servlets"/>
+  <import file="../../common-build.xml" />
+
+  <property name="webapp.html" location="webapp_content/html" />
+  <property name="webapp.js" location="webapp_content/js" />
+  <property name="webapp.resources" location="webapp_content/resources" />
+  <property name="webapp.web-inf" location="webapp_content/WEB-INF" />
+
+  <property name="webapps.dir" location="${lib}/../../webapps" />
+  <property name="warfile" location="${webapps.dir}/console.war" />
+  <target name="clean" depends="quarks.common.clean">
+    <delete file="${warfile}" />
+  </target>
+	
+  <path id="compile.classpath">
+  	<pathelement location="${quarks.console}/server/ext/jetty-9.3.6/servlet-api-3.1.jar" />
+    <path refid="quarks.ext.classpath" />
+  </path>
+
+  <target name="all" depends="quarks.common.all,war" />
+
+  <target name="war" depends="quarks.common.all">
+    <mkdir dir="${webapps.dir}"/>
+    <war destfile="${warfile}" webxml="${webapp.web-inf}/console.xml">
+      <fileset dir="${webapp.html}" />
+      <zipfileset dir="${webapp.js}" prefix="js" />
+      <zipfileset dir="${webapp.resources}" prefix="resources" />
+      <classes dir="${classes}" />
+    </war>
+  </target>
+	
+  <path id="test.compile.classpath">
+  	<pathelement location="${jar}" />
+    <pathelement location="${test.classes}}" />
+    <path refid="compile.classpath" />
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${test.classes}" />
+    <path refid="test.compile.classpath" />
+  </path>
+
+</project>

@@ -1,0 +1,28 @@
+<project name="quarks.runtime.etiao" default="all" 
+    xmlns:jacoco="antlib:org.jacoco.ant"
+    >
+    <description>
+        Build the runtime etiao library.
+    </description>
+
+  <import file="../../common-build.xml"/>
+
+  <path id="compile.classpath">
+    <pathelement location="${lib}/quarks.api.graph.jar" />
+    <pathelement location="${lib}/quarks.spi.graph.jar" />
+    <path refid="quarks.ext.classpath" />
+  </path>
+
+  <path id="test.compile.classpath">
+    <pathelement location="${jar}" />
+    <path refid="compile.classpath"/>
+  	<pathelement location="../../api/graph/test.classes" />
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${test.classes}" />
+    <path refid="test.compile.classpath"/>
+  </path>
+
+
+</project>

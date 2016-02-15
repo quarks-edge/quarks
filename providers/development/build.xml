@@ -1,0 +1,29 @@
+<project name="quarks.providers.development" default="all" 
+    xmlns:jacoco="antlib:org.jacoco.ant"
+    >
+    <description>
+        Build the development topology provider.
+    </description>
+
+  <import file="../../common-build.xml"/>
+
+  <path id="compile.classpath">
+    <pathelement location="${quarks.lib}/quarks.providers.direct.jar" />
+    <pathelement location="${quarks.console}/server/lib/quarks.console.server.jar" />
+    <pathelement location="${quarks.utils}/metrics/lib/quarks.utils.metrics.jar" />
+    <pathelement location="${lib}/quarks.runtime.jmxcontrol.jar" />
+  </path>
+
+  <path id="test.compile.classpath">
+    <pathelement location="${jar}" />
+    <pathelement location="../../api/topology/test.classes" />
+    <path refid="compile.classpath"/>
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${test.classes}" />
+    <path refid="test.compile.classpath"/>
+  </path>
+
+
+</project>

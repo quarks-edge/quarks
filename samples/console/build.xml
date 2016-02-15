@@ -1,0 +1,25 @@
+<project name="quarks.samples.console" default="all" xmlns:jacoco="antlib:org.jacoco.ant">
+	<description>
+        Build samples demonstrating Console functionality.
+    </description>
+
+        <property name="component.path" value="samples"/>
+	<import file="../../common-build.xml" />
+
+	<path id="compile.classpath">
+        <pathelement location="${quarks.console}/server/lib/quarks.console.server.jar" />
+        <path refid="quarks.ext.classpath" />
+	</path>
+
+	<path id="test.compile.classpath">
+		<pathelement location="${jar}" />
+		<path refid="compile.classpath" />
+	</path>
+
+	<path id="test.classpath">
+		<pathelement location="${test.classes}" />
+		<path refid="test.compile.classpath" />
+	</path>
+
+
+</project>

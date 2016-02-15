@@ -1,0 +1,30 @@
+<project name="quarks.connectors.common" default="all" 
+    xmlns:jacoco="antlib:org.jacoco.ant"
+    >
+    <description>
+        Build common connector code.
+    </description>
+
+  <import file="../../common-build.xml"/>
+
+  <path id="compile.classpath">
+    <pathelement location="${lib}/quarks.api.topology.jar" />
+    <path refid="quarks.ext.classpath" />
+  </path>
+
+
+  <path id="test.compile.classpath">
+    <pathelement location="${jar}" />
+    <pathelement location="${lib}/quarks.providers.direct.jar"/>
+    <pathelement location="../../api/topology/test.classes"/>
+    <pathelement location="../../providers/direct/test.classes"/>
+    <path refid="compile.classpath"/>
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${test.classes}" />
+    <path refid="test.compile.classpath"/>
+  </path>
+
+
+</project>

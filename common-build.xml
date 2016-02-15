@@ -1,0 +1,180 @@
+<project name="quarks.common"
+  xmlns:jacoco="antlib:org.jacoco.ant"
+  >
+    <description>
+        Common tasks.
+    </description>
+
+
+    <!-- Assumption is that build files are two levels deep -->
+    <property name="quarks.dir" location="${basedir}/../.."/>
+
+    <property name="quarks.tools" location="${quarks.dir}/tools"/>
+
+    <property name="target.dir" location="${quarks.dir}/target"/>
+    <property name="quarks.ext" location="${quarks.dir}/ext"/>
+
+    <!-- Project specific extension jars -->
+    <property name="project.ext" location="${basedir}/ext"/>
+
+    <property name="target.java8.dir" location="${target.dir}/java8"/>
+    <property name="target.java8.ext" location="${target.java8.dir}/ext"/>
+
+    <property name="quarks.lib" location="${target.java8.dir}/lib"/>
+
+   <!-- default to quarks lib  -->
+   <condition property="lib"
+       value="${target.java8.dir}/${component.path}/lib"
+       else="${quarks.lib}">
+       <isset property="component.path"/>
+   </condition>
+   <condition property="component.ext"
+       value="${target.java8.dir}/${component.path}/ext">
+       <isset property="component.path"/>
+   </condition>
+
+   <property name="quarks.analytics" location="${target.java8.dir}/analytics"/>
+   <property name="quarks.connectors" location="${target.java8.dir}/connectors"/>
+   <property name="quarks.console" location="${target.java8.dir}/console"/>
+   <property name="quarks.utils" location="${target.java8.dir}/utils"/>
+   <property name="quarks.samples" location="${target.java8.dir}/samples"/>
+
+    <property name="src" location="src/main/java"/>
+    <property name="classes" location="classes"/>
+    <property name="jarname" value="${ant.project.name}.jar"/>
+    <property name="jar" location="${lib}/${jarname}"/>
+
+    <property name="test.src" location="src/test/java"/>
+    <property name="test.classes" location="test.classes"/>
+    <property name="test.dir" location="unittests"/>
+
+    <!-- compile.classpath ref is used by default for compilation
+         and manifest class path generation. 
+         When the full compile needs external jars that should
+         not be in the manifest compile.classpath should just
+         include local jars and a new reference id should be used
+         that includes compile.classpath and the external jars.
+         The property full.compile.classpath.id is set
+         to the name of the reference (see android examples).
+    -->
+
+    <property name="full.compile.classpath.id" value="compile.classpath"/>
+
+    <!-- Core Quarks ext class path -->
+    <path id="quarks.ext.classpath">
+      <pathelement location="${target.java8.ext}/google-gson-2.2.4/gson-2.2.4.jar" />
+      <pathelement location="${target.java8.ext}/slf4j-1.7.12/slf4j-api-1.7.12.jar"/>
+      <pathelement location="${target.java8.ext}/metrics-3.1.2/metrics-core-3.1.2.jar"/>
+    </path>
+
+    <!-- Quarks samples common class path -->
+    <path id="quarks.samples.classpath">
+      <pathelement location="${quarks.lib}/quarks.providers.development.jar"/>
+      <pathelement location="${quarks.lib}/quarks.providers.direct.jar"/>
+      <pathelement location="${target.java8.ext}/slf4j-1.7.12/slf4j-jdk14-1.7.12.jar"/>
+    </path>
+
+    <!-- expects a property of component.path e.g. connectors/iotf -->
+    <!-- only called by non-core components -->
+    <macrodef name="setup.component">
+	<sequential>
+            <property name="component.target" location="${target.java8.dir}/${component.path}"/>
+            <property name="component.lib" location="${component.target}/lib"/>
+<!--            <property name="component.ext" location="${component.target}/ext"/> -->
+
+            <mkdir dir="${component.lib}"/>
+            <mkdir dir="${component.ext}"/>
+	    <copy todir="${component.ext}" includeEmptyDirs="no" failonerror="false" quiet="true">
+	       <fileset dir="${project.ext}"/>
+	    </copy>
+	</sequential>
+    </macrodef>
+    <target name="project.component" if="component.path">
+       <setup.component/>
+    </target>
+	
+	  <macrodef name="quarks.compile">
+	      <sequential>
+		    <javac debug="true" includeantruntime="no"
+		       srcdir="${src}" 
+		       destdir="${classes}"
+		       classpathref="${full.compile.classpath.id}"/>
+	      </sequential>
+	  </macrodef>
+	
+	<target name="all" depends="jar,test.compile"/>
+
+	<target name="init">
+	    <mkdir dir="${classes}"/>
+	    <mkdir dir="${test.classes}"/>
+	    <mkdir dir="${target.java8.dir}"/>
+	    <mkdir dir="${target.java8.ext}"/>
+	    <mkdir dir="${quarks.lib}"/>
+	    <copy todir="${target.java8.ext}">
+	       <fileset dir="${quarks.ext}"/>
+	    </copy>
+	  </target>
+	
+	  <target name="clean" >
+	    <delete dir="${classes}"/>
+	    <delete dir="${test.classes}"/>
+	    <delete dir="${test.dir}"/>
+	    <delete file="${jar}"/>
+	  </target>
+
+	  <target name="compile" depends="init,project.component">
+	  	<quarks.compile/>
+	  </target>
+	
+	  <target name="jar" depends="compile">
+
+	    <manifestclasspath property="jar.classpath" jarfile="${jar}"
+	        maxParentLevels="5">
+	      <classpath refid="compile.classpath"/>
+	    </manifestclasspath>
+	    <jar destfile="${jar}">
+	      <manifest>
+                <attribute name="Implementation-Title" value="${ant.project.name}"/>
+                <attribute name="Implementation-Version" value="${commithash}-${DSTAMP}-${TSTAMP}"/>
+                <attribute name="Implementation-Vendor" value="quarks-edge@github.com"/>
+	        <attribute name="Class-Path" value="${jar.classpath}"/>
+	      </manifest>
+	      <fileset dir="${classes}"/>
+	    </jar>
+	  </target>
+	
+	  <target name="test.compile" depends="jar">
+	    <javac debug="true" includeantruntime="yes"
+	       srcdir="${test.src}" 
+	       destdir="${test.classes}"
+	       classpathref="test.compile.classpath"/>
+	  </target>
+
+	  <!-- Allow the pattern of tests to run be set
+	       ant -Dtest.base.pattern='**/*TestManual.java'
+	  -->
+	  <property name="test.base.pattern" value="**/*Test.java"/>
+
+	  <target name="test" depends="test.compile,test.run"/>
+
+	  <target name="test.run">
+	     <mkdir dir="${test.dir}"/>
+	     <tempfile property="test.run.dir" prefix="testrun" destDir="${test.dir}"/>
+	     <mkdir dir="${test.run.dir}"/>
+	   <jacoco:coverage enabled="yes" destfile="${test.run.dir}/jacoco.exec">
+	     <junit fork="yes" dir="${test.run.dir}" printsummary="yes" showoutput="no"
+	           haltonfailure="yes">
+	       <classpath>
+	         <path refid="test.classpath"/>
+	       </classpath>
+	       <assertions><enable/></assertions>
+	       <formatter type="xml"/>
+	       <batchtest todir="${test.run.dir}">
+	          <fileset dir="${test.src}">
+	             <include name="${test.base.pattern}"/>
+	          </fileset>
+	       </batchtest>
+	     </junit>
+	   </jacoco:coverage>
+	   </target>
+</project>

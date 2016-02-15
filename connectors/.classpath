@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="common/src/main/java"/>
+	<classpathentry kind="src" path="common/src/test/java"/>
+	<classpathentry kind="src" path="file/src/main/java"/>
+	<classpathentry kind="src" path="file/src/test/java"/>
+	<classpathentry kind="src" path="http/src/main/java"/>
+	<classpathentry kind="src" path="http/src/test/java"/>
+	<classpathentry kind="src" path="iot/src/main/java"/>
+	<classpathentry kind="src" path="iot/src/test/java"/>
+	<classpathentry kind="src" path="iotf/src/main/java"/>
+	<classpathentry kind="src" path="iotf/src/test/java"/>
+	<classpathentry kind="src" path="jdbc/src/main/java"/>
+	<classpathentry kind="src" path="jdbc/src/test/java"/>
+	<classpathentry kind="src" path="kafka/src/main/java"/>
+	<classpathentry kind="src" path="kafka/src/test/java"/>
+	<classpathentry kind="src" path="mqtt/src/main/java"/>
+	<classpathentry kind="src" path="mqtt/src/test/java"/>
+	<classpathentry kind="lib" path="http/ext/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="http/ext/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="http/ext/httpclient-4.3.6.jar"/>
+	<classpathentry kind="lib" path="http/ext/httpcore-4.3.3.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/com.ibm.iotf.client-0.0.9.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/lib/com.ibm.json4j_1.0.1.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/lib/common-lang3.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/lib/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/lib/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/lib/commons-net-3.3.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/lib/httpclient-4.3.6.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/lib/httpcore-4.3.3.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/lib/javax.servlet_3.0.0.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/lib/joda-time-2.6.jar"/>
+	<classpathentry kind="lib" path="iotf/ext/lib/org.eclipse.paho.client.mqttv3-1.0.3-20150818.040635-202.jar"/>
+	<classpathentry kind="lib" path="kafka/ext/kafka_2.10-0.8.2.2.jar"/>
+	<classpathentry kind="lib" path="kafka/ext/kafka-clients-0.8.2.2.jar"/>
+	<classpathentry kind="lib" path="kafka/ext/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="kafka/ext/metrics-core-2.2.0.jar"/>
+	<classpathentry kind="lib" path="kafka/ext/scala-library-2.10.4.jar"/>
+	<classpathentry kind="lib" path="kafka/ext/zkclient-0.3.jar"/>
+	<classpathentry kind="lib" path="kafka/ext/zookeeper-3.4.6.jar"/>
+	<classpathentry kind="lib" path="mqtt/ext/org.eclipse.paho.client.mqttv3-1.0.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ext"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/spi"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/providers"/>
+	<classpathentry kind="output" path="common/classes"/>
+</classpath>

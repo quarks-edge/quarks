@@ -1,0 +1,310 @@
+<project name="quarks" default="all"
+  xmlns:jacoco="antlib:org.jacoco.ant"
+  >
+    <description>
+        Top-level build.xml for Quarks.
+    </description>
+	
+  <property name="release.base" location="release-${ant.project.name}"/>
+
+  <property name="report.dir" location="reports"/>
+  <property name="target.dir" location="target"/>
+  <property name="javadoc.dir" location="${target.dir}/docs/javadoc"/>
+  <property name="release.dir" location="${release.base}"/>
+
+  <target name="all" depends="init,suball,copy,docs"
+    description="Build the code and Javadoc into target. Requires Java 8"
+    />
+
+  <target name="init" depends="setcommitversion">
+    <mkdir dir="${target.dir}"/>
+  </target>
+
+  <target name="setcommitversion">
+        <!-- Create the time stamp -->
+    <tstamp/>
+
+    <!-- Extract the git commit hash -->
+    <exec executable="git" outputproperty="commithash">
+       <arg value="rev-parse"/>
+       <arg value="--short"/>
+       <arg value="HEAD"/>
+    </exec>
+    <mkdir dir="${target.dir}"/>
+    <echoproperties destfile="${target.dir}/version.txt">
+       <propertyset>
+          <propertyref name="DSTAMP"/>
+          <propertyref name="TSTAMP"/>
+          <propertyref name="commithash"/>
+       </propertyset>
+    </echoproperties>
+  </target>
+
+  <target name="copy">
+     <!-- copy README.md -->
+     <copy todir="${target.dir}" file="README.md"/>
+
+     <!-- copy scripts -->
+     <mkdir dir="${target.dir}/java8/scripts"/>
+     <copy todir="${target.dir}/java8/scripts" includeEmptyDirs="no">
+        <fileset dir="scripts"/>
+     </copy>
+
+     <!-- copy sample code -->
+     <mkdir dir="${target.dir}/java8/samples/src"/>
+     <copy todir="${target.dir}/java8/samples/src" includeEmptyDirs="no">
+        <fileset dir="samples" includes="**/*.java" excludes="**/build.xml **/test/**"/>
+     </copy>
+
+  </target>
+
+  <target name="suball">
+     <subprojects target="all"/>
+  </target>
+  <target name="test"
+     description="Run all JUnit tests. Requires Java 8"
+     >
+     <echo message="HINT: to include tests for connectors do: ant -Dtest.base.pattern='**/*TestManual.java' test"/>
+     <subprojects target="test"/>
+  </target>
+  <target name="clean">
+     <subprojects target="clean"/>
+    <delete dir="${report.dir}"/>
+    <delete dir="${javadoc.dir}"/>
+    <delete dir="${release.dir}"/>
+    <delete dir="${target.dir}"/>
+  </target>
+
+  <macrodef name="subprojects">
+      <attribute name="target"/>
+      <sequential>		
+        <ant dir="api/function" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="api/execution" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="api/window" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="api/oplet" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="api/graph" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="api/topology" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="spi/graph" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="spi/topology" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="runtime/etiao" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="runtime/jmxcontrol" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="utils/metrics" target="@{target}" useNativeBasedir="true"/>
+
+        <ant dir="providers/direct" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/common" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/iot" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/file" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/http" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/iotf" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/jdbc" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/kafka" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/mqtt" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="console/server" target="@{target}" useNativeBasedir="true" />
+        <ant dir="console/servlets" target="@{target}" useNativeBasedir="true" />
+        <ant dir="providers/development" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="analytics/math3" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="samples/utils" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="samples/apps" target="@{target}" useNativeBasedir="true" />
+        <ant dir="samples/topology" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="samples/connectors" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="samples/console" target="@{target}" useNativeBasedir="true" />
+        <ant dir="android/topology" target="@{target}" useNativeBasedir="true" />
+        <ant dir="android/hardware" target="@{target}" useNativeBasedir="true" />
+        <ant dir="test/svt" target="@{target}" useNativeBasedir="true" />
+      </sequential>
+  </macrodef>
+
+  <target name="junit.report">
+     <mkdir dir="${report.dir}/junit"/>
+     <junitreport todir="${report.dir}">
+        <fileset dir="${basedir}">
+            <include name="**/unittests/*/TEST-*.xml"/>
+        </fileset>
+        <report format="frames" todir="${report.dir}/junit"/>
+     </junitreport>
+  </target>
+
+  <target name="coverage.report" >
+     <mkdir dir="${report.dir}/coverage"/>
+   <jacoco:report>
+    <executiondata>
+       <fileset dir="${basedir}">
+            <include name="**/unittests/*/jacoco*.exec"/>
+       </fileset>
+    </executiondata>
+    <structure name="Quarks">
+
+    <group name="Quarks API">
+      <classfiles>
+         <fileset dir="${target.dir}/java8/lib">
+            <include name="quarks.api.*.jar"/>
+         </fileset>
+      </classfiles>
+    <sourcefiles encoding="UTF-8">
+        <fileset dir="${basedir}/api/function/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/api/execution/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/api/oplet/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/api/graph/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/api/topology/src/main/java" includes="**/*.java"/>
+    </sourcefiles>
+    </group>
+    <group name="Quarks SPI">
+      <classfiles>
+         <fileset dir="${target.dir}/java8/lib">
+            <include name="quarks.spi.*.jar"/>
+         </fileset>
+      </classfiles>
+    <sourcefiles encoding="UTF-8">
+        <fileset dir="${basedir}/spi/graph/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/spi/topology/src/main/java" includes="**/*.java"/>
+    </sourcefiles>
+    </group>
+    <group name="Quarks Runtime">
+      <classfiles>
+         <fileset dir="${target.dir}/java8/lib">
+            <include name="quarks.runtime.*.jar"/>
+         </fileset>
+      </classfiles>
+    <sourcefiles encoding="UTF-8">
+        <fileset dir="${basedir}/runtime/etiao/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/runtime/jmxcontrol/src/main/java" includes="**/*.java"/>
+    </sourcefiles>
+    </group>
+
+    <group name="Quarks Utilities">
+      <classfiles>
+         <fileset dir="${target.dir}/java8/utils">
+            <include name="**/quarks.utils.*.jar"/>
+         </fileset>
+      </classfiles>
+    <sourcefiles encoding="UTF-8">
+        <fileset dir="${basedir}/utils/metrics/src/main/java" includes="**/*.java"/>
+    </sourcefiles>
+    </group>
+    <group name="Quarks Connectors">
+      <classfiles>
+         <fileset dir="${target.dir}/java8/connectors">
+            <include name="**/quarks.connectors.*.jar"/>
+         </fileset>
+      </classfiles>
+    <sourcefiles encoding="UTF-8">
+        <fileset dir="${basedir}/connectors/common/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/connectors/file/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/connectors/iot/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/connectors/iotf/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/connectors/jdbc/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/connectors/kafka/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/connectors/mqtt/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/connectors/http/src/main/java" includes="**/*.java"/>
+    </sourcefiles>
+    </group>
+
+    <group name="Quarks Providers">
+      <classfiles>
+         <fileset dir="${target.dir}/java8/lib">
+            <include name="quarks.providers.*.jar"/>
+         </fileset>
+      </classfiles>
+    <sourcefiles encoding="UTF-8">
+        <fileset dir="${basedir}/providers/direct/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/providers/development/src/main/java" includes="**/*.java"/>
+    </sourcefiles>
+    </group>
+
+    <group name="Quarks Analytics">
+      <classfiles>
+         <fileset dir="${target.dir}/java8/analytics">
+            <include name="**/quarks.analytics.*.jar"/>
+         </fileset>
+      </classfiles>
+    <sourcefiles encoding="UTF-8">
+        <fileset dir="${basedir}/analytics/math3/src/main/java" includes="**/*.java"/>
+    </sourcefiles>
+    </group>
+
+    <group name="Quarks Console">
+      <classfiles>
+         <fileset dir="${target.dir}/java8/console">
+            <include name="**/quarks.console.*.jar"/>
+         </fileset>
+      </classfiles>
+    <sourcefiles encoding="UTF-8">
+        <fileset dir="${basedir}/console/server/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/console/servlets/src/main/java" includes="**/*.java"/>
+    </sourcefiles>
+    </group>
+
+    </structure>
+    <html destdir="${report.dir}/coverage"/>
+    </jacoco:report>
+   </target>
+
+  <target name="reports" depends="junit.report,coverage.report"
+    description="Produce test and coverage reports under reports after executing the test target"
+    />
+
+  <target name="docs">
+  <mkdir dir="${javadoc.dir}"/>
+  <javadoc
+      destdir="${javadoc.dir}"
+      author="true"
+      version="true"
+      use="true"
+      windowtitle="Quarks Pre-Alpha"
+      additionalparam="-Xdoclint:none"
+      Overview="quarks_overview.html"
+      failonwarning="true"
+      excludepackagenames="quarks.connectors.runtime,quarks.connectors.*.runtime,quarks.console.*,quarks.topology.spi.*,quarks.graph.spi.*"
+      >
+      <sourcepath>
+         <dirset dir="${basedir}">
+           <include name="*/*/src/main/java"/>
+           <exclude name="android/**"/>
+         </dirset>
+      </sourcepath>
+      <classpath>
+        <fileset dir="ext">
+           <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir=".">
+           <include name="console/*/ext/*/*.jar"/>
+           <include name="connectors/*/ext/*.jar"/>
+           <include name="analytics/*/ext/*/*.jar"/>
+           <include name="utils/metrics/ext/*/*.jar"/>
+        </fileset>
+      </classpath>
+
+       <doctitle>Quarks Pre-Alpha Evaluation</doctitle>
+       <footer><![CDATA[<a href="http://quarks-edge.github.io">quarks-edge community @ github.com</a>]]></footer>
+       <bottom>Copyright IBM 2015,2016</bottom>
+       <group title="Quarks API" packages="quarks.execution,quarks.function,quarks.topology,quarks.topology.*,quarks.execution.*"/>
+       <group title="Quarks Providers" packages="quarks.providers.*"/>
+       <group title="Quarks Connectors" packages="quarks.connectors.*"/>
+       <group title="Quarks Samples" packages="quarks.samples.*"/>
+       <group title="Quarks Analytics" packages="quarks.analytics.*"/>
+       <group title="Quarks Utilities" packages="quarks.metrics,quarks.metrics.*"/>
+       <group title="Quarks Low-Level API" packages="quarks.graph,quarks.graph.*,quarks.oplet,quarks.oplet.*,quarks.window"/>
+       <group title="Quarks SPI" packages="quarks.*.spi.*"/>
+     </javadoc>
+  </target>
+
+  <target name="release" depends="clean,setcommitversion,all,docs,create_release_bundle"/>
+	
+  <target name="create_release_bundle">
+      <!-- Build Java7 and Android versions -->
+      <ant dir="platform/java7" target="retro7" useNativeBasedir="true"/>
+      <ant dir="platform/android" target="all" useNativeBasedir="true"/>
+
+      <mkdir dir="${release.dir}" />
+      <property name="releasefilename" value="${release.dir}/quarks-v0.3.0-${DSTAMP}-${TSTAMP}.tgz"/>
+      <tar compression="gzip" longfile="gnu" destfile="${releasefilename}">
+        <tarfileset dir="${target.dir}" prefix="quarks"
+         excludes="**/*.sh"/>
+        <tarfileset dir="${target.dir}" prefix="quarks"
+         includes="**/*.sh" filemode="755"/>
+      </tar>
+      <checksum file="${releasefilename}"/>
+      <checksum algorithm="sha1" file="${releasefilename}"/>
+  </target>
+
+</project>

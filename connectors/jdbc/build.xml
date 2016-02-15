@@ -1,0 +1,34 @@
+<project name="quarks.connectors.jdbc" default="all" 
+    xmlns:jacoco="antlib:org.jacoco.ant"
+    >
+    <description>
+        Build JDBC connectors.
+    </description>
+
+  <property environment="env"/>
+  <property name="component.path" value="connectors/jdbc"/>
+  <import file="../../common-build.xml"/>
+
+  <path id="compile.classpath">
+    <pathelement location="${quarks.lib}/quarks.api.topology.jar" />
+    <pathelement location="${quarks.lib}/quarks.connectors.common.jar" />
+  </path>
+
+
+  <path id="test.compile.classpath">
+    <pathelement location="${jar}" />
+    <pathelement location="${quarks.lib}/quarks.providers.direct.jar"/>
+    <pathelement location="../../api/topology/test.classes"/>
+    <pathelement location="../../providers/direct/test.classes"/>
+    <pathelement location="../../connectors/common/test.classes"/>
+    <pathelement location="${env.DERBY_HOME}/lib/derby.jar"/>
+    <path refid="compile.classpath"/>
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${test.classes}" />
+    <path refid="test.compile.classpath"/>
+  </path>
+
+
+</project>

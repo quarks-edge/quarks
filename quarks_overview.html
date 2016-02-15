@@ -1,0 +1,198 @@
+<body>
+Quarks provides an programming model and runtime for executing streaming
+analytics at the <i>edge</i>
+<H1>Quarks Pre-Alpha Evaluation</H1>
+<OL>
+<LI><a href="#overview">Overview</A></LI>
+<LI><a href="#model">Programming Model</A></LI>
+<LI><a href="#start">Getting Started</A></LI>
+</OL>
+<a name="overview"></a>
+<H2>Overview</H2>
+Quarks provides an programming model and runtime for executing streaming
+analytics at the <i>edge</i>. Quarks is focusing on two edge cases:
+<UL>
+<LI>Internet of Things (IoT) - Widely distributed and/or mobile devices.</LI>
+<LI>Enterprise Embedded - Edge analytics within an enterprise, such as local analytic applications of eash system in a machine room, or error log analytics in application servers.</LI>
+</UL>
+In both cases Quarks applications analyze live data and
+send results of that analytics and/or data intermittently
+to back-end systems for deeper analysis. A Quarks application
+can use analytics to decide when to send information to back-end systems,
+such as when the behaviour of the system is outside normal parameters
+(e.g. an engine running too hot).
+<BR>
+Quarks applications do not send data continually
+to back-end systems as the cost of communication may be high
+(e.g. cellular networks) or bandwidth may be limited.
+<P>
+Quarks applications communicate with back-end systems through
+some form of message hub as there may be millions of edge devices.
+Quarks supports these message hubs:
+<UL>
+<LI> MQTT - Messaging standard for IoT</LI>
+<LI> IBM Watson IoT Platform - Cloud based service providing a device model on top of MQTT</LI>
+<LI> Apache Kafka - Enterprise message bus</LI>
+</UL> 
+</P>
+<P>
+Back-end analytic systems are used to perform analysis on information from Quarks applications that cannot be performed at the edge. Such analysis may be:
+<UL>
+<LI>Running complex analytic algorithms than require more resources (cpu, memory etc.) than are available at the edge. </LI>
+<LI>Maintaining more state per device that can exist at the edge, e.g. hours of state for patients' medical sensors. </LI>
+<LI>Correlating device information with multiple data sources: </LI>
+<UL>
+<LI> Weather data</LI>
+<LI> Social media data</LI>
+<LI> Data of record (e.g patients' medical histories, trucking manifests).</LI>
+<LI> Other devices </LI>
+<LI>etc.</LI>
+</UL>
+</UL>
+<BR>
+Back-end systems can interact or control devices based upon their analytics, by sending commands to specific devices, e.g. reduce maximum engine revs to reduce chance of failure before the next scheduled service, or send an alert of an accident ahead.
+</P>
+<a name="model"></a>
+<H2>Programming Model</H2>
+Quarks applications are streaming applications in which each <em>tuple</em>
+(data item or event) in a <em>stream</em> of data is processed as it occurs.
+Additionally, you can process <em>windows</em> (logical subsets) of data.
+For example, you could analyze the last 90 seconds of data from a sensor to identify trends in the data
+<P>
+<H3>Topology functional API</H3>
+<H4>Overview</H4>
+The primary api is {@link quarks.topology.Topology} which uses a functional
+model to build a topology of {@link quarks.topology.TStream streams} for an application.
+<BR>
+{@link quarks.topology.TStream TStream} is a declaration of a stream of tuples, an application will create streams that source data (e.g. sensor readings) and then apply functions that transform those streams into derived streams, for example simply filtering a stream containg engine temperator readings to a derived stream that only contains readings thar are greater than 100&deg;C.
+<BR>
+An application terminates processing for a stream by <em>sinking</em> it. Sinking effectively terminates a stream by applying processing to each tuple on the stream (as it occurs) that does not produce a result. Typically this sinking is transmitting the tuple to an external system, for example the messgae hub to send the data to a back-end system, or locally sending the data to a user interface.
+</P>
+<P>
+This programming style is typical for streaming systems and similar APIs are supported by systems such as Apache Flink, Apache Spark Streaming, IBM Streams and Java 8 streams.
+</P>
+<H4>Functions</H4>
+Quarks supports Java 8 and it is encouraged to use Java 8 as functions can be easily and clearly written using lambda expressions.
+<H4>Arbitrary Topology</H4>
+Simple applications may just be a pipeline of streams, for example, logically:
+<BR>
+{@code source --> filter --> transform --> aggregate --> send to IoTF}
+<BR>
+However Quarks allows arbitrary topologies including:
+<UL>
+<LI>Multiple source streams in an application</LI>
+<LI>Multiple sinks in an application </LI>
+<LI>Multiple processing including sinks against a stream (fan-out)</LI>
+<LI>Union of streams (fan-in)  </LI>
+<LI>Correlation of streams by allowing streams to be joined (to be added)</LI>
+</UL>
+<H3>Graph API</H3>
+<H4>Overview</H4>
+The {@link quarks.graph.Graph graph} API is a lower-level API that the
+topology api is built on top of. A graph consists of
+{@link quarks.oplet.Oplet oplet} invocations connected by streams.
+The oplet invocations contain the processing applied to each tuple
+on streams connected to their input ports. Processing by the oplet
+submits tuples to its output ports for subsequent processing
+by downstream connected oplet invocations.
+<a name="start"></a>
+<H2>Getting Started</H2>
+A number of sample Java applications are provided that demonstrate use of Quarks.
+<BR>
+The Java code for the samples is under {@code <quarks-release>/samples}.
+See the {@code README} there.
+<BR>
+Shell scripts to run the samples are {@code <quarks-release>/scripts}.
+See the {@code README} there.
+<BR>
+Summary of samples:
+<TABLE border=1 width="80%" table-layout="auto">
+<TR class="rowColor"><TH>Sample</TH><TH>Description</TH><TH>Focus</TH></TR>
+<TR class="altColor"><TD>{@link quarks.samples.topology.HelloWorld}</TD>
+  <TD>Prints Hello World! to standard output.</TD>
+  <TD>Basic mechanics of declaring a topology and executing it.</TD></TR>
+<TR class="altColor"><TD>{@link quarks.samples.topology.PeriodicSource}</TD>
+  <TD>Polls a random number generator for a new value every second
+      and then prints out the raw value and a filtered and transformed stream.</TD>
+  <TD>Polling of a data value to create a source stream.</TD></TR>
+<TR class="altColor"><TD>{@link quarks.samples.topology.SensorsAggregates}</TD>
+  <TD>Demonstrates partitioned aggregation and filtering of simulated sensors
+      that are bursty in nature, so that only intermittently
+      is the data output to {@code System.out}</TD>
+  <TD>Simulated sensors with windowed aggregation</TD></TR>
+<TR class="altColor"><TD>{@link quarks.samples.topology.SimpleFilterTransform}</TD>
+  <TD></TD>
+  <TD></TD></TR>
+<TR class="altColor"><TD><a href="{@docRoot}/quarks/samples/connectors/file/package-summary.html">
+      File</a></TD>
+  <TD>Write a stream of tuples to files.  Watch a directory for new files
+      and create a stream of tuples from the file contents.</TD>
+  <TD>Use of the <a href="{@docRoot}/quarks/connectors/file/package-summary.html">
+      File stream connector</a></TD></TR>
+<TR class="altColor"><TD><a href="{@docRoot}/quarks/samples/connectors/iotf/package-summary.html">
+      IoTF</a></TD>
+  <TD>Sends simulated sensor readings to an IBM Watson IoT Platform instance as device events.</TD>
+  <TD>Use of the <a href="{@docRoot}/quarks/connectors/iotf/package-summary.html">
+      IoTF stream connector</a></TD></TR>
+<TR class="altColor"><TD><a href="{@docRoot}/quarks/samples/connectors/jdbc/package-summary.html">
+      JDBC</a></TD>
+  <TD>Write a stream of tuples to an Apache Derby database table.
+      Create a stream of tuples by reading a table.</TD>
+  <TD>Use of the <a href="{@docRoot}/quarks/connectors/jdbc/package-summary.html">
+      JDBC stream connector</a></TD></TR>
+<TR class="altColor"><TD><a href="{@docRoot}/quarks/samples/connectors/kafka/package-summary.html">
+      Kafka</a></TD>
+  <TD>Publish a stream of tuples to a Kafka topic. 
+      Create a stream of tuples by subscribing to a topic and receiving 
+      messages from it.</TD>
+  <TD>Use of the <a href="{@docRoot}/quarks/connectors/kafka/package-summary.html">
+      Kafka stream connector</a></TD></TR>
+<TR class="altColor"><TD><a href="{@docRoot}/quarks/samples/connectors/mqtt/package-summary.html">
+      MQTT</a></TD>
+  <TD>Publish a stream of tuples to a MQTT topic. 
+      Create a stream of tuples by subscribing to a topic and receiving 
+      messages from it.</TD>
+  <TD>Use of the <a href="{@docRoot}/quarks/connectors/mqtt/package-summary.html">
+      MQTT stream connector</a></TD></TR>
+<TR class="altColor"><TD><a href="{@docRoot}/quarks/samples/apps/sensorAnalytics/package-summary.html">
+      SensorAnalytics</a></TD>
+  <TD>Demonstrates a Sensor Analytics application that includes: 
+      configuration control, a device of one or more sensors and
+      some typical analytics, use of MQTT for publishing results and receiving
+      commands, local results logging, conditional stream tracing.</TD>
+  <TD>A more complete sample application demonstrating common themes.</TD></TR>
+</TABLE>
+<BR>
+Other samples are also provided but have not yet been fully documented.
+Feel free to explore them.
+<H2>Building Applications</H2>
+You will need to include one or more Quarks jars in your {@code classpath} depending
+on what features your application uses.
+<P>
+Include one or both of the following:
+<ul>
+<li>{@code <quarks-release>/lib/quarks.providers.direct.jar} - if you use the
+{@link quarks.providers.direct.DirectProvider DirectProvider}</li>
+<li>{@code <quarks-release>/lib/quarks.providers.development.jar} - if you use the
+{@link quarks.providers.development.DevelopmentProvider DevelopmentProvider}</li>
+</ul>
+Include the jar of any Quarks connector you use:
+<ul>
+<li>{@code <quarks-release>/connectors/file/lib/quarks.connectors.file.jar}</li>
+<li>{@code <quarks-release>/connectors/jdbc/lib/quarks.connectors.jdbc.jar}</li>
+<li>{@code <quarks-release>/connectors/iotf/lib/quarks.connectors.iotf.jar}</li>
+<li>{@code <quarks-release>/connectors/kafka/lib/quarks.connectors.kafka.jar}</li>
+<li>{@code <quarks-release>/connectors/mqtt/lib/quarks.connectors.mqtt.jar}</li>
+</ul>
+Include jars for any Quarks utility features you use:
+<ul>
+<li>{@code <quarks-release>/utils/metrics/lib/quarks.utils.metrics.jar} - for the {@code quarks.metrics} package</li>
+</ul>
+Quarks uses <a href="www.slf4j.org">slf4j</a> for logging,
+leaving the decision of the actual logging implementation to your application
+(e.g., {@code java.util.logging} or {@code log4j}).  
+For {@code java.util.logging} you can include:
+<ul>
+<li>{@code <quarks-release>/ext/slf4j-1.7.12/slf4j-jdk-1.7.12.jar}</li>
+</ul>
+</body>

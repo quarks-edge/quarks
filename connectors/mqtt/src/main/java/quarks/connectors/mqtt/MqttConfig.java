@@ -1,0 +1,404 @@
+/*
+# Licensed Materials - Property of IBM
+# Copyright IBM Corp. 2015,2016 
+*/
+package quarks.connectors.mqtt;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
+
+import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import com.google.gson.JsonObject;
+
+import quarks.function.Consumer;
+import quarks.topology.json.JsonFunctions;
+
+/**
+ * MQTT broker connector configuration.
+ */
+public class MqttConfig {
+    private MqttConnectOptions options = new MqttConnectOptions();
+    private String clientId;
+    private MqttClientPersistence persistence;
+    private long actionTimeToWaitMillis = -1;
+    private int idleTimeout;
+    private int subscriberIdleReconnectIntervalSec = 60;
+    
+    /**
+     * Create a new configuration from {@link Properties}.
+     * <p>
+     * There is a property corresponding to each {@code MqttConfig.set<name>()}
+     * method.  Unless otherwise stated, the property's value is a string
+     * of the corresponding method's argument type.
+     * Properties not specified yield a configuration value as
+     * described by and their corresponding {@code set<name>()}.
+     * <p>
+     * Properties other than those noted are ignored.
+     * 
+     * <h3>MQTT connector properties</h3>
+     * <ul>
+     * <li>mqtt.actionTimeToWaitMillis</li>
+     * <li>mqtt.cleanSession</li>
+     * <li>mqtt.clientId</li>
+     * <li>mqtt.connectionTimeoutSec</li>
+     * <li>mqtt.idleTimeoutSec</li>
+     * <li>mqtt.keepAliveSec</li>
+     * <li>mqtt.password</li>
+     * <li>mqtt.persistence</li>
+     * <li>mqtt.serverURLs - csv list of MQTT URLs of the form: 
+     *                          {@code tcp://<host>:<port>}
+     *    </li>
+     * <li>mqtt.subscriberIdleReconnectIntervalSec</li>
+     * <li>mqtt.userName</li>
+     * <li>mqtt.will - JSON for with the following properties:
+     *     <ul>
+     *     <li>topic - string</li>
+     *     <li>payload - string for byte[] in UTF8</li>
+     *     <li>qos - integer</li>
+     *     <li>retained - boolean</li>
+     *     </ul>
+     *     </li>
+     * </ul>
+     * @param properties  properties specifying the configuration. 
+     *        
+     * @return the configuration
+     * @throws IllegalArgumentException for illegal values
+     */
+    public static MqttConfig fromProperties(Properties properties) {
+        MqttConfig config = new MqttConfig();
+        Properties p = properties;
+        setConfig(p, "mqtt.actionTimeToWaitMillis", 
+                val -> config.setActionTimeToWaitMillis(Long.valueOf(val)));
+        setConfig(p, "mqtt.cleanSession", 
+                val -> config.setCleanSession(Boolean.valueOf(val)));
+        setConfig(p, "mqtt.clientId", 
+                val -> config.setClientId(val));
+        setConfig(p, "mqtt.connectionTimeoutSec", 
+                val -> config.setConnectionTimeout(Integer.valueOf(val)));
+        setConfig(p, "mqtt.idleTimeoutSec", 
+                val -> config.setIdleTimeout(Integer.valueOf(val)));
+        setConfig(p, "mqtt.keepAliveSec", 
+                val -> config.setKeepAliveInterval(Integer.valueOf(val)));
+        setConfig(p, "mqtt.password", 
+                val -> config.setPassword(val.toCharArray()));
+        setConfig(p, "mqtt.persistence", 
+                val -> config.setPersistence(newPersistenceProvider(val)));
+        setConfig(p, "mqtt.serverURLs", 
+                val -> config.setServerURLs(val.split(",")));
+        setConfig(p, "mqtt.subscriberIdleReconnectIntervalSec", 
+                val -> config.setSubscriberIdleReconnectInterval(Integer.valueOf(val)));
+        setConfig(p, "mqtt.userName", 
+                val -> config.setUserName(val));
+        setConfig(p, "mqtt.will", val -> {
+                        JsonObject jo = JsonFunctions.fromString().apply(val);
+                        String topic = jo.get("topic").getAsString();
+                        byte[] payload = jo.get("payload").getAsString().getBytes(StandardCharsets.UTF_8);
+                        int qos = jo.get("qos").getAsInt();
+                        boolean retained = jo.get("retained").getAsBoolean();
+                        config.setWill(topic, payload, qos, retained);      
+                    });
+        return config;
+    }
+
+    private static void setConfig(Properties p, String name, Consumer<String> setter) {
+        try {
+            String value = p.getProperty(name);
+            if (value != null) {
+                setter.accept(value);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException(name, e);
+        }
+    }
+    
+    private static MqttClientPersistence newPersistenceProvider(String className) {
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(className);
+            return (MqttClientPersistence) clazz.newInstance();
+        }
+        catch (Exception e) {
+            throw new IllegalArgumentException(e.getLocalizedMessage(), e);
+        }
+    }
+
+    /**
+     * Create a new configuration.
+     */
+    public MqttConfig() { }
+        
+    /**
+     * Create a new configuration.
+     * @param serverURL the MQTT broker's URL
+     * @param clientId the MQTT client's id.  Auto-generated if null.
+     */
+    public MqttConfig(String serverURL, String clientId) {
+        options.setServerURIs(new String[] {serverURL});
+        this.clientId = clientId;
+    }
+  
+    /**
+     * Get the connection Client Id.
+     * @return the value
+     */
+    public String getClientId() {
+        return clientId;
+    }
+    
+    /**
+     * Get the maximum time to wait for an action (e.g., publish message) to complete.
+     * @return the value
+     */
+    public long getActionTimeToWaitMillis() {
+        return actionTimeToWaitMillis;
+    }
+    
+    /**
+     * Get the QoS 1 and 2 in-flight message persistence handler.
+     * @return the value
+     */
+    public MqttClientPersistence getPersistence() {
+        return persistence;
+    }
+    
+    /**
+     * Get the connection timeout.
+     * @return the value
+     */
+    public int getConnectionTimeout() {
+        return options.getConnectionTimeout();
+    }
+    
+    /**
+     * Get the idle connection timeout.
+     * @return the value
+     */
+    public int getIdleTimeout() {
+        return idleTimeout;
+    }
+
+    /**
+     * Get the subscriber idle reconnect interval.
+     */
+    public int getSubscriberIdleReconnectInterval() {
+        return subscriberIdleReconnectIntervalSec;
+    }
+
+    /**
+     * Get the connection Keep alive interval.
+     * @return the value
+     */
+    public int getKeepAliveInterval() {
+        return options.getKeepAliveInterval();
+    }
+
+    /**
+     * Get the MQTT Server URLs
+     * @return the value
+     */
+    public String[] getServerURLs() {
+        return options.getServerURIs();
+    }
+
+    /**
+     * Get a Last Will and Testament message's destination topic.
+     * @return the value.  may be null.
+     */
+    public String getWillDestination() {
+        return options.getWillDestination();
+    }
+
+    /**
+     * Get a Last Will and Testament message's payload.
+     * @return the value. may be null.
+     */
+    public byte[] getWillPayload() {
+        MqttMessage msg = options.getWillMessage();
+        return msg==null ? null : msg.getPayload();
+    }
+
+    /**
+     * Get a Last Will and Testament message's QOS.
+     * @return the value.
+     */
+    public int getWillQOS() {
+        MqttMessage msg = options.getWillMessage();
+        return msg==null ? 0 : msg.getQos();
+    }
+
+    /**
+     * Get a Last Will and Testament message's "retained" setting.
+     * @return the value.
+     */
+    public boolean getWillRetained() {
+        MqttMessage msg = options.getWillMessage();
+        return msg==null ? false : msg.isRetained();
+    }
+
+    /**
+     * Get the clean session setting.
+     * @return the value
+     */
+    public boolean isCleanSession() {
+        return options.isCleanSession();
+    }
+    
+    /**
+     * Get the the password to use for authentication with the server.
+     */
+    public char[] getPassword() {
+        return options.getPassword();
+    }
+
+    /**
+     * Get the username to use for authentication with the server.
+     */
+    public String getUserName() {
+        return options.getUserName();
+    }
+
+    /**
+     * Connection Client Id.
+     * <p>
+     * Optional. default null: a clientId is auto-generated.
+     * @param clientId
+     */
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+    
+    /**
+     * Maximum time to wait for an action (e.g., publish message) to complete.
+     * <p>
+     * Optional. default: -1 no timeout. 0 also means no timeout.
+     * @param actionTimeToWaitMillis
+     */
+    public void setActionTimeToWaitMillis(long actionTimeToWaitMillis) {
+        this.actionTimeToWaitMillis = actionTimeToWaitMillis;
+    }
+    
+    /**
+     * QoS 1 and 2 in-flight message persistence.
+     * <p>
+     * optional. default: use memory persistence.
+     * @param persistence
+     */
+    public void setPersistence(MqttClientPersistence persistence) {
+        this.persistence = persistence;
+    }
+
+    /**
+     * Clean Session.
+     * <p>
+     * Qptional. default: true.
+     * @param cleanSession
+     */
+    public void setCleanSession(boolean cleanSession) {
+        options.setCleanSession(cleanSession);
+    }
+
+    /**
+     * Connection timeout.
+     * Optional. 0 disables the timeout / blocks until connected. default: 30 seconds.
+     * @param connectionTimeoutSec
+     */
+    public void setConnectionTimeout(int connectionTimeoutSec) {
+        options.setConnectionTimeout(connectionTimeoutSec);
+    }
+
+    /**
+     * Idle connection timeout.
+     * Optional. 0 disables idle connection disconnect. default: 0 seconds (disabled).
+     * <p>
+     * Following an idle disconnect, the connector will automatically
+     * reconnect when it receives a new tuple to publish.
+     * If the connector is subscribing to topics, it will also reconnect
+     * as per {@link #setSubscriberIdleReconnectInterval(int)}.
+     * <p>
+     * @param idleTimeoutSec
+     * @see #setSubscriberIdleReconnectInterval(int)
+     */
+    public void setIdleTimeout(int idleTimeoutSec) {
+        if (idleTimeoutSec < 0)
+            idleTimeoutSec = 0;
+        this.idleTimeout = idleTimeoutSec;
+    }
+    
+    /**
+     * Subscriber idle reconnect interval.
+     * <p>
+     * Following an idle disconnect, if the connector is subscribing to topics,
+     * it will reconnect after the specified interval.
+     * Optional. default: 60 seconds.
+     * @param seconds
+     */
+    public void setSubscriberIdleReconnectInterval(int seconds) {
+        if (seconds < 0)
+            seconds = 0;
+        subscriberIdleReconnectIntervalSec = seconds;
+    }
+
+    /**
+     * Connection Keep alive.
+     * <p>
+     * Optional. 0 disables keepalive processing. default: 60 seconds.
+     * @param keepAliveSec
+     */
+    public void setKeepAliveInterval(int keepAliveSec)
+            throws IllegalArgumentException {
+        options.setKeepAliveInterval(keepAliveSec);
+    }
+
+    /**
+     * MQTT Server URLs
+     * <p>
+     * Required. Must be an array of one or more MQTT server URLs.
+     * When connecting, the first URL that successfully connects is used.
+     * @param serverUrls
+     */
+    public void setServerURLs(String[] serverUrls) {
+        options.setServerURIs(serverUrls);
+    }
+
+    /**
+     * Last Will and Testament.
+     * <p>
+     * optional. default: no last-will-and-testament.
+     * @param topic topic to publish to
+     * @param payload the last-will-and-testament message value
+     * @param qos the quality of service to use to publish the message
+     * @param retained true to retain the message across connections
+     */
+    public void setWill(String topic, byte[] payload, int qos, boolean retained) {
+        options.setWill(topic, payload, qos, retained);
+    }
+
+    /**
+     * Set the password to use for authentication with the server.
+     * Optional. default: null.
+     * @param password
+     */
+    public void setPassword(char[] password) {
+        options.setPassword(password);
+    }
+
+    /**
+     * Set the username to use for authentication with the server.
+     * Optional. default: null.
+     * @param userName
+     */
+    public void setUserName(String userName) {
+        options.setUserName(userName);
+    }
+
+    /**
+     * INTERNAL USE ONLY.
+     * @return object
+     */
+    public Object options() {
+        return options;
+    }
+}

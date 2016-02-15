@@ -1,0 +1,35 @@
+<project name="quarks.platform.android" default="all"
+  xmlns:jacoco="antlib:org.jacoco.ant"
+  >
+    <description>
+        Create the Android set of jars.
+        Copies the Java 7 jars excluding any ones not supported on Android.
+    </description>
+
+  <property name="quarks" location="../.."/>
+  <property name="quarks8.target" location="${quarks}/target/java8"/>
+  <property name="quarks7.target" location="${quarks}/target/java7"/>
+  <property name="quarks.android.target" location="${quarks}/target/android"/>
+
+  <target name="init">
+    <mkdir dir="${quarks.android.target}"/>
+  </target>
+
+  <target name="all" depends="copyFrom7"
+    description="Create the Android jars"
+    />
+
+  <target name="copyFrom7" depends="init">
+    <copy todir="${quarks.android.target}">
+       <fileset dir="${quarks7.target}"
+           excludes="scripts/** lib/quarks.runtime.jmxcontrol.jar"
+       />
+
+    </copy>
+    <!-- Delete the Android jars from Java 8 and 7 -->
+    <!-- They get built there and are processed through the retrolambda -->
+    <delete dir="${quarks8.target}/android"/>
+    <delete dir="${quarks7.target}/android"/>
+  </target>
+
+</project>
