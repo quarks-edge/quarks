@@ -1,0 +1,32 @@
+<project name="quarks.samples.connectors" default="all" xmlns:jacoco="antlib:org.jacoco.ant">
+    <description>
+        Build samples demonstrating connector functionality.
+    </description>
+
+  <property name="component.path" value="samples"/>
+  <import file="../../common-build.xml"/>
+
+  <path id="compile.classpath">
+    <path refid="quarks.samples.classpath"/>
+    <pathelement location="${quarks.connectors}/mqtt/lib/quarks.connectors.mqtt.jar"/>
+    <pathelement location="${quarks.connectors}/kafka/lib/quarks.connectors.kafka.jar"/>
+    <pathelement location="${quarks.connectors}/file/lib/quarks.connectors.file.jar"/>
+    <pathelement location="${quarks.connectors}/iotf/lib/quarks.connectors.iotf.jar"/>
+    <pathelement location="${quarks.connectors}/jdbc/lib/quarks.connectors.jdbc.jar"/>
+    <pathelement location="${lib}/quarks.samples.topology.jar"/>
+    <pathelement location="${lib}/quarks.samples.utils.jar"/>
+    <path refid="quarks.ext.classpath" />
+  </path>
+
+  <path id="test.compile.classpath">
+    <pathelement location="${jar}" />
+    <path refid="compile.classpath"/>
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${test.classes}" />
+    <path refid="test.compile.classpath"/>
+  </path>
+
+
+</project>

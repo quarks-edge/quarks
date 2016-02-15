@@ -1,0 +1,31 @@
+<project name="quarks.console.server" default="all" xmlns:jacoco="antlib:org.jacoco.ant">
+	<description>
+		Build the console server classes.
+	</description>
+
+        <property name="component.path" value="console/server"/>
+	<import file="../../common-build.xml" />
+
+	<path id="compile.classpath">
+		<pathelement location="${component.ext}/jetty-9.3.6/jetty-http-9.3.6.v20151106.jar" />
+		<pathelement location="${component.ext}/jetty-9.3.6/jetty-io-9.3.6.v20151106.jar" />
+		<pathelement location="${component.ext}/jetty-9.3.6/jetty-security-9.3.6.v20151106.jar" />
+		<pathelement location="${component.ext}/jetty-9.3.6/jetty-server-9.3.6.v20151106.jar" />
+		<pathelement location="${component.ext}/jetty-9.3.6/jetty-servlet-9.3.6.v20151106.jar" />
+		<pathelement location="${component.ext}/jetty-9.3.6/jetty-util-9.3.6.v20151106.jar" />
+		<pathelement location="${component.ext}/jetty-9.3.6/jetty-webapp-9.3.6.v20151106.jar" />
+		<pathelement location="${component.ext}/jetty-9.3.6/jetty-xml-9.3.6.v20151106.jar" />
+		<pathelement location="${component.ext}/jetty-9.3.6/servlet-api-3.1.jar" />
+	</path>
+
+	<path id="test.compile.classpath">
+		<pathelement location="${jar}" />
+		<path refid="compile.classpath" />
+	</path>
+
+	<path id="test.classpath">
+		<pathelement location="${test.classes}" />
+		<path refid="test.compile.classpath" />
+	</path>
+
+</project>

@@ -1,0 +1,37 @@
+<project name="quarks.connectors.mqtt" default="all" 
+    xmlns:jacoco="antlib:org.jacoco.ant"
+    >
+    <description>
+        Build MQTT connectors.
+    </description>
+
+  <property name="component.path" value="connectors/mqtt"/>
+  <import file="../../common-build.xml"/>
+
+  <property name="ext" location="../../ext"/>
+
+  <path id="compile.classpath">
+    <pathelement location="${quarks.lib}/quarks.api.topology.jar" />
+    <pathelement location="${quarks.lib}/quarks.connectors.common.jar" />
+    <pathelement location="${quarks.connectors}/iot/lib/quarks.connectors.iot.jar" />
+    <pathelement location="${component.ext}/org.eclipse.paho.client.mqttv3-1.0.2.jar"/>
+  </path>
+
+
+  <path id="test.compile.classpath">
+    <pathelement location="${jar}" />
+    <pathelement location="${quarks.lib}/quarks.providers.direct.jar"/>
+    <pathelement location="../../api/topology/test.classes"/>
+    <pathelement location="../../providers/direct/test.classes"/>
+    <pathelement location="../../connectors/common/test.classes"/>
+    <path refid="compile.classpath"/>
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${test.classes}" />
+    <path refid="test.compile.classpath"/>
+    <path refid="quarks.ext.classpath" />
+  </path>
+
+
+</project>

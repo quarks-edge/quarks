@@ -1,0 +1,1 @@
+embedded contains a TopologyProvider that directly builds an executable graph.

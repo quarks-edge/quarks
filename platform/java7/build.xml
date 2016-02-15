@@ -1,0 +1,194 @@
+<project name="quarks.platform.java7" default="all"
+  xmlns:jacoco="antlib:org.jacoco.ant"
+  >
+    <description>
+        Create Java 7 versions of selected jars in java8
+        by running retrolambda against them.
+    </description>
+
+  <property environment="env"/>
+
+  <property name="quarks" location="../.."/>
+  <property name="quarks8.target" location="${quarks}/target/java8"/>
+  <property name="quarks7.target" location="${quarks}/target/java7"/>
+
+  <property name="input.dir" location="classes.in"/>
+  <property name="output.dir" location="classes.out"/>
+  <property name="test.classes.dir" location="classes.test"/>
+  <property name="ext.dir" location="${quarks}/ext"/>
+
+  <path id="quarks.classpath">
+    <pathelement location="${ext.dir}/slf4j-1.7.12/slf4j-api-1.7.12.jar"/>
+    <pathelement location="${ext.dir}/google-gson-2.2.4/gson-2.2.4.jar"/>
+    <pathelement location="${ext.dir}/metrics-3.1.2/metrics-core-3.1.2.jar"/>
+  </path>
+  <property name="qcp" refid="quarks.classpath"/>
+
+  <target name="init">
+    <mkdir dir="${quarks7.target}"/>
+  </target>
+
+  <macrodef name="retro7">
+   <attribute name="qjar"/>
+   <attribute name="qdir" default="lib" />
+      <sequential>
+        <delete dir="${input.dir}"/>
+        <delete dir="${output.dir}"/>
+
+        <mkdir dir="${input.dir}"/>
+        <mkdir dir="${output.dir}"/>
+
+        <unzip dest="${input.dir}" src="${quarks8.target}/@{qdir}/@{qjar}"/>
+
+        <exec executable="java">
+          <arg value="-Dretrolambda.inputDir=${input.dir}"/>
+          <arg value="-Dretrolambda.classpath=${quarks8.target}/@{qdir}/@{qjar}:${qcp}"/>
+          <arg value="-Dretrolambda.outputDir=${output.dir}"/>
+          <arg value="-Dretrolambda.defaultMethods=false"/>
+          <arg value="-jar"/>
+          <arg value="ext/retrolambda-2.1.0.jar"/>
+        </exec>
+        <mkdir dir="${quarks7.target}/@{qdir}"/>
+	<jar destfile="${quarks7.target}/@{qdir}/@{qjar}"
+	  filesonly="true"
+	  manifest="${input.dir}/META-INF/MANIFEST.MF"
+	  >
+	      <fileset dir="${output.dir}"/>
+	</jar>
+      </sequential>
+  </macrodef>
+
+  <target name="all" depends="clean"
+    description="Compile Quarks and produce Java 7 jars using retrolambda. Must be run with a Java 8 virtual machine."
+    >
+    <ant dir="${quarks}" inheritAll="false">
+       <target name="clean"/>
+       <target name="all"/>
+    </ant>
+    <antcall target="retro7"/>
+  </target>
+
+  <target name="retro7" >
+    <antcall target="retro7.quarks"/>
+    <antcall target="retro7.quarks.android"/>
+  </target>
+
+  <target name="retro7.quarks" >
+    <retro7 qjar="quarks.api.function.jar" />
+    <retro7 qjar="quarks.api.execution.jar" />
+    <retro7 qjar="quarks.api.graph.jar" />
+    <retro7 qjar="quarks.api.window.jar" />
+    <retro7 qjar="quarks.api.oplet.jar" />
+    <retro7 qjar="quarks.api.topology.jar" />
+    <retro7 qjar="quarks.spi.graph.jar" />
+    <retro7 qjar="quarks.spi.topology.jar" />
+    <retro7 qjar="quarks.runtime.etiao.jar" />
+    <retro7 qjar="quarks.runtime.jmxcontrol.jar" />
+    <retro7 qjar="quarks.utils.metrics.jar" qdir="utils/metrics/lib" />
+    <retro7 qjar="quarks.providers.direct.jar" />
+    <retro7 qjar="quarks.connectors.common.jar" />
+    <retro7 qjar="quarks.connectors.iot.jar" qdir="connectors/iot/lib" />
+    <retro7 qjar="quarks.connectors.iotf.jar" qdir="connectors/iotf/lib" />
+    <retro7 qjar="quarks.connectors.http.jar" qdir="connectors/http/lib" />
+
+    <mkdir dir="${quarks7.target}/ext"/>
+    <copy todir="${quarks7.target}/ext">
+       <fileset dir="${quarks8.target}/ext"/>
+    </copy>
+
+    <mkdir dir="${quarks7.target}/connectors/iotf/ext"/>
+    <copy todir="${quarks7.target}/connectors/iotf/ext">
+       <fileset dir="${quarks8.target}/connectors/iotf/ext"/>
+    </copy>
+    <mkdir dir="${quarks7.target}/connectors/mqtt/ext"/>
+    <copy todir="${quarks7.target}/connectors/mqtt/ext">
+       <fileset dir="${quarks8.target}/connectors/mqtt/ext"/>
+    </copy>
+    <mkdir dir="${quarks7.target}/analytics/math3/ext"/>
+    <copy todir="${quarks7.target}/analytics/math3/ext">
+       <fileset dir="${quarks8.target}/analytics/math3/ext"/>
+    </copy>
+
+  </target>
+  <target name="retro7.quarks.android" if="env.ANDROID_SDK_PLATFORM">
+    <retro7 qjar="quarks.android.topology.jar" qdir="android/topology/lib" />
+    <retro7 qjar="quarks.android.hardware.jar" qdir="android/hardware/lib" />
+  </target>
+
+  <path id="tc.classpath">
+      <dirset dir="${quarks}">
+         <include name="**/test.classes"/>
+      </dirset>
+  </path>
+  <property name="tccp" refid="tc.classpath"/>
+
+  <macrodef name="retro7.test">
+   <attribute name="tdir"/>
+   <attribute name="ldir" default="lib"/>
+      <sequential>
+        <echo message="Testing: @{tdir}"/>
+        <delete dir="${quarks}/@{tdir}/test7.classes"/>
+        <mkdir dir="${quarks}/@{tdir}/test7.classes"/>
+
+        <exec executable="java">
+          <arg value="-Dretrolambda.inputDir=${quarks}/@{tdir}/test.classes"/>
+          <arg value="-Dretrolambda.classpath=${qcp7}:${qcp}:${tccp}"/>
+          <arg value="-Dretrolambda.outputDir=${quarks}/@{tdir}/test7.classes"/>
+          <arg value="-Dretrolambda.defaultMethods=true"/>
+          <arg value="-jar"/>
+          <arg value="ext/retrolambda-2.1.0.jar"/>
+        </exec>
+        <delete dir="${quarks}/@{tdir}/test.classes"/>
+        <move   file="${quarks}/@{tdir}/test7.classes"
+              tofile="${quarks}/@{tdir}/test.classes"/>
+        <ant dir="${quarks}/@{tdir}" target="test.run" inheritAll="false">
+           <property name="lib" location="${quarks7.target}/@{ldir}"/>
+           <property name="quarks.lib" location="${quarks7.target}/lib"/>
+           <property name="quarks.utils" location="${quarks7.target}/utils"/>
+           <property name="quarks.connectors" location="${quarks7.target}/connectors"/>
+        </ant>
+        </sequential>
+  </macrodef>
+
+  <target name="test"
+    description="Run Quarks tests using the Java 7 jars. Should be run with JAVA_HOME pointing to a Java 7 virtual machine, though can also be run with Java 8"
+    >
+  <path id="quarks.java7.classpath">
+      <fileset dir="${quarks7.target}/lib">
+         <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${quarks7.target}/connectors">
+         <include name="*/lib/*.jar"/>
+      </fileset>
+      <fileset dir="${quarks7.target}/utils">
+         <include name="*/lib/*.jar"/>
+      </fileset>
+      <fileset dir="${quarks7.target}/analytics">
+         <include name="*/lib/*.jar"/>
+      </fileset>
+  </path>
+  <property name="qcp7" refid="quarks.java7.classpath"/>
+    <retro7.test tdir="api/function"/>
+    <retro7.test tdir="api/execution"/>
+    <retro7.test tdir="api/graph" />
+    <retro7.test tdir="api/window" />
+    <retro7.test tdir="api/oplet" />
+    <retro7.test tdir="api/topology" />
+    <retro7.test tdir="spi/graph" />
+    <retro7.test tdir="spi/topology" />
+    <retro7.test tdir="runtime/etiao" />
+    <retro7.test tdir="runtime/jmxcontrol" />
+    <retro7.test tdir="utils/metrics"  ldir="utils/metrics/lib"/>
+    <retro7.test tdir="providers/direct" />
+    <retro7.test tdir="connectors/common"/>
+    <retro7.test tdir="connectors/iotf"  ldir="connectors/iotf/lib"/>
+    <retro7.test tdir="connectors/http"  ldir="connectors/http/lib"/>
+  </target>
+
+  <target name="clean">
+        <delete dir="${input.dir}"/>
+        <delete dir="${output.dir}"/>
+        <delete dir="${quarks7.target}"/>
+  </target>
+
+</project>

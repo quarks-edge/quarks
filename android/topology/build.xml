@@ -1,0 +1,42 @@
+<project name="quarks.android.topology" default="all" 
+    xmlns:jacoco="antlib:org.jacoco.ant"
+    >
+    <description>
+        Build Android topology utilities
+    </description>
+
+  <property name="full.compile.classpath.id" value="android.classpath"/>
+
+  <property environment="env"/>
+  <property name="component.path" value="android/topology"/>
+  <import file="../../common-build.xml"/>
+
+  <path id="compile.classpath">
+    <pathelement location="${quarks.lib}/quarks.api.topology.jar" />
+  </path>
+
+
+  <path id="android.classpath">
+    <path refid="compile.classpath"/>
+    <pathelement location="${env.ANDROID_SDK_PLATFORM}/android.jar"/>
+  </path>
+
+  <path id="test.compile.classpath">
+    <pathelement location="${jar}" />
+    <path refid="compile.classpath"/>
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${test.classes}" />
+    <path refid="test.compile.classpath"/>
+  </path>
+
+ <target name="all" if="env.ANDROID_SDK_PLATFORM">
+    <antcall target="quarks.common.all"/>
+ </target>
+
+ <!-- no tests -->
+ <target name="test.compile"/>
+ <target name="test.run"/>
+
+</project>
