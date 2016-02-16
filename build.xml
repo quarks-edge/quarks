@@ -250,7 +250,7 @@
       author="true"
       version="true"
       use="true"
-      windowtitle="Quarks Pre-Alpha"
+      windowtitle="Quarks v0.3"
       additionalparam="-Xdoclint:none"
       Overview="quarks_overview.html"
       failonwarning="true"
@@ -274,9 +274,9 @@
         </fileset>
       </classpath>
 
-       <doctitle>Quarks Pre-Alpha Evaluation</doctitle>
+       <doctitle>Quarks v0.3</doctitle>
        <footer><![CDATA[<a href="http://quarks-edge.github.io">quarks-edge community @ github.com</a>]]></footer>
-       <bottom>Copyright IBM 2015,2016</bottom>
+       <bottom>Copyright IBM 2015,2016 - ${commithash}-${DSTAMP}-${TSTAMP}</bottom>
        <group title="Quarks API" packages="quarks.execution,quarks.function,quarks.topology,quarks.topology.*,quarks.execution.*"/>
        <group title="Quarks Providers" packages="quarks.providers.*"/>
        <group title="Quarks Connectors" packages="quarks.connectors.*"/>
