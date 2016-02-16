@@ -5,6 +5,8 @@
 /**
  * Apache Kafka enterprise messing hub stream connector.
  * <p>
+ * The connector uses and includes components from the Kafka 0.8.2.2 release.
+ * <p>
  * Stream tuples may be published to Kafka broker topics
  * and created by subscribing to broker topics.
  * For more information about Kafka see

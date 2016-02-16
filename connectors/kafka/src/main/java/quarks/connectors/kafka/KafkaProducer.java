@@ -19,6 +19,7 @@ import quarks.topology.Topology;
  * {@code KafkaProducer} is a connector for publishing a stream of tuples
  * to Apache Kafka messaging system topics.
  * <p>
+ * The connector uses and includes components from the Kafka 0.8.2.2 release.
  * For more information about Kafka see
  * <a href="http://kafka.apache.org">http://kafka.apache.org</a>
  * <p>
