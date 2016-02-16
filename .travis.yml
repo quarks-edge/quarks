@@ -1,5 +1,13 @@
 language: java
+
+addons:
+  apt:
+    packages:
+    - junit4
+    
 install: true
-script: ant clean all
+
+script: ant -lib /usr/share/java/junit4.jar clean all
+
 jdk:
   - oraclejdk8
