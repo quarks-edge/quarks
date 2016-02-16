@@ -4,9 +4,9 @@ Quarks is an open source programming model and runtime for edge devices that ena
 
 We want to build a community around Quarks for analytics at the edge, so welcome contributions to any aspect of Quarks including:
 
- * Feedback from use in IoT and other device environemnts.
+ * Feedback from use in IoT and other device environments.
  * Support for more device environments
- * Additional connectors to edge sensors or new messgae hibs
+ * Additional connectors to edge sensors or new message hubs
  * Analytics to be executed at the edge
  * Sample applications
  * Documentation
