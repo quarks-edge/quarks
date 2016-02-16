@@ -76,7 +76,7 @@ Quarks supports Java 8 and it is encouraged to use Java 8 as functions can be ea
 <H4>Arbitrary Topology</H4>
 Simple applications may just be a pipeline of streams, for example, logically:
 <BR>
-{@code source --> filter --> transform --> aggregate --> send to IoTF}
+{@code source --> filter --> transform --> aggregate --> send to MQTT}
 <BR>
 However Quarks allows arbitrary topologies including:
 <UL>
@@ -97,14 +97,16 @@ submits tuples to its output ports for subsequent processing
 by downstream connected oplet invocations.
 <a name="start"></a>
 <H2>Getting Started</H2>
+Below, {@code <quarks-target>} refers to a Quarks release's platform target
+directory such as {@code .../quarks/java8}.
+<P>
 A number of sample Java applications are provided that demonstrate use of Quarks.
 <BR>
-The Java code for the samples is under {@code <quarks-release>/samples}.
+The Java code for the samples is under {@code <quarks-target>/samples}.
+<P>
+Shell scripts to run the samples are {@code <quarks-target>/scripts}.
 See the {@code README} there.
-<BR>
-Shell scripts to run the samples are {@code <quarks-release>/scripts}.
-See the {@code README} there.
-<BR>
+<P>
 Summary of samples:
 <TABLE border=1 width="80%" table-layout="auto">
 <TR class="rowColor"><TH>Sample</TH><TH>Description</TH><TH>Focus</TH></TR>
@@ -166,33 +168,33 @@ Summary of samples:
 Other samples are also provided but have not yet been fully documented.
 Feel free to explore them.
 <H2>Building Applications</H2>
-You will need to include one or more Quarks jars in your {@code classpath} depending
+You need to include one or more Quarks jars in your {@code classpath} depending
 on what features your application uses.
 <P>
 Include one or both of the following:
 <ul>
-<li>{@code <quarks-release>/lib/quarks.providers.direct.jar} - if you use the
+<li>{@code <quarks-target>/lib/quarks.providers.direct.jar} - if you use the
 {@link quarks.providers.direct.DirectProvider DirectProvider}</li>
-<li>{@code <quarks-release>/lib/quarks.providers.development.jar} - if you use the
+<li>{@code <quarks-target>/lib/quarks.providers.development.jar} - if you use the
 {@link quarks.providers.development.DevelopmentProvider DevelopmentProvider}</li>
 </ul>
 Include the jar of any Quarks connector you use:
 <ul>
-<li>{@code <quarks-release>/connectors/file/lib/quarks.connectors.file.jar}</li>
-<li>{@code <quarks-release>/connectors/jdbc/lib/quarks.connectors.jdbc.jar}</li>
-<li>{@code <quarks-release>/connectors/iotf/lib/quarks.connectors.iotf.jar}</li>
-<li>{@code <quarks-release>/connectors/kafka/lib/quarks.connectors.kafka.jar}</li>
-<li>{@code <quarks-release>/connectors/mqtt/lib/quarks.connectors.mqtt.jar}</li>
+<li>{@code <quarks-target>/connectors/file/lib/quarks.connectors.file.jar}</li>
+<li>{@code <quarks-target>/connectors/jdbc/lib/quarks.connectors.jdbc.jar}</li>
+<li>{@code <quarks-target>/connectors/iotf/lib/quarks.connectors.iotf.jar}</li>
+<li>{@code <quarks-target>/connectors/kafka/lib/quarks.connectors.kafka.jar}</li>
+<li>{@code <quarks-target>/connectors/mqtt/lib/quarks.connectors.mqtt.jar}</li>
 </ul>
 Include jars for any Quarks utility features you use:
 <ul>
-<li>{@code <quarks-release>/utils/metrics/lib/quarks.utils.metrics.jar} - for the {@code quarks.metrics} package</li>
+<li>{@code <quarks-target>/utils/metrics/lib/quarks.utils.metrics.jar} - for the {@code quarks.metrics} package</li>
 </ul>
 Quarks uses <a href="www.slf4j.org">slf4j</a> for logging,
 leaving the decision of the actual logging implementation to your application
 (e.g., {@code java.util.logging} or {@code log4j}).  
 For {@code java.util.logging} you can include:
 <ul>
-<li>{@code <quarks-release>/ext/slf4j-1.7.12/slf4j-jdk-1.7.12.jar}</li>
+<li>{@code <quarks-target>/ext/slf4j-1.7.12/slf4j-jdk-1.7.12.jar}</li>
 </ul>
 </body>
