@@ -20,26 +20,32 @@ import quarks.samples.topology.SensorsAggregates;
 import quarks.topology.TStream;
 
 /**
- * Sample sending sensor device events to IoTF. <BR>
+ * Sample sending sensor device events to IBM Watson IoT Platform. <BR>
  * Simulates a couple of bursty sensors and sends the readings from the sensors
- * to IoTF as device with id {@code sensors}. <BR>
+ * to IBM Watson IoT Platform as device events with id {@code sensors}. <BR>
  * Subscribes to device commands with identifier {@code display}.
+ * <P>
+ * In addition a device event with id {@code hearbeat} is sent
+ * every minute. This ensure a connection attempt to IBM Watson IoT Platform
+ * is made immediately rather than waiting for a bursty sensor to become
+ * active.
  * <P>
  * This sample requires an IBM Watson IoT Platform service and a device configuration.
  * The device configuration is read from the file {@code device.cfg} in the
  * current directory. <BR>
- * In order to see commands send from IoTF there must be an analytic application
+ * In order to see commands send from IBM Watson IoT Platform
+ * there must be an analytic application
  * that sends commands with the identifier {@code display}.
  * </P>
  */
-public class IoTFSensors {
+public class IotfSensors {
 
     public static void main(String[] args) {
         
         String deviceCfg = args[0];
 
         DirectProvider tp = new DirectProvider();
-        DirectTopology topology = tp.newTopology("IoTFSensors");
+        DirectTopology topology = tp.newTopology("IotfSensors");
 
         // Declare a connection to IoTF
         IotDevice device = new IotfDevice(topology, new File(deviceCfg));
