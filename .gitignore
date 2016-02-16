@@ -1,5 +1,9 @@
 *.class
 
+# More generated artifacts
+/target
+/test/svt/lib
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
