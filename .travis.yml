@@ -1,16 +1,17 @@
-sudo: required
-dist: trusty
-
 language: java
+
+before_install:
+  - wget http://archive.apache.org/dist/ant/binaries/apache-ant-1.9.4-bin.tar.gz
+  - tar xzf apache-ant-1.9.4-bin.tar.gz
 
 addons:
   apt:
     packages:
     - junit4
-    
+
 install: true
 
-script: ant -lib /usr/share/java/junit4.jar clean all
+script: apache-ant-1.9.4/bin/ant -lib /usr/share/java/junit4.jar clean all
 
 jdk:
   - oraclejdk8
