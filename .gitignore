@@ -3,6 +3,7 @@
 # More generated artifacts
 /target
 /test/svt/lib
+/release-quarks
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
