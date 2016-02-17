@@ -11,10 +11,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
+import quarks.function.Functions;
 import quarks.topology.TStream;
 import quarks.topology.Topology;
 import quarks.topology.plumbing.PlumbingStreams;
@@ -109,43 +111,70 @@ public abstract class PlumbingTest extends TopologyAbstractTest {
         assertTrue("valid:" + tc.getResult(), tc.valid());
     }
 
+    public static class TimeAndId {
+    	private static AtomicInteger ids = new AtomicInteger();
+    	long ms;
+    	final int id;
+    	
+    	public TimeAndId() {
+    		this.ms = System.currentTimeMillis();
+    		this.id = ids.incrementAndGet();
+    	}
+    	public TimeAndId(TimeAndId tai) {
+    		this.ms = System.currentTimeMillis() - tai.ms;
+    		this.id = tai.id;
+    	}
+    	@Override
+    	public String toString() {
+    		return "TAI:" + id + "@" + ms;
+    	}
+    	
+    }
     
     @Test
     public void testPressureReliever() throws Exception {
 
         Topology topology = newTopology();
         
-        TStream<Long> raw = topology.poll(() -> System.currentTimeMillis(), 10, TimeUnit.MILLISECONDS);
+        int[] count = new int[1];
+
+        TStream<TimeAndId> raw = topology.poll(() -> new TimeAndId(), 10, TimeUnit.MILLISECONDS);
+           
         
-        TStream<Long> pr = PlumbingStreams.pressureReliever(raw, v -> 0, 5);
+        TStream<TimeAndId> pr = PlumbingStreams.pressureReliever(raw, Functions.unpartitioned(), 5);
         
         // insert a blocking delay acting as downstream operator that cannot keep up
-        TStream<Long> slow = PlumbingStreams.blockingDelay(pr, 200, TimeUnit.MILLISECONDS);
+        TStream<TimeAndId> slow = PlumbingStreams.blockingDelay(pr, 200, TimeUnit.MILLISECONDS);
         
         // calculate the delay
-        TStream<Long> slowM = slow.modify(v -> System.currentTimeMillis() - v);
+        TStream<TimeAndId> slowM = slow.modify(v -> new TimeAndId(v));
         
         // Also process raw that should be unaffected by the slow path
-        TStream<Long> processed = raw.map(v -> v * 2);
+        TStream<String> processed = raw.asString();
         
         
         Condition<Long> tcSlowCount = topology.getTester().atLeastTupleCount(slow, 20);
-        Condition<List<Long>> tcRaw = topology.getTester().streamContents(raw);
-        Condition<List<Long>> tcSlow = topology.getTester().streamContents(slow);
-        Condition<List<Long>> tcSlowM = topology.getTester().streamContents(slowM);
-        Condition<List<Long>> tcProcessed = topology.getTester().streamContents(processed);
+        Condition<List<TimeAndId>> tcRaw = topology.getTester().streamContents(raw);
+        Condition<List<TimeAndId>> tcSlow = topology.getTester().streamContents(slow);
+        Condition<List<TimeAndId>> tcSlowM = topology.getTester().streamContents(slowM);
+        Condition<List<String>> tcProcessed = topology.getTester().streamContents(processed);
         complete(topology, tcSlowCount);
         
         assertTrue(tcProcessed.getResult().size() > tcSlowM.getResult().size());
-        for (Long delay : tcSlowM.getResult())
-            assertTrue(delay < 300);
+        for (TimeAndId delay : tcSlowM.getResult())
+            assertTrue(delay.ms < 300);
 
-        Set<Long> uniq = new HashSet<>(tcRaw.getResult());
+        // Must not lose any tuples in the non relieving path
+        Set<TimeAndId> uniq = new HashSet<>(tcRaw.getResult());
         assertEquals(tcRaw.getResult().size(), uniq.size());
 
-        uniq = new HashSet<>(tcProcessed.getResult());
-        assertEquals(tcProcessed.getResult().size(), uniq.size());
+        // Must not lose any tuples in the non relieving path
+        Set<String> uniqProcessed = new HashSet<>(tcProcessed.getResult());
+        assertEquals(tcProcessed.getResult().size(), uniqProcessed.size());
+        
+        assertEquals(uniq.size(), uniqProcessed.size());
            
+        // Might lose tuples, but must not have send duplicates
         uniq = new HashSet<>(tcSlow.getResult());
         assertEquals(tcSlow.getResult().size(), uniq.size());
     }
