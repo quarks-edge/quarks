@@ -303,7 +303,7 @@ public class WindowTest {
     }
 
     private void assertOnTimeEvictions(List<Long> diffs) {
-        double tolerance = .03;
+        double tolerance = .08;
         for(int i = 1; i < diffs.size(); i++){
             assertTrue(withinTolerance(1000.0, diffs.get(i).doubleValue(), tolerance));
         }
