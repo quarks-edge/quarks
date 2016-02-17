@@ -5,6 +5,7 @@
 package quarks.test.window;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import static quarks.function.Functions.unpartitioned;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import quarks.function.BiConsumer;
@@ -28,6 +30,11 @@ import quarks.window.Windows;
 
 
 public class WindowTest {
+	
+	@Before
+	public void notForCi() {
+		assumeTrue(System.getProperty("quarks.build.ci") == null);
+	}
     
     /**
      * Verifies that the state of the window is correct after each tuple offer.

@@ -29,8 +29,7 @@ public abstract class PlumbingTest extends TopologyAbstractTest {
 	
 	@Before
 	public void notForCi() {
-		assumeTrue("Ignore for CI tests due to timing issues",
-				System.getProperty("quarks.build.ci") == null);
+		assumeTrue(System.getProperty("quarks.build.ci") == null);
 	}
 
 	@Test
