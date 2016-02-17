@@ -65,5 +65,5 @@ Your back-end systems can also use analytics to interact with and control edge d
 
 See http://quarks-edge.github.io/ for more information on all aspects of Quarks!
 
-Additional information for developing the Quarks runtime can also be found [here](DEVELOPING)
+Additional information for how to contribute to the development of Quarks can also be found [here](DEVELOPMENT.md)
 
