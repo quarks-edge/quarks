@@ -94,9 +94,9 @@ public abstract class TWindowTest extends TopologyAbstractTest{
         TStream<Long> diffStream = window.aggregate((tuples, key) -> {
             assertEquals(Integer.valueOf(0), key);
             if(tuples.size() < 2){
-                return (long)0;
+                return null;
             }
-            return tuples.get(tuples.size() -1) - (long)tuples.get(0);
+            return tuples.get(tuples.size() -1) - tuples.get(0);
         });
         
         diffStream.sink((tuple) -> diffs.add(tuple));
@@ -105,7 +105,7 @@ public abstract class TWindowTest extends TopologyAbstractTest{
         complete(t, tc);
         
         for(Long diff : diffs){
-            assertTrue(diff < 1040);
+            assertTrue("Diff is: " + diff, diff >=0 && diff < 1040);
         }
         
     }
