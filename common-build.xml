@@ -169,6 +169,8 @@
 	       </classpath>
 	       <assertions><enable/></assertions>
 	       <formatter type="xml"/>
+	       <!-- Only use the brief formatter for a continuous integration build" -->
+	       <formatter type="brief" usefile="no" if="quarks.build.ci"/>
 	       <batchtest todir="${test.run.dir}">
 	          <fileset dir="${test.src}">
 	             <include name="${test.base.pattern}"/>
