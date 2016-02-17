@@ -50,7 +50,7 @@ medical device.
 * Correlating data from the device with data from other sources, such as:
   * Weather data
   * Social media data
-  * Data of record, such as a patient’s medical history or trucking manifests
+  * Data of record, such as a patient’s medical history or tracking manifests
   * Data from other devices
 
 Quarks communicates with your back-end systems through the following message hubs:
