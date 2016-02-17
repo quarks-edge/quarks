@@ -2,11 +2,18 @@
 
 quarks=../../..
 
-# Runs the Sample MQTT Publisher or Subscriber
+# Runs IBM Watson IoT Plaform sample.
 #
-# ./runmqttsample.sh pub
-# ./runmqttsample.sh sub
+# runiotfsensors.sh path/device.cfg
+#
+# e.g. runiotfsensors.sh $HOME/device.cfg
+#
+# This connectors to your IBM Watson IoT Platform service
+# as the device defined in the device.cfg.
+# The format of device.cfg is the standard one for
+# IBM Watson IoT Platform and a sample is in this directory
+# (omitting values for the authorization tokens).
 
 export CLASSPATH=${quarks}/samples/lib/quarks.samples.connectors.jar
 
-java quarks.samples.connectors.iotf.IoTFSensors $1
+java quarks.samples.connectors.iotf.IotfSensors $1

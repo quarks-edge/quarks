@@ -19,13 +19,16 @@ import quarks.topology.Topology;
 /**
  * IBM Watson IoT Platform Quickstart sample.
  * Submits a JSON device event every second using the
- * same format as the IoTF device simulator,
+ * same format as the Quickstart device simulator,
  * with keys {@code temp}, {@code humidity}  and {@code objectTemp}
  * and random values.
- * 
+ * <P>
  * The device type is {@code iotsamples-quarks} and a random
  * device identifier is generated. Both are printed out when
  * the application starts.
+ * </P>
+ * A URL is also printed that allows viewing of the data
+ * as it received by the Quickstart service.
  */
 public class IotfQuickstart {
 
@@ -40,6 +43,8 @@ public class IotfQuickstart {
         
         System.out.println("Quickstart device type:" + IotfDevice.QUICKSTART_DEVICE_TYPE);
         System.out.println("Quickstart device id  :" + deviceId);
+        System.out.println("https://quickstart.internetofthings.ibmcloud.com/#/device/"
+             + deviceId);
              
         Random r = new Random();
         TStream<double[]> raw = topology.poll(() -> {
@@ -61,7 +66,6 @@ public class IotfQuickstart {
         });
         
         device.events(json, "sensors", QoS.FIRE_AND_FORGET);
-        
 
         tp.submit(topology);
     }
