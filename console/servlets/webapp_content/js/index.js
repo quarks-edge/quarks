@@ -195,84 +195,32 @@ var formatNumber = d3.format(",.0f"),
     tupleColorRange = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf" ];
     
 
-	var	 _currTooltipId = null,
-     _lastTooltipLoc = null,
-     _showTooltipTimeout = null,
-     _hideTooltipTimeout = null,
-		
-     showWaitTime = 700,
-     hideWaitTime = 500;
+	var	showTimeout = null,
+     hideTimeout = null,
+     showTime = 800,
+     hideTime = 600;
     
-    var clearHideTooltipTimeout = function(){
-   		if(_hideTooltipTimeout){
-  			clearTimeout(_hideTooltipTimeout);
-  			_hideTooltipTimeout = null;
+    var clearHideTimeout = function(){
+   		if (hideTimeout){
+  			clearTimeout(hideTimeout);
+  			hideTimeout = null;
   		}
    };
 
     var hideTooltip = function(d, i)  {
-		    	if(_lastTooltipLoc && d){
-		    		var height = _lastTooltipLoc.height === undefined ? 115 : _lastTooltipLoc.height;
-		    		var ttWidth = _lastTooltipLoc.width === undefined ? 197 : _lastTooltipLoc.width;
-		    		var dX = d.x;
-		    		var dY = d.y;
-		    		var xHigh = d.x + ttWidth;
-		    		var xLow = Math.abs(d.x - ttWidth);
-		    		var yHigh = d.y + height;
-		    		var yLow = Math.abs(d.y - height);
-		    		
-		    		var eventX = d3.event.clientX;
-		    		var eventY = d3.event.clientY;
-		    			if((eventX > xHigh) || (eventX < xLow) || (eventY > yHigh) || (eventY < yLow)){
-				    		if(!_hideTooltipTimeout && _currTooltipId){
-					    		_hideTooltipTimeout = setTimeout(function(){  
-					 
-					    			_hideTooltipTimeout = null;
-					    			_currTooltipId = null;
-					    			_lastTooltipLoc = null;
-					    		
-					    			if(_showTooltipTimeout){
-					    				clearTimeout(_showTooltipTimeout);
-					    			}
-					    		
-					    			tooltip.style("display", "none");
-					    		
-					    		}, hideWaitTime);
-				    		}
-		    			}
-		    	} else if (!d) {
-		    		/* d is null if they mouse out of the tooltip
-		    		hide the tooltip if they are also not on the rect
-		    		since the tooltip is positioned at the top of the rect, assume that if they go above the
-		    		current position of the tooltip we should hide the tooltip.
-		    		the case of them leaving the rect below the tooltip is covered above */
-		    		var height = _lastTooltipLoc.height === undefined ? 115 : _lastTooltipLoc.height;
-		    		var ttWidth = _lastTooltipLoc.width === undefined ? 197 : _lastTooltipLoc.width;
-		    		var xHigh = _lastTooltipLoc.X + ttWidth;
-		    		var yHigh = _lastTooltipLoc.Y + height;
-
-		    		var eventX = d3.event.clientX;
-		    		var eventY = d3.event.clientY;
-
-	    			if((eventX > xHigh) || (eventY < yHigh) ){
-				    	if(!_hideTooltipTimeout && _currTooltipId){
-					    	_hideTooltipTimeout = setTimeout(function(){  
-					 
-					    		_hideTooltipTimeout = null;
-					    		_currTooltipId = null;
-					    		_lastTooltipLoc = null;
-					    		
-					    		if(_showTooltipTimeout){
-					    			clearTimeout(_showTooltipTimeout);
-					    		}
-					    		
-					    		tooltip.style("display", "none");
-					    		
-					    	}, hideWaitTime);
-				    	}
-		    		}
-		    	}
-		    };
+		clearHideTimeout();
+    	hideTimeout = setTimeout(function(){  
+ 
+    		hideTimeout = null;
+    		
+    		if(showTimeout){
+    			clearTimeout(showTimeout);
+    		}
+    		
+    		tooltip.style("display", "none");
+    		
+    	}, hideTime);
+	};
 
 var svg = d3.select("#chart").append("svg")
     .attr("width", width + margin.left + margin.right + 5)
@@ -307,7 +255,7 @@ var tooltip = d3.select("body")
 	.attr("class", "tooltip")
 	.style("display", "none")
 	.on('mouseover', function(d,i) {
-		clearHideTooltipTimeout();
+		clearHideTimeout();
 	})
 	.on('mouseout', function(d,i) {
 		hideTooltip(null,i);
@@ -315,42 +263,27 @@ var tooltip = d3.select("body")
 	
 
 var showTooltip = function(content, d, i, event) {
-	clearHideTooltipTimeout();
-	var opName = d.id.toString();
-	if(_currTooltipId != opName){
-		_currTooltipId = opName;
-		_lastTooltipLoc = {"X": event.pageX, "Y": event.pageY};
+	clearHideTimeout();
 
-    	if(_showTooltipTimeout){
-    		clearTimeout(_showTooltipTimeout);
-    	}
-    	
-    	_showTooltipTimeout = setTimeout(function(){
-    		_showTooltipTimeout = null;
-    		if(_lastTooltipLoc){
-    			if(content){
-	    			tooltip.html(content);
-
-	    			var paddingY = 4;
-					if(window.innerWidth - _lastTooltipLoc.X < 200){
-						paddingY = 0;
-					}
-					tooltip.style("padding-x", -22)
-					.style("padding-y", paddingY)
-					.style("left", (_lastTooltipLoc.X - 350) + "px")
-					.style("top", _lastTooltipLoc.Y +"px")
-					.style("display", "block");
-					
-					_lastTooltipLoc.height = tooltip[0][0].clientHeight;
-					_lastTooltipLoc.width = tooltip[0][0].clientWidth;
-				}
-    		}
-    		}, showWaitTime);
-    	
-    	
-	}else{
-		_lastTooltipLoc = {"X": d.x, "Y": d.y};
+	if(showTimeout){
+		clearTimeout(showTimeout);
 	}
+    	
+	showTimeout = setTimeout(function(){
+		showTimeout = null;
+			if(content){
+    			tooltip.html(content);
+
+				tooltip.style("padding-x", -22)
+				.style("padding-y", 0)
+				.style("left", (event.pageX - 350) + "px")
+				.style("top", event.pageY +"px")
+				.style("display", "block");
+			}
+		
+		}, showTime);
+    	
+    	
 };
 
 var displayRowsTooltip = function(newRequest) {
