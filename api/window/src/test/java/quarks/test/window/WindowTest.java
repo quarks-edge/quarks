@@ -31,11 +31,6 @@ import quarks.window.Windows;
 
 public class WindowTest {
 	
-	@Before
-	public void notForCi() {
-		assumeTrue(System.getProperty("quarks.build.ci") == null);
-	}
-    
     /**
      * Verifies that the state of the window is correct after each tuple offer.
      */
@@ -254,6 +249,9 @@ public class WindowTest {
     
     @Test
     public void timeActionTest() throws InterruptedException {
+		// Timing variances on shared machines can cause this test to fail
+		assumeTrue(System.getProperty("quarks.build.ci") == null);
+
         List<Long> diffs = new ArrayList<>();
         List<Boolean> initialized = new ArrayList<>();
         initialized.add(false);

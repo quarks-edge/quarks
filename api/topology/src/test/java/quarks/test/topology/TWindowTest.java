@@ -7,6 +7,7 @@ package quarks.test.topology;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import static quarks.function.Functions.identity;
 import static quarks.function.Functions.unpartitioned;
 import static quarks.function.Functions.zero;
@@ -79,6 +80,9 @@ public abstract class TWindowTest extends TopologyAbstractTest{
     
     @Test
     public void testTimeWindowTimeDiff() throws Exception {
+		// Timing variances on shared machines can cause this test to fail
+		assumeTrue(System.getProperty("quarks.build.ci") == null);
+
         Topology t = newTopology();
         
         // Define data
