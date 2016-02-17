@@ -136,8 +136,6 @@ public abstract class PlumbingTest extends TopologyAbstractTest {
 
         Topology topology = newTopology();
         
-        int[] count = new int[1];
-
         TStream<TimeAndId> raw = topology.poll(() -> new TimeAndId(), 10, TimeUnit.MILLISECONDS);
            
         
