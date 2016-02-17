@@ -6,6 +6,7 @@ package quarks.test.topology;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -24,8 +26,14 @@ import quarks.topology.tester.Condition;
 
 @Ignore
 public abstract class PlumbingTest extends TopologyAbstractTest {
+	
+	@Before
+	public void notForCi() {
+		assumeTrue("Ignore for CI tests due to timing issues",
+				System.getProperty("quarks.build.ci") == null);
+	}
 
-    @Test
+	@Test
     public void testBlockingDelay() throws Exception {
 
         Topology topology = newTopology();
