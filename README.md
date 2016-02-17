@@ -62,3 +62,8 @@ Quarks communicates with your back-end systems through the following message hub
 Your back-end systems can also use analytics to interact with and control edge devices. For example:
 * A traffic alert system can send an alert to vehicles that are heading towards an area where an accident occurred
 * A vehicle monitoring system can reduce the maximum engine revs to reduce the chance of failure before the next scheduled service if it detects patterns that indicate a potential problem
+
+See http://quarks-edge.github.io/ for more information on all aspects of Quarks!
+
+Additional information for how to contribute to the development of Quarks can also be found [here](DEVELOPMENT.md)
+
