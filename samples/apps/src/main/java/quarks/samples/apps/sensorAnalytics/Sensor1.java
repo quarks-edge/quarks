@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.math3.util.Pair;
 
@@ -89,28 +90,28 @@ public class Sensor1 {
      */
     public void addAnalytics() {
 
-        // Use a synchronized list to contain a dynamically changeable value.
-        List<Range<Integer>> range = Collections.synchronizedList(new ArrayList<>(1));
-        List<Boolean> isPublish1hzOutsideRange = Collections.synchronizedList(new ArrayList<>(1));
+        // Need synchronization for set/get of dynamically changeable values.
+        AtomicReference<Range<Integer>> range = new AtomicReference<>();
+        AtomicReference<Boolean> isPublish1hzOutsideRange = new AtomicReference<>();
         
         // Initialize the controls
-        range.add(0, app.utils().getRange(sensorId, "outside1hzMeanRange", Integer.class));
-        isPublish1hzOutsideRange.add(0, false);
+        range.set(app.utils().getRange(sensorId, "outside1hzMeanRange", Integer.class));
+        isPublish1hzOutsideRange.set(false);
         
-        // Handle the sensor's commands
+        // Handle the sensor's device commands
         app.mqttDevice().commands(commandId("set1hzMeanRangeThreshold"))
             .tag(commandId("set1hzMeanRangeThreshold"))
             .sink(jo -> {
                     Range<Integer> newRange = Range.valueOf(getCommandValue(jo), Integer.class);
                     System.out.println("===== Changing range to "+newRange+" ======");
-                    range.set(0, newRange);
+                    range.set(newRange);
                 });
         app.mqttDevice().commands(commandId("setPublish1hzOutsideRange"))
             .tag(commandId("setPublish1hzOutsideRange"))
             .sink(jo -> {
                     Boolean b = new Boolean(getCommandValue(jo));
                     System.out.println("===== Changing isPublish1hzOutsideRange to "+b+" ======");
-                    isPublish1hzOutsideRange.set(0, b);
+                    isPublish1hzOutsideRange.set(b);
                 });
         
         // Create a raw simulated sensor stream of 1000 tuples/sec.
@@ -152,9 +153,9 @@ public class Sensor1 {
         TStream<JsonObject> outside1hzMeanRange = j1hzStats.filter(
                 sample -> {
                     int value = JsonTuples.getStatistic(sample, MEAN).getAsInt();
-                    return !range.get(0).contains(value);
+                    return !range.get().contains(value);
                 }).tag("outside1hzMeanRange");
-        traceStream(outside1hzMeanRange, () -> "outside1hzMeanRange"+range.get(0)); 
+        traceStream(outside1hzMeanRange, () -> "outside1hzMeanRange"+range.get()); 
         
         // Log every outside1hzMeanRange event
         app.utils().logStream(outside1hzMeanRange, "ALERT", "outside1hzMeanRange");
@@ -165,7 +166,7 @@ public class Sensor1 {
         // TODO enhance MqttDevice with configurable reliever. 
         app.mqttDevice().events(
                 PlumbingStreams.pressureReliever(
-                    outside1hzMeanRange.filter(tuple -> isPublish1hzOutsideRange.get(0)),
+                    outside1hzMeanRange.filter(tuple -> isPublish1hzOutsideRange.get()),
                     tuple -> 0, 30),
                 app.sensorEventId(sensorId, "outside1hzMeanRangeEvent"), QoS.FIRE_AND_FORGET);
         
