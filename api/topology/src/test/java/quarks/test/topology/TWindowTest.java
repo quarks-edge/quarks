@@ -81,8 +81,8 @@ public abstract class TWindowTest extends TopologyAbstractTest{
     @Test
     public void testTimeWindowTimeDiff() throws Exception {
 		// Timing variances on shared machines can cause this test to fail
-		assumeTrue(System.getProperty("quarks.build.ci") == null);
-
+    	assumeTrue(!Boolean.getBoolean("quarks.build.ci"));
+    	
         Topology t = newTopology();
         
         // Define data

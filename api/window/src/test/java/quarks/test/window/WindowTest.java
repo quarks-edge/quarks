@@ -19,7 +19,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import quarks.function.BiConsumer;
@@ -250,7 +249,7 @@ public class WindowTest {
     @Test
     public void timeActionTest() throws InterruptedException {
 		// Timing variances on shared machines can cause this test to fail
-		assumeTrue(System.getProperty("quarks.build.ci") == null);
+    	assumeTrue(!Boolean.getBoolean("quarks.build.ci"));
 
         List<Long> diffs = new ArrayList<>();
         List<Boolean> initialized = new ArrayList<>();

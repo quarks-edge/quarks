@@ -30,7 +30,7 @@ public abstract class PlumbingTest extends TopologyAbstractTest {
 	@Test
     public void testBlockingDelay() throws Exception {
 		// Timing variances on shared machines can cause this test to fail
-		assumeTrue(System.getProperty("quarks.build.ci") == null);
+		assumeTrue(!Boolean.getBoolean("quarks.build.ci"));
 
         Topology topology = newTopology();
         
@@ -54,7 +54,7 @@ public abstract class PlumbingTest extends TopologyAbstractTest {
     @Test
     public void testBlockingThrottle() throws Exception {
 		// Timing variances on shared machines can cause this test to fail
-		assumeTrue(System.getProperty("quarks.build.ci") == null);
+    	assumeTrue(!Boolean.getBoolean("quarks.build.ci"));
 
         Topology topology = newTopology();
         
@@ -140,7 +140,7 @@ public abstract class PlumbingTest extends TopologyAbstractTest {
     @Test
     public void testPressureReliever() throws Exception {
 		// Timing variances on shared machines can cause this test to fail
-		assumeTrue(System.getProperty("quarks.build.ci") == null);
+		assumeTrue(!Boolean.getBoolean("quarks.build.ci"));
 
         Topology topology = newTopology();
         
