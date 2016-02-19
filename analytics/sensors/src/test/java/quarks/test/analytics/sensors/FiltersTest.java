@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import static quarks.function.Functions.identity;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -75,5 +76,29 @@ public class FiltersTest  extends TopologyAbstractTest implements DirectTestSetu
         
         assertEquals("A", results.get(5).get("id").getAsString());
         assertEquals(42.0, results.get(5).get("reading").getAsDouble(), 0.0);
+	}
+	
+	@Test
+	public void testDeadbandMaxSuppression() throws Exception {
+	    Topology topology = newTopology("testDeadbandMaxSuppression");
+	    
+	    TStream<Double> values = topology.of(12.9, 3.4, 12.3, 15.6, 18.4, -3.7, -4.5, 15.0, 16.0, 30.0, 42.0 );
+	    
+	    // 18.4 will be included as it is delayed since the last inband value.
+	    values = values.modify(tuple -> {if (tuple == 18.4)
+			try {
+				Thread.sleep(5000);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			} return tuple;});
+	    
+	    TStream<Double> filtered = Filters.deadband(values, identity(),
+	    		v -> v >= 10.0 && v <= 30.0, 3, TimeUnit.SECONDS);
+	    
+        Condition<Long> count = topology.getTester().tupleCount(filtered, 8);
+        Condition<List<Double>> contents = topology.getTester().streamContents(filtered, 12.9, 3.4, 12.3, 18.4, -3.7, -4.5, 15.0, 42.0 );
+        complete(topology, count);
+        assertTrue(count.valid());
+        assertTrue(contents.valid());
 	}
 }
