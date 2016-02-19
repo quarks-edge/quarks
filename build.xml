@@ -103,6 +103,7 @@
         <ant dir="console/servlets" target="@{target}" useNativeBasedir="true" />
         <ant dir="providers/development" target="@{target}" useNativeBasedir="true"/>
         <ant dir="analytics/math3" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="analytics/sensors" target="@{target}" useNativeBasedir="true"/>
         <ant dir="samples/utils" target="@{target}" useNativeBasedir="true"/>
         <ant dir="samples/apps" target="@{target}" useNativeBasedir="true" />
         <ant dir="samples/topology" target="@{target}" useNativeBasedir="true"/>
@@ -219,6 +220,7 @@
       </classfiles>
     <sourcefiles encoding="UTF-8">
         <fileset dir="${basedir}/analytics/math3/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/analytics/sensors/src/main/java" includes="**/*.java"/>
     </sourcefiles>
     </group>
 
