@@ -2,9 +2,12 @@
 # Licensed Materials - Property of IBM
 # Copyright IBM Corp. 2015,2016 
 */
-package quarks.connectors.ws;
+package quarks.connectors.wsclient;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+
+import com.google.gson.JsonObject;
 
 import quarks.function.Function;
 import quarks.topology.TSink;
@@ -24,15 +27,15 @@ import quarks.topology.json.JsonFunctions;
  * Properties properties = new Properties();
  * properties.load(Files.newBufferedReader(new File(propsPath).toPath()));
  *
- * Topology t = new DirectProvider();
+ * Topology t = ...;
  * WebSocketClient wsclient = new WebSocketClient(t, properties);
  * 
- * // send a stream's tuples as JSON to a Web Socket Server
+ * // send a stream's JsonObject tuples as JSON to a Web Socket Server
  * TStream<JsonObject> s = ...;
- * wsclient.send(s, JsonFunctions.asString());
+ * wsclient.send(s);
  * 
- * // create a stream of tuples from JSON received from a Web Socket Server
- * TStream<JsonObject> r = wsclient.receive(JsonFunctions.fromString());
+ * // create a stream of JsonObject tuples from JSON received from a Web Socket Server
+ * TStream<JsonObject> r = wsclient.receive();
  * r.print();
  * }</pre>
  */
@@ -58,64 +61,62 @@ public class WebSocketClient {
     }
 
     /**
-     * Send a stream's String tuples as a String payload.
+     * Send a stream's JsonObject tuples as JSON.
      * @param stream the stream
      * @return sink
      */
-    public TSink<String> send(TStream<String> stream) {
-        return send(stream, tuple -> tuple);
+    public TSink<JsonObject> send(TStream<JsonObject> stream) {
+        return sendBytes(stream, JsonFunctions.asBytes());
     }
 
     /**
-     * Send a stream's tuples as a String payload.
+     * Send a stream's String tuples as UTF8.
      * @param stream the stream
-     * @param toPayload function to create the payload from a tuple.
      * @return sink
-     * @see JsonFunctions#asString()
      */
-    public <T> TSink<T> send(TStream<T> stream, Function<T,String> toPayload) {
-        return null; // TODO
+    public TSink<String> sendString(TStream<String> stream) {
+        return sendBytes(stream, tuple -> tuple.getBytes(StandardCharsets.UTF_8));
     }
-
+    
     /**
-     * Send a stream's tuples as a byte[] payload.
+     * Send a stream's byte[] tuples.
      * @param stream the stream
-     * @param toPayload function to create the payload from a tuple.
      * @return sink
-     * @see JsonFunctions#asBytes()
      */
-    public <T> TSink<T> sendBytes(TStream<T> stream, Function<T,byte[]> toPayload) {
-        return null; // TODO
+    public TSink<byte[]> sendBytes(TStream<byte[]> stream) {
+        return sendBytes(stream, tuple -> tuple);
     }
     
-    /**
-     * Create a stream of String tuples from received String payload messages.
-     * @return the stream
-     */
-    public TStream<String> receive() {
-    	return receive(payload -> payload);
-    }
-    
-    /**
-     * Create a stream of tuples from received String payload messages.
-     * 
-     * @param toTuple function to create a tuple from the payload
-     * @return the stream
-     * @see JsonFunctions#fromString()
-     */
-    public <T> TStream<T> receive(Function<String,T> toTuple) {
-        return null; // TODO
-    }
-    
-    /**
-     * Create a stream of tuples from received byte[] payload messages.
-     * 
-     * @param toTuple function to create a tuple from the payload
-     * @return the stream
-     * @see JsonFunctions#fromBytes()
-     */
-    public <T> TStream<T> receiveBytes(Function<byte[],T> toTuple) {
-        return null; // TODO
+    private <T> TSink<T> sendBytes(TStream<T> stream, Function<T,byte[]> toPayload) {
+    	return null; // TODO
     }
 
+    /**
+     * Create a stream of JsonObject tuples from received JSON messages.
+     * @return the stream
+     */
+    public TStream<JsonObject> receive() {
+    	return receiveBytes(JsonFunctions.fromBytes());
+    }
+    
+    /**
+     * Create a stream of String tuples from received UTF8 messages.
+     * @return the stream
+     */
+    public TStream<String> receiveString() {
+    	return receiveBytes(payload -> new String(payload, StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Create a stream of byte[] tuples from received messages.
+     * @return the stream
+     */
+    public TStream<byte[]> receiveBytes() {
+    	return receiveBytes(payload -> payload);
+    }
+    
+    private <T> TStream<T> receiveBytes(Function<byte[],T> toTuple) {
+    	return null; // TODO
+    }
+    
 }

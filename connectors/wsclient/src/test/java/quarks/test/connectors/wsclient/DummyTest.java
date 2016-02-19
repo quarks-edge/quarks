@@ -3,7 +3,7 @@
 # Copyright IBM Corp. 2015,2016 
 */
 
-package quarks.test.connectors.websocket;
+package quarks.test.connectors.wsclient;
 
 import org.junit.Ignore;
 
