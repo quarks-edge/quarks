@@ -6,6 +6,7 @@
 package quarks.console.server;
 
 import java.io.IOException;
+import java.security.ProtectionDomain;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -32,6 +33,8 @@ public class HttpServer {
         private static final WebAppContext WEBAPP = new WebAppContext();
         private static final HttpServer INSTANCE = new HttpServer();
         private static boolean INITIALIZED = false;
+        private static final String consoleWarNotFoundMessage =  
+    			"console.war not found.  Run 'ant' from the top level quarks directory, or 'ant' from 'console/servlets' to create console.war under the webapps directory.";
     }
 
     /**
@@ -47,7 +50,7 @@ public class HttpServer {
      * @return HttpServer: the singleton instance of this class
      * @throws IOException
      */
-    public static HttpServer getInstance() throws IOException {
+    public static HttpServer getInstance() throws Exception {
         if (!HttpServerHolder.INITIALIZED) {
             HttpServerHolder.WEBAPP.setContextPath("/console");
             ServletContextHandler contextJobs = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -55,8 +58,23 @@ public class HttpServer {
             ServletContextHandler contextMetrics = new ServletContextHandler(ServletContextHandler.SESSIONS);
             contextMetrics.setContextPath("/metrics");
             ServerUtil sUtil = new ServerUtil();
-            String warFilePath = sUtil.getAbsoluteWarFilePath("console.war");
-            HttpServerHolder.WEBAPP.setWar(warFilePath);
+            String commandWarFilePath = sUtil.getAbsoluteWarFilePath("console.war");
+            if (commandWarFilePath.equals("")){
+            	// check if we are on Eclipse, if Eclipse can't find it, it probably does not exist
+            	// running on Eclipse, look for the eclipse war file path
+            	ProtectionDomain protectionDomain = HttpServer.class.getProtectionDomain();
+            	String eclipseWarFilePath = sUtil.getEclipseWarFilePath(protectionDomain, "console.war");
+            	if (!eclipseWarFilePath.equals("")) {            	
+            		HttpServerHolder.WEBAPP.setWar(eclipseWarFilePath);
+            	} else {
+            		throw new Exception(HttpServerHolder.consoleWarNotFoundMessage);
+            	}
+            } else {
+            	HttpServerHolder.WEBAPP.setWar(commandWarFilePath);
+            }
+
+
+            
             HttpServerHolder.WEBAPP.addAliasCheck(new AllowSymLinkAliasChecker()); 
             ContextHandlerCollection contexts = new ContextHandlerCollection();
             contexts.setHandlers(new Handler[] { contextJobs, contextMetrics, HttpServerHolder.WEBAPP });
