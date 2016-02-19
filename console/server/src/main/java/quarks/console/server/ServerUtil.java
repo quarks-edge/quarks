@@ -7,6 +7,8 @@ package quarks.console.server;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.URL;
+import java.security.ProtectionDomain;
 
 public class ServerUtil {
 
@@ -60,17 +62,39 @@ public class ServerUtil {
     
     /**
      * Looks for the absolute file path of the name of the warFileName argument
-     * @param warFileName the name of the war file to find the absolute path of
+     * @param warFileName the name of the war file to find the absolute path to
      * @return the absolute path to the warFileName argument as a String
      */
     public String getAbsoluteWarFilePath(String warFileName) {
-        File warFile = getWarFilePath();
-        if (warFile != null) {
-            return warFile.getAbsolutePath() + "/" + warFileName;
+        File warFilePath = getWarFilePath();
+        if (warFilePath != null) {
+        	File warFile = new File(warFilePath.getAbsolutePath() + "/" + warFileName);
+        	if (warFile.exists()) {        	
+        		return warFile.getAbsolutePath();
+        	} else {
+        		return "";
+        	}
         }
         else {
             return "";
         }
+    }
+    
+    /**
+     * Looks for the absolute file path of the name of the warFileName argument when running from Eclipse
+     * @param warFileName the name of the war file to find the absolute path to
+     * @return the absolute path to the warFileName argument as a String
+     */
+    public String getEclipseWarFilePath(ProtectionDomain pDomain, String warFileName) {
+        URL location = pDomain.getCodeSource().getLocation();
+        File topQuarks = new File(location.getPath()).getParentFile().getParentFile().getParentFile();
+        File warFile = new File(topQuarks, "./target/java8/console/webapps/" +warFileName);
+        if (warFile.exists()) {
+        	return warFile.getAbsolutePath();
+        } else {
+        	return "";
+        }
+	
     }
 
 }
