@@ -16,6 +16,8 @@
 	<classpathentry kind="src" path="kafka/src/test/java"/>
 	<classpathentry kind="src" path="mqtt/src/main/java"/>
 	<classpathentry kind="src" path="mqtt/src/test/java"/>
+	<classpathentry kind="src" path="websocket/src/main/java"/>
+	<classpathentry kind="src" path="websocket/src/test/java"/>
 	<classpathentry kind="lib" path="http/ext/commons-codec-1.10.jar"/>
 	<classpathentry kind="lib" path="http/ext/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="http/ext/httpclient-4.3.6.jar"/>
