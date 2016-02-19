@@ -9,7 +9,13 @@ import java.util.concurrent.TimeUnit;
 import quarks.function.Function;
 import quarks.function.Predicate;
 
-public class DeadbandFilter<T, V> implements Predicate<T> {
+/**
+ * Deadband predicate function.
+ *
+ * @param <T> Tuple type.
+ * @param <V> Value type for the deadband function.
+ */
+class DeadbandFilter<T, V> implements Predicate<T> {
 
     private static final long serialVersionUID = 1L;
 
@@ -23,11 +29,11 @@ public class DeadbandFilter<T, V> implements Predicate<T> {
 
     private transient long lastSend;
     
-    public DeadbandFilter(Function<T, V> valueFunction, Predicate<V> deadbandFunction) {
+    DeadbandFilter(Function<T, V> valueFunction, Predicate<V> deadbandFunction) {
         this(valueFunction , deadbandFunction, 0, null);
     }
 
-    public DeadbandFilter(Function<T, V> valueFunction, Predicate<V> deadbandFunction, long period, TimeUnit unit) {
+    DeadbandFilter(Function<T, V> valueFunction, Predicate<V> deadbandFunction, long period, TimeUnit unit) {
         this.valueFunction = valueFunction;
         this.deadbandFunction = deadbandFunction;
         this.period = period;

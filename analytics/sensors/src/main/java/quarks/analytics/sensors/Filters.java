@@ -37,7 +37,8 @@ public class Filters {
      * </LI>
      * </UL>
      * 
-     * @param <T>
+     * @param <T> Tuple type.
+     * @param <V> Value type for the deadband function.
      * 
      * @param stream Stream containing readings.
      * @param value Function to obtain the tuple's value passed to the deadband function.
