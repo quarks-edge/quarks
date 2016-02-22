@@ -14,6 +14,8 @@ import quarks.topology.TStream;
  * Filters aimed at sensors.
  */
 public class Filters {
+	
+	private Filters() {}
 
     /**
      * Deadband filter with maximum suppression time.
@@ -71,7 +73,20 @@ public class Filters {
      * OR it is the first tuple (effectively the state of the filter starts as outside of the deadband).
      * </LI>
      * </UL>
-     * 
+     * <P>
+     * Here's an example of how {@code deadband()} would pass through tuples for a sequence of
+     * values against the shaded dead band area. Circled values are ones that are passed through
+     * the filter to the returned stream.
+     * <BR>
+     * <UL>
+     * <LI>All tuples with a value outside the dead band.</LI>
+     * <LI>Two tuples with values within the dead band that are the first time values return to being in band
+     * after being outside of the dead band.</LI>
+     * <LI>The first tuple.</LI>
+     * </UL>
+     * <BR>
+     * <img src="doc-files/deadband.png" alt="Deadband example"/>
+     * </P>
      * 
      * @param <T> Tuple type.
      * @param <V> Value type for the deadband function.
