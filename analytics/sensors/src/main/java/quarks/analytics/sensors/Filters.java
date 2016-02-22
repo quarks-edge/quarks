@@ -23,10 +23,10 @@ public class Filters {
      * A tuple {@code t} is passed through the deadband filter if:
      * <UL>
      * <LI>
-     * {@code deadband.test(value.apply(t))} is false, that is the tuple's value is outside of the deadband
+     * {@code inBand.test(value.apply(t))} is false, that is the tuple's value is outside of the deadband
      * </LI>
      * <LI>
-     * OR {@code deadband.test(value.apply(t))} is true AND the last tuple's value was outside of the deadband.
+     * OR {@code inBand.test(value.apply(t))} is true AND the last tuple's value was outside of the deadband.
      * This corresponds to the first tuple's value inside the deadband after a period being outside it.
      * </LI>
      * <LI>
@@ -42,15 +42,15 @@ public class Filters {
      * 
      * @param stream Stream containing readings.
      * @param value Function to obtain the tuple's value passed to the deadband function.
-     * @param deadband Function that defines the deadband.
+     * @param inBand Function that defines the deadband.
      * @param maximumSuppression Maximum amount of time to suppress values that are in the deadband.
      * @param unit Unit for {@code maximumSuppression}.
      * @return Filtered stream.
      */
-    public static <T, V> TStream<T> deadband(TStream<T> stream, Function<T, V> value, Predicate<V> deadband,
+    public static <T, V> TStream<T> deadband(TStream<T> stream, Function<T, V> value, Predicate<V> inBand,
             long maximumSuppression, TimeUnit unit) {
 
-        return stream.filter(new DeadbandFilter<>(value, deadband, maximumSuppression, unit));
+        return stream.filter(new Deadband<>(value, inBand, maximumSuppression, unit));
     }
     
     /**
@@ -61,10 +61,10 @@ public class Filters {
      * A tuple {@code t} is passed through the deadband filter if:
      * <UL>
      * <LI>
-     * {@code deadband.test(value.apply(t))} is false, that is the value is outside of the deadband
+     * {@code inBand.test(value.apply(t))} is false, that is the value is outside of the deadband
      * </LI>
      * <LI>
-     * OR {@code deadband.test(value.apply(t))} is true and the last value was outside of the deadband.
+     * OR {@code inBand.test(value.apply(t))} is true and the last value was outside of the deadband.
      * This corresponds to the first value inside the deadband after a period being outside it.
      * </LI>
      * <LI>
@@ -78,11 +78,11 @@ public class Filters {
      * 
      * @param stream Stream containing readings.
      * @param value Function to obtain the value passed to the deadband function.
-     * @param deadband Function that defines the deadband.
+     * @param inBand Function that defines the deadband.
      * @return Filtered stream.
      */
-    public static <T, V> TStream<T> deadband(TStream<T> stream, Function<T, V> value, Predicate<V> deadband) {
+    public static <T, V> TStream<T> deadband(TStream<T> stream, Function<T, V> value, Predicate<V> inBand) {
 
-        return stream.filter(new DeadbandFilter<>(value, deadband));
+        return stream.filter(new Deadband<>(value, inBand));
     }
 }

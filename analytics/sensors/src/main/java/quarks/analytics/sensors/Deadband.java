@@ -15,12 +15,12 @@ import quarks.function.Predicate;
  * @param <T> Tuple type.
  * @param <V> Value type for the deadband function.
  */
-class DeadbandFilter<T, V> implements Predicate<T> {
+class Deadband<T, V> implements Predicate<T> {
 
     private static final long serialVersionUID = 1L;
 
     private final Function<T, V> valueFunction;
-    private final Predicate<V> deadbandFunction;
+    private final Predicate<V> inBand;
     private final long period;
     private final TimeUnit unit;
 
@@ -29,13 +29,13 @@ class DeadbandFilter<T, V> implements Predicate<T> {
 
     private transient long lastSend;
     
-    DeadbandFilter(Function<T, V> valueFunction, Predicate<V> deadbandFunction) {
+    Deadband(Function<T, V> valueFunction, Predicate<V> deadbandFunction) {
         this(valueFunction , deadbandFunction, 0, null);
     }
 
-    DeadbandFilter(Function<T, V> valueFunction, Predicate<V> deadbandFunction, long period, TimeUnit unit) {
+    Deadband(Function<T, V> valueFunction, Predicate<V> inBand, long period, TimeUnit unit) {
         this.valueFunction = valueFunction;
-        this.deadbandFunction = deadbandFunction;
+        this.inBand = inBand;
         this.period = period;
         this.unit = unit;
     }
@@ -45,7 +45,7 @@ class DeadbandFilter<T, V> implements Predicate<T> {
         final V value = valueFunction.apply(t);
         boolean passTuple;
         long now = 0;
-        if (!deadbandFunction.test(value)) {
+        if (!inBand.test(value)) {
             outOfBand = true;
             passTuple = true;
         } else if (outOfBand) {
