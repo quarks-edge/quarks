@@ -11,7 +11,6 @@ import quarks.oplet.plumbing.Isolate;
 import quarks.oplet.plumbing.PressureReliever;
 import quarks.oplet.plumbing.UnorderedIsolate;
 import quarks.topology.TStream;
-import quarks.topology.Topology;
 
 /**
  * Plumbing utilities for {@link TStream}.
