@@ -561,7 +561,7 @@ public abstract class TStreamTest extends TopologyAbstractTest {
                 Topology t = newTopology();
                 TStream<String> s = t.strings("a", "b", "c", "d", "e", "f", "g", "h");
                 // Throw on the 8th tuple
-                s.sink((tuple) -> { if ("h".equals(tuple)) throw new RuntimeException("user stopped");});
+                s.sink((tuple) -> { if ("h".equals(tuple)) throw new RuntimeException("Expected Test Exception");});
                 // Expect 7 tuples out of 8
                 Condition<Long> tc = t.getTester().tupleCount(s, 7);
                 complete(t, tc);
@@ -586,7 +586,7 @@ public abstract class TStreamTest extends TopologyAbstractTest {
                 AtomicLong n = new AtomicLong(0);
                 TStream<Long> s = t.poll(() -> n.incrementAndGet(), 10, TimeUnit.MILLISECONDS);
                 // Throw on the 8th tuple
-                s.sink((tuple) -> { if (8 == n.get()) throw new RuntimeException("user stopped");});
+                s.sink((tuple) -> { if (8 == n.get()) throw new RuntimeException("Expected Test Exception");});
                 // Expect 7 tuples out of 8
                 Condition<Long> tc = t.getTester().tupleCount(s, 7);
                 complete(t, tc);
