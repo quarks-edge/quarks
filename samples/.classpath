@@ -20,5 +20,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/spi"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/runtime"/>
 	<classpathentry kind="output" path="apps/classes"/>
 </classpath>
