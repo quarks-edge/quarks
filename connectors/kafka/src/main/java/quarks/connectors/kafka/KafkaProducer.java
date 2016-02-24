@@ -20,6 +20,7 @@ import quarks.topology.Topology;
  * to Apache Kafka messaging system topics.
  * <p>
  * The connector uses and includes components from the Kafka 0.8.2.2 release.
+ * It has been successfully tested against a kafka_2.11-0.9.0.0 server as well.
  * For more information about Kafka see
  * <a href="http://kafka.apache.org">http://kafka.apache.org</a>
  * <p>
