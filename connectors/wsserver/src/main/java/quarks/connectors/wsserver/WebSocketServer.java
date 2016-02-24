@@ -5,7 +5,6 @@
 package quarks.connectors.wsserver;
 
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import com.google.gson.JsonObject;
@@ -15,10 +14,9 @@ import quarks.function.Function;
 import quarks.topology.TSink;
 import quarks.topology.TStream;
 import quarks.topology.Topology;
-import quarks.topology.json.JsonFunctions;
 
 /**
- * A connector for receiving and sending messages to a Web Socket Client.
+ * TBD/PLACEHOLDER A connector for receiving and sending messages to a WebSocket Client.
  * <p>
  * Sample use:
  * <pre>{@code
@@ -44,12 +42,13 @@ import quarks.topology.json.JsonFunctions;
 public class WebSocketServer {
 
     /**
-     * Create a new Web Socket Server connector.
+     * Create a new WebSocket Server connector.
      * <p>
      * Configuration parameters:
      * <ul>
      * <li>ws.url - "ws://host[:port]", "wss://host[:port]"
-     *   the default port is 80 and 443 for "ws" and "wss" respectively</li>
+     *   the default port is 80 and 443 for "ws" and "wss" respectively.
+     *   Any {@code URI path} component is ignored.</li>
      * <li>ws.keyStorePath - required for "wss:"</li>
      * <li>ws.keyStorePassword - required for "wss:"</li>
      * <li>ws.keyPassword - defaults to ws.keyStorePassword value</li>
@@ -63,27 +62,27 @@ public class WebSocketServer {
     }
 
     /**
-     * Create a stream of JsonObject tuples from received JSON messages
+     * Create a stream of JsonObject tuples from received JSON WebSocket text messages
      * ignoring the client address information.
      * <p>
      * @return the stream
      */
     public TStream<JsonObject> receive() {
-        return receiveBytes((payload,clientAddr) -> JsonFunctions.fromBytes().apply(payload));
+        return null; // TODO
     }
 
     /**
-     * Create a stream of String tuples from received UTF8 messages
+     * Create a stream of String tuples from received WebSocket text messages
      * ignoring the client address information.
      * <p>
      * @return the stream
      */
     public TStream<String> receiveString() {
-        return receiveBytes((payload,clientAddr) -> new String(payload, StandardCharsets.UTF_8));
+        return null; // TODO
     }
 
     /**
-     * Create a stream of byte[] tuples from received messages
+     * Create a stream of byte[] tuples from received WebSocket binary messages
      * ignoring the client address information.
      * <p>
      * @return the stream
@@ -93,8 +92,7 @@ public class WebSocketServer {
     }
 
     /**
-     * Create a stream of tuples from received messages.
-     * ignoring the client address information.
+     * Create a stream of tuples from received WebSocket binary messages.
      * <p>
      * @param toTuple function to create a tuple from the byte[] payload
      *        and the client's address.
@@ -105,29 +103,29 @@ public class WebSocketServer {
     }
     
     /**
-     * Send the stream's JsonObject tuples as JSON to all connected clients.
+     * Send the stream's JsonObject tuples as JSON WebSocket text messages to all connected clients.
      * <p>
      * Same as {@code send(stream, tuple -> tuple, null)}
      * @param stream the stream
      * @return a TSink
      */
     public TSink<JsonObject> send(TStream<JsonObject> stream) {
-        return sendBytes(stream, tuple -> JsonFunctions.asBytes().apply(tuple), null);
+        return null; // TODO
     }
     
     /**
-     * Send the stream's String tuples as UTF8 to all connected clients.
+     * Send the stream's String tuples as WebSocket text messages to all connected clients.
      * <p>
      * Same as {@code send(stream, tuple -> tuple, null)}
      * @param stream the stream
      * @return a TSink
      */
     public TSink<String> sendString(TStream<String> stream) {
-        return sendBytes(stream, tuple -> tuple.getBytes(StandardCharsets.UTF_8), null);
+        return null; // TODO
     }
     
     /**
-     * Send the stream's byte[] tuples to all connected clients.
+     * Send the stream's byte[] tuples as WebSocket binary messages to all connected clients.
      * <p>
      * Same as {@code send(stream, tuple -> tuple, null)}
      * @param stream the stream
@@ -138,8 +136,8 @@ public class WebSocketServer {
     }
     
     /**
-     * Send the stream's tuples as byte[] payloads to the tuple specified 
-     * connected client.
+     * Send the stream's tuples as byte[] WebSocket binary messages to the 
+     * specified connected client.
      * 
      * @param stream the stream
      * @param toPayload function to create a payload from a tuple

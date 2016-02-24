@@ -99,6 +99,7 @@
         <ant dir="connectors/jdbc" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/kafka" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/mqtt" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/wsclient" target="@{target}" useNativeBasedir="true"/>
         <ant dir="console/server" target="@{target}" useNativeBasedir="true" />
         <ant dir="console/servlets" target="@{target}" useNativeBasedir="true" />
         <ant dir="providers/development" target="@{target}" useNativeBasedir="true"/>
@@ -271,6 +272,7 @@
         <fileset dir=".">
            <include name="console/*/ext/*/*.jar"/>
            <include name="connectors/*/ext/*.jar"/>
+           <include name="connectors/wsclient/ext/*/*.jar"/>
            <include name="analytics/*/ext/*/*.jar"/>
            <include name="utils/metrics/ext/*/*.jar"/>
         </fileset>

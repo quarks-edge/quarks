@@ -3,6 +3,6 @@
 # Copyright IBM Corp. 2015,2016 
 */
 /**
- * Web Socket Server Connector for receiving and sending messages to a Web Socket Client.
+ * TBD/PLACEHOLDER WebSocket Server Connector for receiving and sending messages to a WebSocket Client.
  */
 package quarks.connectors.wsserver;

@@ -2,10 +2,10 @@
     xmlns:jacoco="antlib:org.jacoco.ant"
     >
     <description>
-        Build Web Socket Client connector.
+        Build WebSocket Client connector.
     </description>
 
-  <property name="component.path" value="connectors/mqtt"/>
+  <property name="component.path" value="connectors/wsclient"/>
   <import file="../../common-build.xml"/>
 
   <property name="ext" location="../../ext"/>
@@ -13,6 +13,7 @@
   <path id="compile.classpath">
     <pathelement location="${quarks.lib}/quarks.api.topology.jar" />
     <pathelement location="${quarks.lib}/quarks.connectors.common.jar" />
+    <fileset dir="${component.ext}/jetty" includes="*.jar"/>
   </path>
 
   <path id="test.compile.classpath">
@@ -21,6 +22,7 @@
     <pathelement location="../../api/topology/test.classes"/>
     <pathelement location="../../providers/direct/test.classes"/>
     <pathelement location="../../connectors/common/test.classes"/>
+    <fileset dir="test.ext/jetty" includes="*.jar"/>
     <path refid="compile.classpath"/>
   </path>
 
