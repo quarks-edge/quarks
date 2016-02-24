@@ -97,7 +97,6 @@ public class EtiaoGraphTest extends GraphTest {
         
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(new GraphType(g));
-        System.out.println(json);
         
         GraphType gt2 = new Gson().fromJson(json, GraphType.class);
         assertEquals(5, gt2.getVertices().size());
@@ -152,7 +151,6 @@ public class EtiaoGraphTest extends GraphTest {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(new GraphType(g));
-        System.out.println(json);
         
         GraphType gt = new Gson().fromJson(json, GraphType.class);
         assertEquals(5, gt.getVertices().size());

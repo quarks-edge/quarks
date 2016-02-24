@@ -9,6 +9,9 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import quarks.function.BiConsumer;
 import quarks.oplet.core.Source;
 
@@ -32,6 +35,7 @@ public class ThreadFactoryTracker implements ThreadFactory {
     private final Thread.UncaughtExceptionHandler handler;
     private volatile boolean shutdown;
     private final ThreadSets threads = new ThreadSets();
+    private static final Logger logger = LoggerFactory.getLogger(ThreadFactoryTracker.class);
 
     ThreadFactoryTracker(String threadName, ThreadFactory tf, BiConsumer<Object, Throwable> completer) {
         this.threadName = threadName;
@@ -41,7 +45,7 @@ public class ThreadFactoryTracker implements ThreadFactory {
             @Override
             public void uncaughtException(Thread thread, Throwable throwable) {
                 try {
-                    if (!backgroundException(thread, throwable))
+                    if (!trackedThreadUncaughtException(thread, throwable))
                         Thread.getDefaultUncaughtExceptionHandler().uncaughtException(thread, throwable);
                 } finally {
                     threads.removeRunning(Thread.currentThread());
@@ -129,19 +133,19 @@ public class ThreadFactoryTracker implements ThreadFactory {
     }
 
     /**
-     * Handle an exception thrown by a background thread.
-     * The executable shuts down.
+     * Handle an exception thrown by a tracked thread.
+     * 
      * @return true if this exception was handled.
      */
-    private boolean backgroundException(Thread t, Throwable e) {
-        // TODO trace.log(LogLevel.ERROR, e.getLocalizedMessage(), e);
-        synchronized (System.err) {
-            System.err.println("Uncaught exception from thread " + t.getName() + ": " + e);
-            e.printStackTrace();
-        }
+    private boolean trackedThreadUncaughtException(Thread t, Throwable e) {
+        getLogger().error("Uncaught exception in thread " + t.getName(), e);
         return true;
     }
-    
+
+    private Logger getLogger() {
+        return logger;
+    }
+
     private static class ThreadSets {
         private final Set<Thread> newThreads = new HashSet<Thread>();     // created, not running yet
         private final Set<Thread> runningThreads = new HashSet<Thread>(); // running
