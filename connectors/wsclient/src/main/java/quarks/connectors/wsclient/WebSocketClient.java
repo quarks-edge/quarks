@@ -60,6 +60,10 @@ public class WebSocketClient {
     /**
      * Create a new Web Socket Client connector.
      * <p>
+     * !!! At this moment only "ws" is supported !!!
+     * <br>
+     * TODO support for "wss" and associated params.
+     * <p>
      * Configuration parameters:
      * <ul>
      * <li>ws.uri - "ws://host[:port][/path]", "wss://host[:port][/path]"
