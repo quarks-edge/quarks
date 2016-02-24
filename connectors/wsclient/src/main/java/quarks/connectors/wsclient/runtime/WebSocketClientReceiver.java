@@ -34,7 +34,7 @@ public class WebSocketClientReceiver<T> implements Consumer<Consumer<T>>, AutoCl
     }
     
     void onTextMessage(String message) {
-        eventHandler.accept(((Function<String,T>)toTuple).apply(message));
+        eventHandler.accept(toTuple.apply(message));
     }
 
     @Override
