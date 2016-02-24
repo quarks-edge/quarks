@@ -7,7 +7,7 @@ package quarks.connectors.wsclient.runtime;
 import quarks.function.Consumer;
 import quarks.function.Function;
 
-public class WebSocketClientReceiver<T> implements Consumer<Consumer<T>> {
+public class WebSocketClientReceiver<T> implements Consumer<Consumer<T>>, AutoCloseable {
     private static final long serialVersionUID = 1L;
     protected final WebSocketClientConnector connector;
     private final Function<String,T> toTuple;
@@ -35,6 +35,11 @@ public class WebSocketClientReceiver<T> implements Consumer<Consumer<T>> {
     
     void onTextMessage(String message) {
         eventHandler.accept(((Function<String,T>)toTuple).apply(message));
+    }
+
+    @Override
+    public void close() throws Exception {
+        connector.close();
     }
 
 }

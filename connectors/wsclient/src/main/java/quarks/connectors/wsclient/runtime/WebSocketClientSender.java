@@ -7,7 +7,7 @@ package quarks.connectors.wsclient.runtime;
 import quarks.function.Consumer;
 import quarks.function.Function;
 
-public class WebSocketClientSender<T> implements Consumer<T> {
+public class WebSocketClientSender<T> implements Consumer<T>, AutoCloseable {
     private static final long serialVersionUID = 1L;
     protected final WebSocketClientConnector connector;
     protected final Function<T,String> toPayload;
@@ -20,6 +20,11 @@ public class WebSocketClientSender<T> implements Consumer<T> {
     @Override
     public void accept(T value) {
         connector.sendText(toPayload.apply(value));
+    }
+
+    @Override
+    public void close() throws Exception {
+        connector.close();
     }
 
 }

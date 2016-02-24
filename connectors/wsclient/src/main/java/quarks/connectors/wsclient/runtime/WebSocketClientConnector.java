@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import quarks.connectors.runtime.Connector;
 
 @ClientEndpoint
-public class WebSocketClientConnector extends Connector<Session> implements Serializable, AutoCloseable {
+public class WebSocketClientConnector extends Connector<Session> implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = LoggerFactory.getLogger(WebSocketClientConnector.class);
     private final Properties config;
