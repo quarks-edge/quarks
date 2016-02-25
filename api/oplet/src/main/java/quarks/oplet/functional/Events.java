@@ -37,18 +37,8 @@ public class Events<T> extends Source<T>implements Consumer<T> {
 
     @Override
     public void start() {
-        // TODO figure out what we really want to do...
-        // For now, allocate a thread so the job containing this oplet
-        // doesn't look "complete".
-        //
-        // We could do one or more of the following:
-        // - provide the Consumer<T> with a way to access this oplet's
-        //   thread factory so it can allocate a thread from it
-        //   (e.g., the JAA Initializable and FunctionContext)
-        // - allocate a thread here and make it available to the fn
-        // - allocate a consumer thread and buffer and where received
-        //   tuples are queued and then send downstream
-
+        // Allocate a thread so the job containing this oplet
+        // doesn't look "complete" and shutdown.
         Thread endlessEventSource = getOpletContext()
                 .getService(ThreadFactory.class)
                 .newThread(() -> {
@@ -59,11 +49,11 @@ public class Events<T> extends Source<T>implements Consumer<T> {
                         // cancelled; we're done.
                     }
                 });
-        getOpletContext().getService(ScheduledExecutorService.class)
-                    .submit(endlessEventSource);
+        endlessEventSource.setDaemon(false);
+        endlessEventSource.start();
 
         // It's possible for uses to do things like a blocking connect
-        // to an external system from eventSetup.accept(). So run it as
+        // to an external system from eventSetup.accept() so run it as
         // a task to avoid start() / submit-job timeouts.
         getOpletContext().getService(ScheduledExecutorService.class)
                     .submit(() -> eventSetup.accept(this));
