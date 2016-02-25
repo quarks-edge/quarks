@@ -18,6 +18,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import quarks.function.BiConsumer;
 
 /**
@@ -30,6 +33,7 @@ import quarks.function.BiConsumer;
  */
 public final class TrackingScheduledExecutor extends ScheduledThreadPoolExecutor {
     private final BiConsumer<Object, Throwable> completer;
+    private static final Logger logger = LoggerFactory.getLogger(TrackingScheduledExecutor.class);
 
     /**
      * Creates an {@code TrackingScheduledExecutor} using the supplied thread 
@@ -66,12 +70,8 @@ public final class TrackingScheduledExecutor extends ScheduledThreadPoolExecutor
             t = unwrapFutureThrowable((Future<?>) r);
         }
         if (t != null) {
-            // TODO trace error
-            synchronized(System.err) {
-                System.err.println("Thread: " + Thread.currentThread().getName() +
-                        ": task terminated with exception : " + t);
-                t.printStackTrace();
-            }
+            getLogger().error("Thread: " + Thread.currentThread().getName() +
+                    ": task terminated with exception : ", t);
             cleanup();
             completer.accept(this, t);
         }
@@ -166,6 +166,10 @@ public final class TrackingScheduledExecutor extends ScheduledThreadPoolExecutor
             }
         }
         return null;
+    }
+
+    private Logger getLogger() {
+        return logger;
     }
 
     /**
