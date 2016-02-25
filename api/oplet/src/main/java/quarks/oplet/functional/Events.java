@@ -39,8 +39,7 @@ public class Events<T> extends Source<T>implements Consumer<T> {
     public void start() {
         // TODO figure out what we really want to do...
         // For now, allocate a thread so the job containing this oplet
-        // doesn't look "complete" and shutdown and so that start()
-        // doesn't timeout from a slow eventSetup handler.
+        // doesn't look "complete".
         //
         // We could do one or more of the following:
         // - provide the Consumer<T> with a way to access this oplet's
@@ -54,11 +53,6 @@ public class Events<T> extends Source<T>implements Consumer<T> {
                 .getService(ThreadFactory.class)
                 .newThread(() -> {
                     try {
-                        // It's typical for uses to do things like a
-                        // blocking connect to an external system from
-                        // eventSetup.accept(). Invoke it here to avoid
-                        // start() / submit-job timeouts.
-                        eventSetup.accept(this);
                         Thread.sleep(Long.MAX_VALUE);
                     }
                     catch (InterruptedException e) {
@@ -67,6 +61,12 @@ public class Events<T> extends Source<T>implements Consumer<T> {
                 });
         getOpletContext().getService(ScheduledExecutorService.class)
                     .submit(endlessEventSource);
+
+        // It's possible for uses to do things like a blocking connect
+        // to an external system from eventSetup.accept(). So run it as
+        // a task to avoid start() / submit-job timeouts.
+        getOpletContext().getService(ScheduledExecutorService.class)
+                    .submit(() -> eventSetup.accept(this));
     }
 
     @Override
