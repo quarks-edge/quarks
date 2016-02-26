@@ -95,6 +95,7 @@
         <ant dir="providers/direct" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/common" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/iot" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/serial" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/file" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/http" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/iotf" target="@{target}" useNativeBasedir="true"/>
