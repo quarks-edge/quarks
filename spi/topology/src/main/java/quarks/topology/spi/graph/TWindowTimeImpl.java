@@ -6,6 +6,7 @@ import static quarks.window.Policies.insertionTimeList;
 import static quarks.window.Policies.processOnInsert;
 import static quarks.window.Policies.scheduleEvictIfEmpty;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +16,7 @@ import quarks.function.Functions;
 import quarks.oplet.window.Aggregate;
 import quarks.topology.TStream;
 import quarks.window.InsertionTimeList;
+import quarks.window.Policies;
 import quarks.window.Window;
 import quarks.window.Windows;
 
@@ -57,6 +59,22 @@ public class TWindowTimeImpl<T, K> extends AbstractTWindow<T, K> {
                         insertionTimeList());
         
         Aggregate<T,U,K> op = new Aggregate<T,U,K>(window, processor);
+        return feeder().pipe(op); 
+    }
+
+    @Override
+    public <U> TStream<U> batch(BiFunction<List<T>, K, U> batcher) {
+        batcher = Functions.synchronizedBiFunction(batcher);
+        Window<T, K, List<T>> window =
+                Windows.window(
+                        alwaysInsert(),
+                        Policies.scheduleEvictOnFirstInsert(time, unit),
+                        Policies.evictAllAndScheduleEvict(time, unit),
+                        (partition, tuple) -> {},
+                        getKeyFunction(),
+                        () -> new ArrayList<T>());
+        
+        Aggregate<T,U,K> op = new Aggregate<T,U,K>(window, batcher);
         return feeder().pipe(op); 
     } 
 }
