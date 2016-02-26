@@ -35,7 +35,7 @@ package quarks.execution.services;
  * A remote system should be able to specify an operation on an
  * control server MBean though its alias and type. For example
  * an application might be submitted with a fixed name
- * <em>PumpAnalytics</em>
+ * <em>PumpAnalytics</em> (as its alias)
  * to allow its {@link quarks.execution.mbeans.JobMXBean JobMXBean}
  * to be determined remotely using a combination of
  * {@link quarks.execution.mbeans.JobMXBean#TYPE JobMXBean.TYPE}
@@ -58,7 +58,8 @@ public interface ControlService {
      * @param id
      *            Unique identifier for the control object.
      * @param alias
-     *            Alias for the control object.
+     *            Alias for the control object. Expected to be unique within the context
+     *            of {@code type}.
      * @param controlInterface
      *            Public interface for the control object.
      * @param control
