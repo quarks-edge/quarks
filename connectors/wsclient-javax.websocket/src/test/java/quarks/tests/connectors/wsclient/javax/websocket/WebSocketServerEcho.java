@@ -1,4 +1,4 @@
-package quarks.test.connectors.wsclient;
+package quarks.tests.connectors.wsclient.javax.websocket;
 
 import java.io.IOException;
 import java.net.URI;

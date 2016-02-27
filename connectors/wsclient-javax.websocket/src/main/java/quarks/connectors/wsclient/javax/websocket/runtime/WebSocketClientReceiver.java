@@ -2,7 +2,7 @@
 # Licensed Materials - Property of IBM
 # Copyright IBM Corp. 2015,2016 
 */
-package quarks.connectors.wsclient.runtime;
+package quarks.connectors.wsclient.javax.websocket.runtime;
 
 import quarks.function.Consumer;
 import quarks.function.Function;

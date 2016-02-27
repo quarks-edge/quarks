@@ -18,6 +18,8 @@
 	<classpathentry kind="src" path="mqtt/src/test/java"/>
 	<classpathentry kind="src" path="wsclient/src/main/java"/>
 	<classpathentry kind="src" path="wsclient/src/test/java"/>
+	<classpathentry kind="src" path="wsclient-javax.websocket/src/main/java"/>
+	<classpathentry kind="src" path="wsclient-javax.websocket/src/test/java"/>
 	<classpathentry kind="lib" path="http/ext/commons-codec-1.10.jar"/>
 	<classpathentry kind="lib" path="http/ext/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="http/ext/httpclient-4.3.6.jar"/>
@@ -39,7 +41,7 @@
 	<classpathentry kind="lib" path="kafka/ext/zkclient-0.3.jar"/>
 	<classpathentry kind="lib" path="kafka/ext/zookeeper-3.4.6.jar"/>
 	<classpathentry kind="lib" path="mqtt/ext/org.eclipse.paho.client.mqttv3-1.0.2.jar"/>
-	<classpathentry kind="lib" path="wsclient/ext/jetty/javax.websocket-api-1.0.jar"/>
+	<classpathentry kind="lib" path="wsclient-javax.websocket/ext/jetty/javax.websocket-api-1.0.jar"/>
 	<classpathentry kind="lib" path="javax.websocket-client/ext/javax-websocket-client-impl-9.3.6.v20151106.jar"/>
 	<classpathentry kind="lib" path="javax.websocket-client/ext/javax.websocket-api-1.0.jar"/>
 	<classpathentry kind="lib" path="javax.websocket-client/ext/jetty-util-9.3.6.v20151106.jar"/>

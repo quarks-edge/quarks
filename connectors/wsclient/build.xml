@@ -2,36 +2,28 @@
     xmlns:jacoco="antlib:org.jacoco.ant"
     >
     <description>
-        Build WebSocket Client connector.
+        Build WebSocket Client connector API.
     </description>
 
   <property name="component.path" value="connectors/wsclient"/>
   <import file="../../common-build.xml"/>
 
-  <property name="ext" location="../../ext"/>
-
   <path id="compile.classpath">
     <pathelement location="${quarks.lib}/quarks.api.topology.jar" />
-    <pathelement location="${quarks.lib}/quarks.connectors.common.jar" />
-    <pathelement location="${component.ext}/jetty/javax.websocket-api-1.0.jar" />
+    <path refid="quarks.ext.classpath" />
   </path>
-
 
   <path id="test.compile.classpath">
     <pathelement location="${jar}" />
-    <pathelement location="${quarks.lib}/quarks.providers.direct.jar"/>
+    <pathelement location="${lib}/quarks.providers.direct.jar"/>
     <pathelement location="../../api/topology/test.classes"/>
     <pathelement location="../../providers/direct/test.classes"/>
-    <pathelement location="../../connectors/common/test.classes"/>
-    <pathelement location="${quarks.connectors}/javax.websocket-client/lib/javax.websocket-client.jar"/>
-    <pathelement location="${quarks.connectors}/javax.websocket-server/lib/javax.websocket-server.jar"/>
     <path refid="compile.classpath"/>
   </path>
 
   <path id="test.classpath">
     <pathelement location="${test.classes}" />
     <path refid="test.compile.classpath"/>
-    <path refid="quarks.ext.classpath" />
   </path>
 
 </project>

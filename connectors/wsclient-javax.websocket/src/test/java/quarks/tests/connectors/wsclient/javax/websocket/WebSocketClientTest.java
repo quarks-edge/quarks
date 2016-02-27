@@ -1,4 +1,4 @@
-package quarks.test.connectors.wsclient;
+package quarks.tests.connectors.wsclient.javax.websocket;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.google.gson.JsonObject;
 
 import quarks.connectors.wsclient.WebSocketClient;
+import quarks.connectors.wsclient.javax.websocket.Jsr356WebSocketClient;
 import quarks.test.connectors.common.ConnectorTestBase;
 import quarks.topology.TSink;
 import quarks.topology.TStream;
@@ -94,7 +95,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Topology t = newTopology("testBasicStaticStuff");
 
         Properties config = getConfig();
-        WebSocketClient wsClient1 = new WebSocketClient(t, config);
+        WebSocketClient wsClient1 = new Jsr356WebSocketClient(t, config);
         
         TStream<String> s1 = wsClient1.receiveString();
         assertNotNull("s1", s1);
@@ -102,7 +103,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         TSink<String> sink1 = wsClient1.sendString(t.strings("one", "two"));
         assertNotNull("sink1", sink1);
         
-        WebSocketClient wsClient2 = new WebSocketClient(t, config);
+        WebSocketClient wsClient2 = new Jsr356WebSocketClient(t, config);
         TStream<String> s2 = wsClient2.receiveString();
         assertNotSame("s1 s2", s1, s2);
         
@@ -113,7 +114,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
     @Test(expected = IllegalArgumentException.class)
     public void testMissingWsUri() {
         Topology t = newTopology("testMissingWsUri");
-        new WebSocketClient(t, new Properties());
+        new Jsr356WebSocketClient(t, new Properties());
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -121,7 +122,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Topology t = newTopology("testMalformedWsUri");
         Properties config = new Properties();
         config.setProperty("ws.uri", "localhost"); // missing scheme
-        new WebSocketClient(t, config);
+        new Jsr356WebSocketClient(t, config);
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -129,7 +130,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Topology t = newTopology("testNotWsUri");
         Properties config = new Properties();
         config.setProperty("ws.uri", "tcp://localhost");
-        new WebSocketClient(t, config);
+        new Jsr356WebSocketClient(t, config);
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -138,7 +139,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Properties config = new Properties();
         config.setProperty("ws.uri", getWssUri());
         // missing trustStorePath
-        new WebSocketClient(t, config);
+        new Jsr356WebSocketClient(t, config);
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -148,7 +149,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         config.setProperty("ws.uri", getWssUri());
         config.setProperty("ws.trustStorePath", "xyzzy"); // not checked till runtime
         // missing truststorePassword
-        new WebSocketClient(t, config);
+        new Jsr356WebSocketClient(t, config);
     }
     
     @Test
@@ -158,7 +159,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         config.setProperty("ws.uri", getWssUri());
         config.setProperty("ws.trustStorePath", "xyzzy"); // not checked till runtime
         config.setProperty("ws.trustStorePassword", "xyzzy"); // not checked till runtime
-        new WebSocketClient(t, config);
+        new Jsr356WebSocketClient(t, config);
     }
     
     @Test(expected = IllegalStateException.class)
@@ -168,7 +169,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         TStream<String> s2 = t.strings("one", "two");
 
         Properties config = getConfig();
-        WebSocketClient wsClient = new WebSocketClient(t, config);
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         wsClient.sendString(s1);
         wsClient.sendString(s2); // should throw
     }
@@ -178,7 +179,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Topology t = newTopology("testTooManyReceiversNeg");
 
         Properties config = getConfig();
-        WebSocketClient wsClient = new WebSocketClient(t, config);
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         @SuppressWarnings("unused")
         TStream<String> s1 = wsClient.receiveString();
         @SuppressWarnings("unused")
@@ -193,7 +194,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         startEchoer();  // before getConfig() so it gets the port
         
         Properties config = getConfig();
-        WebSocketClient wsClient = new WebSocketClient(t, config);
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
         String[] expected = new String[] {
                 "{\"id\":\"id1\",\"value\":27}",
@@ -219,7 +220,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         startEchoer();  // before getConfig() so it gets the port
         
         Properties config = getConfig();
-        WebSocketClient wsClient = new WebSocketClient(t, config);
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
         String[] expected = new String[] { "one", "two" };
         
@@ -240,7 +241,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         startEchoer();  // before getConfig() so it gets the port
         
         Properties config = getConfig();
-        WebSocketClient wsClient = new WebSocketClient(t, config);
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
         String[] expected = new String[] { "one", "two" };
         
@@ -280,7 +281,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Properties config = getWssConfig();
         assertTrue(config.getProperty("ws.uri").startsWith("wss:"));
         
-        WebSocketClient wsClient = new WebSocketClient(t, config);
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
         String[] expected = new String[] { "one", "two" };
         
@@ -308,7 +309,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         String emptyTrustStorePath = "path-to-empty-trust-store"; // TODO
         config.setProperty("ws.trustStorePath", emptyTrustStorePath); // so we don't recognize server cert
         
-        WebSocketClient wsClient = new WebSocketClient(t, config);
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
         String[] expected = new String[] { "one", "two" };
         
@@ -334,7 +335,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Properties config = getWssConfig();
         assertTrue(config.getProperty("ws.uri").startsWith("wss:"));
         
-        WebSocketClient wsClient = new WebSocketClient(t, config);
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
         String[] expected = new String[] { "one", "two" };
         
@@ -361,7 +362,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         assertTrue(config.getProperty("ws.uri").startsWith("wss:"));
         config.remove("ws.keyStorePath");  // so we can't supply client cert
         
-        WebSocketClient wsClient = new WebSocketClient(t, config);
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
         String[] expected = new String[] { "one", "two" };
         

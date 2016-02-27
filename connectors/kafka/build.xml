@@ -10,7 +10,6 @@
 
   <path id="compile.classpath">
     <pathelement location="${quarks.lib}/quarks.api.topology.jar" />
-    <pathelement location="${quarks.lib}/quarks.connectors.common.jar" />
     <fileset dir="${component.ext}" includes="*.jar"/>
     <path refid="quarks.ext.classpath" />
   </path>

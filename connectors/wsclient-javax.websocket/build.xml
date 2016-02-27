@@ -1,11 +1,11 @@
-<project name="quarks.connectors.mqtt" default="all" 
+<project name="quarks.connectors.wsclient-javax.websocket" default="all" 
     xmlns:jacoco="antlib:org.jacoco.ant"
     >
     <description>
-        Build MQTT connectors.
+        Build javax.websocket based WebSocket Client connector.
     </description>
 
-  <property name="component.path" value="connectors/mqtt"/>
+  <property name="component.path" value="connectors/wsclient-javax.websocket"/>
   <import file="../../common-build.xml"/>
 
   <property name="ext" location="../../ext"/>
@@ -13,8 +13,8 @@
   <path id="compile.classpath">
     <pathelement location="${quarks.lib}/quarks.api.topology.jar" />
     <pathelement location="${quarks.connectors}/common/lib/quarks.connectors.common.jar" />
-    <pathelement location="${quarks.connectors}/iot/lib/quarks.connectors.iot.jar" />
-    <pathelement location="${component.ext}/org.eclipse.paho.client.mqttv3-1.0.2.jar"/>
+    <pathelement location="${quarks.connectors}/wsclient/lib/quarks.connectors.wsclient.jar" />
+    <pathelement location="${component.ext}/jetty/javax.websocket-api-1.0.jar" />
   </path>
 
 
@@ -24,6 +24,8 @@
     <pathelement location="../../api/topology/test.classes"/>
     <pathelement location="../../providers/direct/test.classes"/>
     <pathelement location="../../connectors/common/test.classes"/>
+    <pathelement location="${quarks.connectors}/javax.websocket-client/lib/javax.websocket-client.jar"/>
+    <pathelement location="${quarks.connectors}/javax.websocket-server/lib/javax.websocket-server.jar"/>
     <path refid="compile.classpath"/>
   </path>
 
@@ -32,6 +34,5 @@
     <path refid="test.compile.classpath"/>
     <path refid="quarks.ext.classpath" />
   </path>
-
 
 </project>
