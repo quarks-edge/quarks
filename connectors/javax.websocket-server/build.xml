@@ -1,0 +1,28 @@
+<project name="javax.websocket-server" default="all" 
+    xmlns:jacoco="antlib:org.jacoco.ant"
+    >
+    <description>
+        Build Jetty supplied jsr356 WebSocket Server Implementation package.
+    </description>
+
+  <property name="component.path" value="connectors/javax.websocket-server"/>
+  <import file="../../common-build.xml"/>
+
+  <property name="ext" location="../../ext"/>
+
+  <path id="compile.classpath">
+    <fileset dir="${component.ext}" includes="*.jar"/>
+  </path>
+
+  <path id="test.compile.classpath">
+    <pathelement location="${jar}" />
+    <path refid="compile.classpath"/>
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${test.classes}" />
+    <path refid="test.compile.classpath"/>
+    <path refid="quarks.ext.classpath" />
+  </path>
+
+</project>

@@ -18,7 +18,7 @@ import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
-import org.eclipse.jetty.util.component.LifeCycle;
+//import org.eclipse.jetty.util.component.LifeCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,16 +99,16 @@ public class WebSocketClientConnector extends Connector<Session> implements Seri
     @Override
     protected void doClose(Session session) throws Exception {
         getLogger().debug("{} doClose {}", id(), session);
-        WebSocketContainer container = session.getContainer();
+//        WebSocketContainer container = session.getContainer();
         try {
             session.close();
         }
         finally {
-            // Force lifecycle stop when done with container.
-            // This is to free up threads and resources that the
-            // JSR-356 container allocates. But unfortunately
-            // the JSR-356 spec does not handle lifecycles (yet)
-            ((LifeCycle)container).stop();
+//            // Force lifecycle stop when done with container.
+//            // This is to free up threads and resources that the
+//            // JSR-356 container allocates. But unfortunately
+//            // the JSR-356 spec does not handle lifecycles (yet)
+//            ((LifeCycle)container).stop();
         }
     }
     

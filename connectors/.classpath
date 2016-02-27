@@ -39,21 +39,23 @@
 	<classpathentry kind="lib" path="kafka/ext/zkclient-0.3.jar"/>
 	<classpathentry kind="lib" path="kafka/ext/zookeeper-3.4.6.jar"/>
 	<classpathentry kind="lib" path="mqtt/ext/org.eclipse.paho.client.mqttv3-1.0.2.jar"/>
-	<classpathentry kind="lib" path="wsclient/ext/jetty/javax-websocket-client-impl-9.3.6.v20151106.jar"/>
 	<classpathentry kind="lib" path="wsclient/ext/jetty/javax.websocket-api-1.0.jar"/>
-	<classpathentry kind="lib" path="wsclient/ext/jetty/jetty-util-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/ext/jetty/websocket-api-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/ext/jetty/websocket-client-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/ext/jetty/websocket-common-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/test.ext/jetty/javax-websocket-server-impl-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/test.ext/jetty/jetty-http-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/test.ext/jetty/jetty-io-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/test.ext/jetty/jetty-security-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/test.ext/jetty/jetty-server-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/test.ext/jetty/jetty-servlet-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/test.ext/jetty/servlet-api-3.1.jar"/>
-	<classpathentry kind="lib" path="wsclient/test.ext/jetty/websocket-server-9.3.6.v20151106.jar"/>
-	<classpathentry kind="lib" path="wsclient/test.ext/jetty/websocket-servlet-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-client/ext/javax-websocket-client-impl-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-client/ext/javax.websocket-api-1.0.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-client/ext/jetty-util-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-client/ext/websocket-api-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-client/ext/websocket-client-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-client/ext/websocket-common-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-server/ext/javax-websocket-server-impl-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-server/ext/jetty-http-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-server/ext/jetty-io-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-server/ext/jetty-security-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-server/ext/jetty-server-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-server/ext/jetty-servlet-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-server/ext/jetty-util-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-server/ext/servlet-api-3.1.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-server/ext/websocket-server-9.3.6.v20151106.jar"/>
+	<classpathentry kind="lib" path="javax.websocket-server/ext/websocket-servlet-9.3.6.v20151106.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/api"/>

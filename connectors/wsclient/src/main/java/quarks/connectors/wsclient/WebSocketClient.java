@@ -23,12 +23,11 @@ import quarks.topology.json.JsonFunctions;
 /**
  * A connector for sending and receiving messages to a WebSocket Server.
  * <p>
- * A connector is bound to its configuration specified WebSocket URI.
+ * A connector is bound to its configuration specified 
+ * {@code javax.websockets} WebSocket URI.
  * <p> 
  * A single connector instance supports sinking at most one stream
  * and sourcing at most one stream.
- * <p>
- * See {@code javax.websocket} for more information about WebSockets.
  * <p>
  * Sample use:
  * <pre>{@code
@@ -50,6 +49,15 @@ import quarks.topology.json.JsonFunctions;
  * TStream<JsonObject> r = wsclient.receive();
  * r.print();
  * }</pre>
+ * <p>
+ * The connector is written against the JSR356 {@code javax.websockets} API.
+ * {@code javax.websockets} uses the {@link java.util.ServiceLoader} to load
+ * an implementation of {@code javax.websocket.ContainerProvider}.
+ * <p>
+ * The supplied {@code connectors/javax.websocket.client} provides one
+ * such implementation. To use it, include
+ * {@code connectors/javax.websocket-client/lib/javax.websocket-client.jar}
+ * on your classpath.
  */
 public class WebSocketClient {
     private final Topology t;
