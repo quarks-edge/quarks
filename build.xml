@@ -102,6 +102,7 @@
         <ant dir="connectors/javax.websocket-client" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/javax.websocket-server" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/wsclient" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/wsclient-javax.websocket" target="@{target}" useNativeBasedir="true"/>
         <ant dir="console/server" target="@{target}" useNativeBasedir="true" />
         <ant dir="console/servlets" target="@{target}" useNativeBasedir="true" />
         <ant dir="providers/development" target="@{target}" useNativeBasedir="true"/>
