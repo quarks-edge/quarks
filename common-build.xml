@@ -140,8 +140,7 @@
 	        <attribute name="Class-Path" value="${jar.classpath}"/>
 	      </manifest>
 	      <fileset dir="${classes}"/>
-	    </jar>
-	    
+	    </jar>	    
 	  </target>
 	
 	  <target name="test.compile" depends="jar">

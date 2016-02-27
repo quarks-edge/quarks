@@ -2,7 +2,7 @@
     xmlns:jacoco="antlib:org.jacoco.ant"
     >
     <description>
-        Build javax.websocket based WebSocket Client connector.
+        Build JSR356 javax.websocket based WebSocket Client connector.
     </description>
 
   <property name="component.path" value="connectors/wsclient-javax.websocket"/>
