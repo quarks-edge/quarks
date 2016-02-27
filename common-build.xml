@@ -141,6 +141,7 @@
 	      </manifest>
 	      <fileset dir="${classes}"/>
 	    </jar>
+	    
 	  </target>
 	
 	  <target name="test.compile" depends="jar">
