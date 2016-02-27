@@ -41,7 +41,7 @@
 	<classpathentry kind="lib" path="kafka/ext/zkclient-0.3.jar"/>
 	<classpathentry kind="lib" path="kafka/ext/zookeeper-3.4.6.jar"/>
 	<classpathentry kind="lib" path="mqtt/ext/org.eclipse.paho.client.mqttv3-1.0.2.jar"/>
-	<classpathentry kind="lib" path="wsclient-javax.websocket/ext/jetty/javax.websocket-api-1.0.jar"/>
+	<classpathentry kind="lib" path="wsclient-javax.websocket/ext/javax.websocket-api-1.0.jar"/>
 	<classpathentry kind="lib" path="javax.websocket-client/ext/javax-websocket-client-impl-9.3.6.v20151106.jar"/>
 	<classpathentry kind="lib" path="javax.websocket-client/ext/javax.websocket-api-1.0.jar"/>
 	<classpathentry kind="lib" path="javax.websocket-client/ext/jetty-util-9.3.6.v20151106.jar"/>

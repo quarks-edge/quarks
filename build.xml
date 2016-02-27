@@ -202,6 +202,7 @@
         <fileset dir="${basedir}/connectors/mqtt/src/main/java" includes="**/*.java"/>
         <fileset dir="${basedir}/connectors/http/src/main/java" includes="**/*.java"/>
         <fileset dir="${basedir}/connectors/wsclient/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/connectors/wsclient-javax.websocket/src/main/java" includes="**/*.java"/>
     </sourcefiles>
     </group>
 
@@ -276,7 +277,6 @@
         <fileset dir=".">
            <include name="console/*/ext/*/*.jar"/>
            <include name="connectors/*/ext/*.jar"/>
-           <include name="connectors/wsclient/ext/jetty/*.jar"/>
            <include name="analytics/*/ext/*/*.jar"/>
            <include name="utils/metrics/ext/*/*.jar"/>
         </fileset>

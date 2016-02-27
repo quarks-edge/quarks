@@ -14,7 +14,7 @@
     <pathelement location="${quarks.lib}/quarks.api.topology.jar" />
     <pathelement location="${quarks.connectors}/common/lib/quarks.connectors.common.jar" />
     <pathelement location="${quarks.connectors}/wsclient/lib/quarks.connectors.wsclient.jar" />
-    <pathelement location="${component.ext}/jetty/javax.websocket-api-1.0.jar" />
+    <pathelement location="${component.ext}/javax.websocket-api-1.0.jar" />
   </path>
 
 
