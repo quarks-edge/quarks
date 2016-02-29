@@ -14,6 +14,8 @@ import java.util.concurrent.Callable;
 
 import org.junit.Test;
 
+import quarks.execution.mbeans.JobMXBean;
+
 public class ControlsTest {
     
     @Test
@@ -34,5 +36,7 @@ public class ControlsTest {
     @Test
     public void testValid() {
         assertTrue(isControlServiceMBean(Runnable.class));
+        
+        assertTrue(isControlServiceMBean(JobMXBean.class));
     }
 }

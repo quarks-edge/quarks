@@ -22,8 +22,7 @@ public class Controls {
      * <UL>
      * <LI>An interface that does not extend any other interface.</LI>
      * <LI>Not be parameterized</LI>
-     * <LI>All methods must be void</LI>
-     * <LI>Method parameters restricted to thise types:
+     * <LI>Method parameters and return types restricted to these types:
      * <UL>
      * <LI>{@code String, boolean, int, long, double}.</LI>
      * <LI>Any enumeration</LI>
@@ -44,26 +43,34 @@ public class Controls {
             return false;
         
         for (Method cim : controlInterface.getDeclaredMethods()) {
-            if (!Void.TYPE.equals(cim.getReturnType()))
+            if (cim.getReturnType() != Void.TYPE
+                    && !validType(cim.getReturnType()))
                 return false;
             
             for (Parameter pt : cim.getParameters()) {
                 Class<?> ptt = pt.getType();
-                if (String.class == ptt)
-                    continue;
-                if (Boolean.TYPE == ptt)
-                    continue;
-                if (Integer.TYPE == ptt)
-                    continue;
-                if (Long.TYPE == ptt)
-                    continue;
-                if (Double.TYPE == ptt)
-                    continue;
-                if (ptt.isEnum())
-                    continue;
+                if (!validType(ptt))
+                    return false;
             }
         }
         
         return true;
+    }
+
+    static boolean validType(Class<?> type) {
+        if (String.class == type)
+            return true;
+        if (Boolean.TYPE == type)
+            return true;
+        if (Integer.TYPE == type)
+            return true;
+        if (Long.TYPE == type)
+            return true;
+        if (Double.TYPE == type)
+            return true;
+        if (type.isEnum())
+            return true;
+        
+        return false;
     }
 }
