@@ -7,9 +7,11 @@ package quarks.runtime.jsoncontrol;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
@@ -44,6 +46,15 @@ public class JsonControlService implements ControlService {
      * Value is {@value}.
      */
     public static final String OP_KEY = "op";
+    
+    /**
+     * Key for the argument list.
+     * If no arguments are required then 
+     * {@value} can be missing or an empty list.
+     * <BR>
+     * Value is {@value}.
+     */
+    public static final String ARGS_KEY = "args";
 
     private final Map<String, ControlMBean<?>> mbeans = new HashMap<>();
 
@@ -109,33 +120,69 @@ public class JsonControlService implements ControlService {
             return new JsonPrimitive(Boolean.FALSE);
 
         String methodName = request.get(OP_KEY).getAsString();
+        
+        int argumentCount = 0;
+        JsonArray args = null;
+        if (request.has(ARGS_KEY)) {
+            args = request.getAsJsonArray(ARGS_KEY);
+            argumentCount = args.size();
+        }
+            
 
-        Method method = findMethod(mbean.getControlInterface(), methodName);
+        Method method = findMethod(mbean.getControlInterface(), methodName, argumentCount);
 
         if (method == null)
             return new JsonPrimitive(Boolean.FALSE);
 
-        executeMethod(method, mbean.getControl(), getArguments(method, request));
+        executeMethod(method, mbean.getControl(), getArguments(method, args));
 
         return new JsonPrimitive(Boolean.TRUE);
     }
 
-    private Method findMethod(Class<?> controlInterface, String name) {
+    private Method findMethod(Class<?> controlInterface, String name, int argumentCount) {
         Method[] methods = controlInterface.getDeclaredMethods();
 
         for (Method method : methods) {
             if (!Modifier.isPublic(method.getModifiers()))
                 continue;
-            if (name.equals(method.getName()))
+            
+            if (name.equals(method.getName()) && method.getParameterTypes().length == argumentCount)
                 return method;
         }
         return null;
     }
 
-    private Object[] getArguments(Method method, JsonObject request) {
-        if (method.getParameters().length == 0)
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private Object[] getArguments(Method method, JsonArray args) {
+        final Parameter[] params = method.getParameters();
+        
+        if (params.length == 0 || args == null || args.size() == 0)
             return null;
-        throw new UnsupportedOperationException();
+        
+        assert params.length == args.size();
+        
+        Object[] oargs = new Object[params.length];
+        for (int i = 0; i < oargs.length; i++) {
+            final Parameter pt = params[i];
+            final JsonElement arg = args.get(i);
+            Object jarg;
+            
+            if (String.class == pt.getType())
+                jarg = arg.getAsString();
+            else if (Integer.TYPE == pt.getType())
+                jarg = arg.getAsInt();
+            else if (Long.TYPE == pt.getType())
+                jarg = arg.getAsLong();
+            else if (Double.TYPE == pt.getType())
+                jarg = arg.getAsDouble();
+            else if (pt.getType().isEnum())
+                jarg = Enum.valueOf((Class<Enum>) pt.getType(), arg.getAsString());
+            else
+                throw new UnsupportedOperationException(pt.getType().getTypeName());
+            
+            oargs[i] = jarg;
+        }
+        return oargs;
     }
 
     private void executeMethod(Method method, Object control, Object[] arguments)
