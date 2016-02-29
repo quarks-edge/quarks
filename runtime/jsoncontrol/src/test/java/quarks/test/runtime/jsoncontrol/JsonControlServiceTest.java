@@ -196,4 +196,56 @@ public class JsonControlServiceTest {
         assertEquals(726, cb1.getDoneI());
         assertEquals(2924, cb2.getDoneI());
     }
+    
+    @Test
+    public void test2ArgLongDouble() throws Exception {
+        JsonControlService control = new JsonControlService();
+
+        MyBeanImpl cb1 = new MyBeanImpl();
+        MyBeanImpl cb2 = new MyBeanImpl();
+
+        assertEquals(0.0, cb1.getDoneD(), 0.0);
+        assertEquals(0L, cb1.getDoneL());
+        assertEquals(0.0, cb2.getDoneD(), 0.0);
+        assertEquals(0L, cb2.getDoneL());
+
+        control.registerControl("myb", "1ld", null, MyBean.class, cb1);
+        control.registerControl("myb", "2ld", null, MyBean.class, cb2);
+
+        assertEquals(0.0, cb1.getDoneD(), 0.0);
+        assertEquals(0L, cb1.getDoneL());
+        assertEquals(0.0, cb2.getDoneD(), 0.0);
+        assertEquals(0L, cb2.getDoneL());
+
+        JsonObject req = new JsonObject();
+        req.addProperty(JsonControlService.TYPE_KEY, "myb");
+        req.addProperty(JsonControlService.ALIAS_KEY, "1ld");
+        req.addProperty(JsonControlService.OP_KEY, "doLongDouble");
+        JsonArray args = new JsonArray();
+        args.add(new JsonPrimitive(9345L));   
+        args.add(new JsonPrimitive(89.24));   
+        req.add(JsonControlService.ARGS_KEY, args);
+        control.controlRequest(req);
+
+        assertEquals(89.24, cb1.getDoneD(), 0.0);
+        assertEquals(9345L, cb1.getDoneL());
+        assertEquals(0.0, cb2.getDoneD(), 0.0);
+        assertEquals(0L, cb2.getDoneL());
+
+
+        req = new JsonObject();
+        req.addProperty(JsonControlService.TYPE_KEY, "myb");
+        req.addProperty(JsonControlService.ALIAS_KEY, "2ld");
+        req.addProperty(JsonControlService.OP_KEY, "doLongDouble");
+        args = new JsonArray();
+        args.add(new JsonPrimitive(74737L));   
+        args.add(new JsonPrimitive(-9235.232));   
+        req.add(JsonControlService.ARGS_KEY, args);
+        control.controlRequest(req);
+
+        assertEquals(89.24, cb1.getDoneD(), 0.0);
+        assertEquals(9345L, cb1.getDoneL());
+        assertEquals(-9235.232, cb2.getDoneD(), 0.0);
+        assertEquals(74737L, cb2.getDoneL());
+    }
 }
