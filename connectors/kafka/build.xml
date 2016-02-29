@@ -15,7 +15,6 @@
     <path refid="quarks.ext.classpath" />
   </path>
 
-
   <path id="test.compile.classpath">
     <pathelement location="${jar}" />
     <pathelement location="${quarks.lib}/quarks.providers.direct.jar"/>
@@ -28,7 +27,7 @@
   <path id="test.classpath">
     <pathelement location="${test.classes}" />
     <path refid="test.compile.classpath"/>
+    <path refid="test.common.classpath" />
   </path>
-
 
 </project>
