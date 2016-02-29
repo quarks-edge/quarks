@@ -9,7 +9,7 @@ The Quarks community welcomes contributions, please *Get Involved*!
 ### Setup
 
 Once you have forked the repository and created your local clone you need to download
-these additional developement software tools.
+these additional development software tools.
 
 * Java 8 - The development setup assumes Java 8 and Linux. 
 * Apache Ant 1.9.4: The build uses Ant, the version it has been tested with is 1.9.4. - https://ant.apache.org/
@@ -96,7 +96,7 @@ Thus:
    * Java 8 new classes and methods cannot be used.
    
 In general most code is expected to work on Android (but might not yet) with the exception:
-* Functionality aimed at the developmer environment, such as console and development provider
+* Functionality aimed at the developer environment, such as console and development provider
 * Any JMX related code.
 
 ### Using Eclipse
@@ -115,7 +115,7 @@ into your Eclipse workspace directly from your fork.
 1. Select the branch, usually master and click Next
 1. Set the directory where your local clone will be stored and click Next (the directory quarks under this directory is where you can build and run tests using the Ant targets)
 1. Select Import existing Eclipse projects and click Next
-1. Click Finish to bring in all Quarks projects
+1. In the Import Projects window, make sure that the Search for nested projects checkbox is selected. Click Finish to bring in all Quarks projects
 
 Note. Specifics may change depending on your version of Eclipse or the Eclipse Git Team Provider.
 
