@@ -318,9 +318,9 @@ public class WindowTest {
         Window<Integer, Integer, List<Integer>> window =
                 Windows.window(
                         alwaysInsert(),
-                        Policies.countContentsPolicy(113),
+                        Policies.doNothing(),
                         Policies.evictAll(),
-                        Policies.processWhenFull(113),
+                        Policies.processWhenFullAndEvict(113),
                         tuple -> 0,
                         () -> new ArrayList<Integer>());
         window.registerPartitionProcessor(new BiConsumer<List<Integer>, Integer>() {
@@ -346,7 +346,7 @@ public class WindowTest {
                 Windows.window(
                         alwaysInsert(),
                         Policies.scheduleEvictOnFirstInsert(1, TimeUnit.SECONDS),
-                        Policies.evictAllAndScheduleEvict(1, TimeUnit.SECONDS),
+                        Policies.evictAllAndScheduleEvictWithProcess(1, TimeUnit.SECONDS),
                         (partiton, tuple) -> {},
                         tuple -> 0,
                         () -> new ArrayList<Integer>());

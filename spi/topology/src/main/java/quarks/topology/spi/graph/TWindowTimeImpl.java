@@ -69,7 +69,7 @@ public class TWindowTimeImpl<T, K> extends AbstractTWindow<T, K> {
                 Windows.window(
                         alwaysInsert(),
                         Policies.scheduleEvictOnFirstInsert(time, unit),
-                        Policies.evictAllAndScheduleEvict(time, unit),
+                        Policies.evictAllAndScheduleEvictWithProcess(time, unit),
                         (partition, tuple) -> {},
                         getKeyFunction(),
                         () -> new ArrayList<T>());

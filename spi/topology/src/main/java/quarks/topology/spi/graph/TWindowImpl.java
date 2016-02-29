@@ -42,11 +42,11 @@ public class TWindowImpl<T, K> extends AbstractTWindow<T, K> {
         Window<T, K, List<T>> window =
                 Windows.window(
                         alwaysInsert(),
-                        Policies.countContentsPolicy(size),
+                        Policies.doNothing(),
                         Policies.evictAll(),
-                        Policies.processWhenFull(size),
+                        Policies.processWhenFullAndEvict(size),
                         getKeyFunction(),
-                        () -> new ArrayList<T>());
+                        () -> new ArrayList<T>(size));
         
         Aggregate<T,U,K> op = new Aggregate<T,U,K>(window, batcher);
         return feeder().pipe(op); 

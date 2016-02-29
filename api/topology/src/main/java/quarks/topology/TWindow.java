@@ -50,7 +50,7 @@ public interface TWindow<T, K> extends TopologyElement {
     
     /**
      * Declares a stream that represents a batched aggregation of
-     * partitions in this window. Each time the contents of a partition exceeds 
+     * partitions in this window. Each time the contents of a partition equals 
      * the window size or the time duration,
      * {@code batcher.apply(tuples, key)} is called, where {@code tuples} is an
      * {@code List} that containing all the tuples in the partition.

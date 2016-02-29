@@ -49,7 +49,7 @@ public class Policies {
         
         // Can't use lambda since state is required
         return new BiConsumer<Partition<T,K,L>, T>() {
-            boolean first = true;
+            private boolean first = true;
             @Override
             public void accept(Partition<T, K, L> partition, T tuple) {
                 if(first){
@@ -89,13 +89,13 @@ public class Policies {
     }
     
     /**
-     * An eviction policy which evicts all tuples, and schedules the next eviction
-     * after the appropriate interval.
+     * An eviction policy which processes the window, evicts all tuples, and 
+     * schedules the next eviction after the appropriate interval.
      * @param time The timespan in which tuple are permitted in the partition.
      * @param unit The units of time.
      * @return The time-based eviction policy.
      */ 
-    public static <T, K> Consumer<Partition<T, K, List<T>> > evictAllAndScheduleEvict(long time, TimeUnit unit){
+    public static <T, K> Consumer<Partition<T, K, List<T>> > evictAllAndScheduleEvictWithProcess(long time, TimeUnit unit){
         
         long timeMs = TimeUnit.MILLISECONDS.convert(time, unit);
         return (partition) -> {
@@ -166,14 +166,15 @@ public class Policies {
     
     /**
      * Returns a trigger policy that triggers when the size of a partition
-     * equals or exceeds a value.
+     * equals or exceeds a value, and then evicts its contents.
      * @return A trigger policy that triggers processing when the size of 
      * the partition equals or exceets a value.
      */ 
-    public static <T, K, L extends List<T>> BiConsumer<Partition<T, K, L>, T> processWhenFull(final int size){
+    public static <T, K, L extends List<T>> BiConsumer<Partition<T, K, L>, T> processWhenFullAndEvict(final int size){
         return (partition, tuple) -> {
             if(partition.getContents().size() >= size){
                 partition.process();
+                partition.evict();
             }
         };
     }

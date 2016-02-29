@@ -149,7 +149,7 @@ public abstract class TWindowTest extends TopologyAbstractTest{
         complete(t, tc);
         
         for(Long diff : diffs){
-            assertTrue("Diff is: " + diff, diff >=0 && diff < 1040);
+            assertTrue("Diff is: " + diff, diff >=0 && diff < 1060);
         }
         
     }
