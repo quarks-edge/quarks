@@ -19,6 +19,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import quarks.execution.services.Controls;
 import quarks.runtime.jsoncontrol.JsonControlService;
 
 public class JsonControlServiceTest {
@@ -106,6 +107,12 @@ public class JsonControlServiceTest {
         public synchronized Thread.State getDoneTs() {
             return doneTs;
         }
+    }
+    
+    @Test
+    public void testMyBean() {
+        assertTrue(Controls.isControlServiceMBean(MyBean.class));
+        assertFalse(Controls.isControlServiceMBean(MyBeanImpl.class));
     }
 
     @Test
