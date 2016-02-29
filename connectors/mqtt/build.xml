@@ -17,7 +17,6 @@
     <pathelement location="${component.ext}/org.eclipse.paho.client.mqttv3-1.0.2.jar"/>
   </path>
 
-
   <path id="test.compile.classpath">
     <pathelement location="${jar}" />
     <pathelement location="${quarks.lib}/quarks.providers.direct.jar"/>
@@ -31,7 +30,7 @@
     <pathelement location="${test.classes}" />
     <path refid="test.compile.classpath"/>
     <path refid="quarks.ext.classpath" />
+    <path refid="test.common.classpath" />
   </path>
-
 
 </project>

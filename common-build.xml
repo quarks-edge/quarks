@@ -74,6 +74,11 @@
       <pathelement location="${target.java8.ext}/slf4j-1.7.12/slf4j-jdk14-1.7.12.jar"/>
     </path>
 
+    <!-- Quarks unit tests common class path -->
+    <path id="test.common.classpath">
+      <pathelement location="${target.java8.ext}/slf4j-1.7.12/slf4j-jdk14-1.7.12.jar"/>
+    </path>
+
     <!-- expects a property of component.path e.g. connectors/iotf -->
     <!-- only called by non-core components -->
     <macrodef name="setup.component">
