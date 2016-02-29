@@ -57,7 +57,7 @@ public interface TWindow<T, K> extends TopologyElement {
      * The {@code List} is stable during the method call, and returns the
      * tuples in order of insertion into the window, from oldest to newest. <BR>
      * Thus the returned stream will contain a sequence of tuples that where the
-     * most recent tuple represents the most up to date batch of a
+     * most recent tuple represents the most recent batch of a
      * partition. After a partition is batched, its contents are cleared.
      * 
      * @param batcher
