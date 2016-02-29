@@ -18,6 +18,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import quarks.execution.services.ControlService;
+import quarks.execution.services.Controls;
 
 /**
  * Control service that accepts control instructions as JSON objects.
@@ -79,10 +80,19 @@ public class JsonControlService implements ControlService {
 
     /**
      * {@inheritDoc}
+     * <P>
+     * All control service MBeans must be valid according
+     * to {@link Controls#isControlServiceMBean(Class)}.
+     * </P>
+     * 
+     * @see Controls#isControlServiceMBean(Class)
      */
     @Override
     public synchronized <T> String registerControl(String type, String id, String alias, Class<T> controlInterface,
             T control) {
+        if (!Controls.isControlServiceMBean(controlInterface))
+            throw new IllegalArgumentException();
+        
         final String controlId = getControlId(type, id, alias);
         if (mbeans.containsKey(controlId))
             throw new IllegalStateException();
@@ -175,6 +185,8 @@ public class JsonControlService implements ControlService {
                 jarg = arg.getAsLong();
             else if (Double.TYPE == pt.getType())
                 jarg = arg.getAsDouble();
+            else if (Boolean.TYPE == pt.getType())
+                jarg = arg.getAsBoolean();
             else if (pt.getType().isEnum())
                 jarg = Enum.valueOf((Class<Enum>) pt.getType(), arg.getAsString());
             else

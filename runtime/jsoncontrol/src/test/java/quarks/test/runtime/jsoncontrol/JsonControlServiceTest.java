@@ -7,7 +7,11 @@ package quarks.test.runtime.jsoncontrol;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+
+import java.lang.Thread.State;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -27,6 +31,8 @@ public class JsonControlServiceTest {
         void doInt(int i);
 
         void doLongDouble(long l, double d);
+        
+        void doBooleanEnums(boolean b, TimeUnit u, Thread.State ts);
     }
 
     public static class MyBeanImpl implements MyBean {
@@ -37,6 +43,10 @@ public class JsonControlServiceTest {
         private int doneI;
         private long doneL;
         private double doneD;
+        
+        private boolean doneB;
+        private TimeUnit doneU;
+        private Thread.State doneTs;
 
         public String getDoneS() {
             return doneS;
@@ -77,6 +87,24 @@ public class JsonControlServiceTest {
         public synchronized void doLongDouble(long l, double d) {
             doneL = l;
             doneD = d;
+        }
+        @Override
+        public synchronized void doBooleanEnums(boolean b, TimeUnit u, State ts) {
+            doneB = b;
+            doneU = u;
+            doneTs = ts;
+        }
+
+        public synchronized boolean isDoneB() {
+            return doneB;
+        }
+
+        public synchronized TimeUnit getDoneU() {
+            return doneU;
+        }
+
+        public synchronized Thread.State getDoneTs() {
+            return doneTs;
         }
     }
 
@@ -247,5 +275,68 @@ public class JsonControlServiceTest {
         assertEquals(9345L, cb1.getDoneL());
         assertEquals(-9235.232, cb2.getDoneD(), 0.0);
         assertEquals(74737L, cb2.getDoneL());
+    }
+    
+    @Test
+    public void test3ArgBooleanEnum() throws Exception {
+        JsonControlService control = new JsonControlService();
+
+        MyBeanImpl cb1 = new MyBeanImpl();
+        MyBeanImpl cb2 = new MyBeanImpl();
+
+        assertFalse(cb1.isDoneB());
+        assertNull(cb1.getDoneU());
+        assertNull(cb1.getDoneTs());
+        assertFalse(cb2.isDoneB());
+        assertNull(cb2.getDoneU());
+        assertNull(cb2.getDoneTs());
+
+        control.registerControl("myb", "1eb", null, MyBean.class, cb1);
+        control.registerControl("myb", "2eb", null, MyBean.class, cb2);
+
+        assertFalse(cb1.isDoneB());
+        assertNull(cb1.getDoneU());
+        assertNull(cb1.getDoneTs());
+        assertFalse(cb2.isDoneB());
+        assertNull(cb2.getDoneU());
+        assertNull(cb2.getDoneTs());
+
+
+        JsonObject req = new JsonObject();
+        req.addProperty(JsonControlService.TYPE_KEY, "myb");
+        req.addProperty(JsonControlService.ALIAS_KEY, "1eb");
+        req.addProperty(JsonControlService.OP_KEY, "doBooleanEnums");
+        JsonArray args = new JsonArray();
+        args.add(new JsonPrimitive(true));   
+        args.add(new JsonPrimitive(TimeUnit.DAYS.name()));
+        args.add(new JsonPrimitive(Thread.State.NEW.name()));   
+        req.add(JsonControlService.ARGS_KEY, args);
+        control.controlRequest(req);
+
+        assertTrue(cb1.isDoneB());
+        assertSame(TimeUnit.DAYS, cb1.getDoneU());
+        assertSame(Thread.State.NEW, cb1.getDoneTs());
+        assertFalse(cb2.isDoneB());
+        assertNull(cb2.getDoneU());
+        assertNull(cb2.getDoneTs());
+
+
+        req = new JsonObject();
+        req.addProperty(JsonControlService.TYPE_KEY, "myb");
+        req.addProperty(JsonControlService.ALIAS_KEY, "2eb");
+        req.addProperty(JsonControlService.OP_KEY, "doBooleanEnums");
+        args = new JsonArray();
+        args.add(new JsonPrimitive(false));   
+        args.add(new JsonPrimitive(TimeUnit.HOURS.name()));
+        args.add(new JsonPrimitive(Thread.State.BLOCKED.name()));   
+        req.add(JsonControlService.ARGS_KEY, args);
+        control.controlRequest(req);
+
+        assertTrue(cb1.isDoneB());
+        assertSame(TimeUnit.DAYS, cb1.getDoneU());
+        assertSame(Thread.State.NEW, cb1.getDoneTs());
+        assertFalse(cb2.isDoneB());
+        assertSame(TimeUnit.HOURS, cb2.getDoneU());
+        assertSame(Thread.State.BLOCKED, cb2.getDoneTs());
     }
 }

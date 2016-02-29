@@ -23,14 +23,15 @@ package quarks.execution.services;
  * similar to JMX. It does not provide notifications.
  * </P>
  * <P>
- * An instance of a control service bean is defined by its:
+ * An instance of a control service MBean is defined by its:
  * 
  * <UL>
  * <LI> A type </LI>
  * <LI> A identifier - Unique within the current execution context.</LI>
- * <LI> An alias - Optional, but can be combined with the MBeans's type 
- * to logically identify an MBean. </LI>
- * <LI> A Java interface - This defines what actions  </LI>
+ * <LI> An alias - Optional, but can be combined with the control MBeans's type 
+ * to logically identify a control MBean. </LI>
+ * <LI> A Java interface - This defines what operations can be executed
+ * against the control MBean.</LI>
  * </UL>
  * A remote system should be able to specify an operation on an
  * control server MBean though its alias and type. For example
@@ -47,12 +48,15 @@ package quarks.execution.services;
  * of JMX can be used, such as complex types in a control service MBean interface.
  * Portable applications would limit themselves to a smaller subset of
  * capabilities, such as only primitive types and enums.
+ * <BR>
+ * The method {@link Controls#isControlServiceMBean(Class)} defines
+ * the minimal supported interface for any control service.
  * </P>
  */
 public interface ControlService {
 
     /**
-     * Register a control bean for an oplet.
+     * Register a control server MBean for an oplet.
      * 
      * @param type Type of the control object.
      * @param id
