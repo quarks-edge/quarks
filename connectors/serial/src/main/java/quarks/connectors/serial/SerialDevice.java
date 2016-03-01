@@ -5,18 +5,26 @@
 package quarks.connectors.serial;
 
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
-import quarks.function.BiConsumer;
-import quarks.function.BiFunction;
-import quarks.topology.TStream;
+import quarks.function.Function;
+import quarks.function.Supplier;
 import quarks.topology.TopologyElement;
 
 /**
- * Generic interface for a serial port.
- *
+ * Access to a device (or devices) connected by a serial port.
+ * A serial port at runtime is represented by
+ * a {@link SerialPort}.
+ * <P>
+ * {@code SerialDevice} is typically used through
+ * a protocol module that sends the appropriate bytes
+ * to the port and decodes the bytes output by the port.
+ * </P>
+ * <P>
+ * It is guaranteed that during any call to function returned by
+ * this interface has exclusive access to {@link SerialPort}.
+ * </P>
  */
 public interface SerialDevice extends TopologyElement {
 	
@@ -25,25 +33,34 @@ public interface SerialDevice extends TopologyElement {
 	 * Can be used to send setup instructions to the
 	 * device connected to this serial port.
 	 * <BR>
-	 * {@code initializer.accept(out, in)} is called once, passing the output
-	 * and input streams for this port.
+	 * {@code initializer.accept(port)} is called once, passing a runtime
+	 * {@link SerialPort} for this serial device.
 	 * 
 	 * @param initializer Function to be called when the application runs.
 	 */
-	public void setInitializer(BiConsumer<OutputStream,InputStream> initializer);
+	void setInitializer(Consumer<SerialPort> initializer);
 		
 	/**
-	 * Poll the serial port.
+	 * Create a supplier function that can be used to source a
+	 * stream from a serial port device.
 	 * <BR>
-	 * {@code driver.apply(out, in)} is called approximately every {@code period}
-	 * seconds, passing the output and input streams for this port. The returned
-	 * value is present on the returned stream if it is not null.
+	 * Calling {@code get()} on the returned function will result in a call
+	 * to {@code driver.apply(serialPort)}
+	 * passing a runtime {@link SerialPort} for this serial device.
+	 * <BR>
+	 * The function {@code driver} typically sends instructions to the
+	 * serial port using {@link SerialPort#getOutput()} and then
+	 * reads the result using {@link SerialPort#getInput()}.
+	 * <P>
+	 * Multiple instances of a supplier function can be created,
+	 * for example to read different parameters from the
+	 * device connected to the serial port. While each function
+	 * is being called it has exclusive use of the serial port.
+	 * </P>
+	 * @param driver Function that interacts with the serial port to produce a value.
+	 * @return Function that for each call will interact with the serial port to produce a value.
 	 * 
-	 * 
-	 * @param driver Function to poll this serial port.
-	 * @param period Polling period.
-	 * @param unit Unit of {@code period}.
-	 * @return Declaration of stream that will contain the results of calls to {@code driver}.
-	 */
-	public <T> TStream<T> poll(BiFunction<OutputStream,InputStream,T> driver, long period, TimeUnit unit);
+	 * @see quarks.topology.Topology#poll(Supplier, long, TimeUnit)
+	 */	
+	public <T> Supplier<T> getSupplier(Function<SerialPort,T> driver);
 }
