@@ -248,7 +248,7 @@ public class DirectJobTest extends TopologyAbstractTest implements DirectTestSet
         private AtomicInteger count = new AtomicInteger(0);
         protected void injectError(int errorAt) {
             if (count.getAndIncrement() == errorAt)
-                throw new IllegalStateException();
+                throw new RuntimeException("Expected Test Exception");
         }
         
         protected static void sleep(long millis) {
