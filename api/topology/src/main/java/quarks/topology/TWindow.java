@@ -56,9 +56,11 @@ public interface TWindow<T, K> extends TopologyElement {
      * {@code List} that containing all the tuples in the partition.
      * The {@code List} is stable during the method call, and returns the
      * tuples in order of insertion into the window, from oldest to newest. <BR>
-     * Thus the returned stream will contain a sequence of tuples that where the
-     * most recent tuple represents the most recent batch of a
-     * partition. After a partition is batched, its contents are cleared.
+     * Thus the returned stream will contain a sequence of tuples that where 
+     * each tuple represents the output of the most recent batch of a partition.
+     * The tuples contained in a partition during a batch do not overlap with 
+     * the tuples in any subsequent batch. After a partition is batched, its 
+     * contents are cleared.
      * 
      * @param batcher
      *            Logic to aggregation a partition.
