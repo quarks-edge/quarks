@@ -49,6 +49,25 @@ public interface TWindow<T, K> extends TopologyElement {
     <U> TStream<U> aggregate(BiFunction<List<T>, K, U> aggregator);
     
     /**
+     * Declares a stream that represents a batched aggregation of
+     * partitions in this window. Each time the contents of a partition equals 
+     * the window size or the time duration,
+     * {@code batcher.apply(tuples, key)} is called, where {@code tuples} is an
+     * {@code List} that containing all the tuples in the partition.
+     * The {@code List} is stable during the method call, and returns the
+     * tuples in order of insertion into the window, from oldest to newest. <BR>
+     * Thus the returned stream will contain a sequence of tuples that where 
+     * each tuple represents the output of the most recent batch of a partition.
+     * The tuples contained in a partition during a batch do not overlap with 
+     * the tuples in any subsequent batch. After a partition is batched, its 
+     * contents are cleared.
+     * 
+     * @param batcher
+     *            Logic to aggregation a partition.
+     * @return A stream that contains the latest aggregations of partitions in this window.
+     */
+    <U> TStream<U> batch(BiFunction<List<T>, K, U> batcher);
+    /**
      * Returns the key function used to map tuples to partitions.
      * @return Key function used to map tuples to partitions.
      */

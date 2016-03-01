@@ -12,6 +12,7 @@ import static quarks.function.Functions.identity;
 import static quarks.function.Functions.unpartitioned;
 import static quarks.function.Functions.zero;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import quarks.function.Supplier;
 import quarks.topology.TStream;
 import quarks.topology.TWindow;
 import quarks.topology.Topology;
@@ -28,7 +30,45 @@ import quarks.topology.tester.Condition;
 
 @Ignore
 public abstract class TWindowTest extends TopologyAbstractTest{
+    @Test
+    public void testCountBasedBatch() throws Exception{
+        Topology top = newTopology();
+        List<Integer> intList = new ArrayList<>();
+        for(int i = 0; i < 1000;i++)
+            intList.add(i);
+        TStream<Integer> ints = top.source(() -> intList);
+        
+        TWindow<Integer, Integer> window = ints.last(100, tuple -> 0);
+        TStream<Integer> sizes = window.batch((tuples, key) -> {
+            return tuples.size();
+        });
+        Condition<List<Integer> > contents = top.getTester().streamContents(sizes,
+                100,100,100,100,100,100,100,100,100,100);
+        complete(top, contents);
+        assertTrue(contents.valid());
+    }
+    
+    @Test
+    public void testTimeBasedBatch() throws Exception{
+        Topology top = newTopology();
+        TStream<Integer> ints = top.poll(() -> {
+            return 1;
+        }, 10, TimeUnit.MILLISECONDS);
+        
+        TWindow<Integer, Integer> window = ints.last(1000, TimeUnit.MILLISECONDS, tuple -> 0);
+        TStream<Integer> sizes = window.batch((tuples, key) -> {
+            return tuples.size();
+        });
 
+        Condition<List<Integer> > contents = top.getTester().streamContents(sizes,
+           100, 100, 100, 100, 100, 100, 100, 100, 100, 100);
+        complete(top, contents);
+        System.out.println(contents.getResult());
+        for(Integer size : contents.getResult()){
+            assertTrue(size >= 95 && size <= 105);
+        }
+    }
+    
     @Test
     public void testKeyedWindowSum() throws Exception {
         Topology t = newTopology();
@@ -109,7 +149,7 @@ public abstract class TWindowTest extends TopologyAbstractTest{
         complete(t, tc);
         
         for(Long diff : diffs){
-            assertTrue("Diff is: " + diff, diff >=0 && diff < 1040);
+            assertTrue("Diff is: " + diff, diff >=0 && diff < 1060);
         }
         
     }

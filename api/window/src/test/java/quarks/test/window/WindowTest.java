@@ -7,6 +7,11 @@ package quarks.test.window;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 import static quarks.function.Functions.unpartitioned;
+import static quarks.window.Policies.alwaysInsert;
+import static quarks.window.Policies.evictOlderWithProcess;
+import static quarks.window.Policies.insertionTimeList;
+import static quarks.window.Policies.processOnInsert;
+import static quarks.window.Policies.scheduleEvictIfEmpty;
 
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
@@ -22,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 import quarks.function.BiConsumer;
+import quarks.function.BiFunction;
 import quarks.window.InsertionTimeList;
 import quarks.window.Policies;
 import quarks.window.Window;
@@ -305,7 +311,68 @@ public class WindowTest {
         assertOnTimeEvictions(diffs);
         
     }
+    
+    @Test
+    public void countBatchWindowTest(){
+        List<Integer> numBatches = new LinkedList();
+        Window<Integer, Integer, List<Integer>> window =
+                Windows.window(
+                        alwaysInsert(),
+                        Policies.doNothing(),
+                        Policies.evictAll(),
+                        Policies.processWhenFullAndEvict(113),
+                        tuple -> 0,
+                        () -> new ArrayList<Integer>());
+        window.registerPartitionProcessor(new BiConsumer<List<Integer>, Integer>() {
+            int count = 0;
+            @Override
+            public void accept(List<Integer> t, Integer u) {
+                count++;
+                numBatches.add(1);
+            }
+        });
+        for(int i = 0; i < 1000; i++){
+            window.insert(i);
+        }
+        
+        assertTrue(numBatches.size() == 8);
+    }
 
+    @Test
+    public void timeBatchWindowTest() throws InterruptedException{
+        List<Long> numBatches = new LinkedList();
+        
+        Window<Integer, Integer, List<Integer>> window =
+                Windows.window(
+                        alwaysInsert(),
+                        Policies.scheduleEvictOnFirstInsert(1, TimeUnit.SECONDS),
+                        Policies.evictAllAndScheduleEvictWithProcess(1, TimeUnit.SECONDS),
+                        (partiton, tuple) -> {},
+                        tuple -> 0,
+                        () -> new ArrayList<Integer>());
+        
+        window.registerPartitionProcessor(new BiConsumer<List<Integer>, Integer>() {
+            int count = 0;
+            @Override
+            public void accept(List<Integer> t, Integer u) {
+                numBatches.add((long)t.size());
+            }
+        });
+        
+        window.registerScheduledExecutorService(new ScheduledThreadPoolExecutor(5));
+        
+        for(int i = 0; i < 1000; i++){
+            window.insert(i);
+            Thread.sleep(10);
+        }
+        Thread.sleep(10);
+        double tolerance = .04;
+        for(int i = 0; i < numBatches.size(); i++){
+            assertTrue(withinTolerance(100.0, numBatches.get(i).doubleValue(), tolerance));
+        }
+        
+    }
+    
     private void assertOnTimeEvictions(List<Long> diffs) {
         double tolerance = .08;
         for(int i = 1; i < diffs.size(); i++){
