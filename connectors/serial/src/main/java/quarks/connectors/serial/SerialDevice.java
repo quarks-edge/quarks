@@ -41,12 +41,14 @@ public interface SerialDevice extends TopologyElement {
 	void setInitializer(Consumer<SerialPort> initializer);
 		
 	/**
-	 * Create a supplier function that can be used to source a
+	 * Create a function that can be used to source a
 	 * stream from a serial port device.
 	 * <BR>
 	 * Calling {@code get()} on the returned function will result in a call
 	 * to {@code driver.apply(serialPort)}
 	 * passing a runtime {@link SerialPort} for this serial device.
+	 * The value returned by {@code driver.apply(serialPort)} is
+	 * returned by this returned function.
 	 * <BR>
 	 * The function {@code driver} typically sends instructions to the
 	 * serial port using {@link SerialPort#getOutput()} and then
@@ -62,5 +64,5 @@ public interface SerialDevice extends TopologyElement {
 	 * 
 	 * @see quarks.topology.Topology#poll(Supplier, long, TimeUnit)
 	 */	
-	public <T> Supplier<T> getSupplier(Function<SerialPort,T> driver);
+	public <T> Supplier<T> getSource(Function<SerialPort,T> driver);
 }
