@@ -368,7 +368,7 @@ public class WindowTest {
         Thread.sleep(10);
         double tolerance = .08;
         for(int i = 0; i < numBatches.size(); i++){
-            assertTrue(withinTolerance(100.0, numBatches.get(i).doubleValue(), tolerance));
+            assertTrue("Values:" + numBatches.toString(), withinTolerance(100.0, numBatches.get(i).doubleValue(), tolerance));
         }
         
     }
