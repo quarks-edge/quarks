@@ -99,6 +99,10 @@
         <ant dir="connectors/jdbc" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/kafka" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/mqtt" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/javax.websocket-client" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/javax.websocket-server" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/wsclient" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/wsclient-javax.websocket" target="@{target}" useNativeBasedir="true"/>
         <ant dir="console/server" target="@{target}" useNativeBasedir="true" />
         <ant dir="console/servlets" target="@{target}" useNativeBasedir="true" />
         <ant dir="providers/development" target="@{target}" useNativeBasedir="true"/>
@@ -197,6 +201,8 @@
         <fileset dir="${basedir}/connectors/kafka/src/main/java" includes="**/*.java"/>
         <fileset dir="${basedir}/connectors/mqtt/src/main/java" includes="**/*.java"/>
         <fileset dir="${basedir}/connectors/http/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/connectors/wsclient/src/main/java" includes="**/*.java"/>
+        <fileset dir="${basedir}/connectors/wsclient-javax.websocket/src/main/java" includes="**/*.java"/>
     </sourcefiles>
     </group>
 

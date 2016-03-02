@@ -185,7 +185,15 @@ Include the jar of any Quarks connector you use:
 <li>{@code <quarks-target>/connectors/iotf/lib/quarks.connectors.iotf.jar}</li>
 <li>{@code <quarks-target>/connectors/kafka/lib/quarks.connectors.kafka.jar}</li>
 <li>{@code <quarks-target>/connectors/mqtt/lib/quarks.connectors.mqtt.jar}</li>
+<li>{@code <quarks-target>/connectors/wsclient-javax.websocket/lib/quarks.connectors.wsclient.javax.websocket.jar} [*]</li>
 </ul>
+[*] You also need to include a {@code javax.websocket} client implementation
+if you use the {@code wsclient} connector.  Include the following to use
+an Eclipse Jetty based implementation:
+<ul>
+<li>{@code <quarks-target>/connectors/javax.websocket-client/lib/javax.websocket-client.jar}</li>
+</ul>
+<p>
 Include jars for any Quarks utility features you use:
 <ul>
 <li>{@code <quarks-target>/utils/metrics/lib/quarks.utils.metrics.jar} - for the {@code quarks.metrics} package</li>

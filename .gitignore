@@ -4,6 +4,7 @@
 /target
 /test/svt/lib
 /release-quarks
+/reports
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

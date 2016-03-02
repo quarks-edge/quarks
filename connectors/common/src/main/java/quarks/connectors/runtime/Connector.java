@@ -404,7 +404,8 @@ public abstract class Connector<T> implements AutoCloseable, Serializable {
 
     /**
      * A one-shot request to connect the client to its server.
-     * @param client the connector's client object.
+     * @param client the connector's client object.  may be null.
+     * @return a connected client.  not necessarily the same as {@code client}.
      * @throws Exception if unable to connect
      */
     protected abstract T doConnect(T client) throws Exception;

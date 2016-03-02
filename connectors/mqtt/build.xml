@@ -12,7 +12,7 @@
 
   <path id="compile.classpath">
     <pathelement location="${quarks.lib}/quarks.api.topology.jar" />
-    <pathelement location="${quarks.lib}/quarks.connectors.common.jar" />
+    <pathelement location="${quarks.connectors}/common/lib/quarks.connectors.common.jar" />
     <pathelement location="${quarks.connectors}/iot/lib/quarks.connectors.iot.jar" />
     <pathelement location="${component.ext}/org.eclipse.paho.client.mqttv3-1.0.2.jar"/>
   </path>
