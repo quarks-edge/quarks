@@ -2,6 +2,10 @@
 <html>
 <head>
 <title>Quarks Console</title>
+
+<link rel="stylesheet" type="text/css" href="js/ext/jquery-ui-1.11.4.custom/jquery-ui.min.css">
+<link rel="stylesheet" type="text/css" href="js/ext/jquery-ui-1.11.4.custom/jquery-ui.theme.min.css">
+<link rel="stylesheet" type="text/css" href="js/ext/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css">
 <link rel="stylesheet" type="text/css" href="resources/css/main.css">
 <link rel="stylesheet" type="text/css" href="resources/css/metrics.css">
 <link rel="shortcut icon" href="resources/images/favicon.png" />
@@ -27,19 +31,29 @@
 <option value="static">Static flow</option>
 <option value="flow">Tuple count</option>
 <option value="opletColor">Oplet kind</option>
-<option value='stags' disabled>Stream tags</option>
+<!-- <option value='stags' disabled>Stream tags</option> -->
 </select>
 
-<div id="tagsDiv" style="display:none;margin-top: 10px;">
-<label class="tagsLabel">Tag:</label>
-<select id="tags"></select>
+<div id="tagsDiv" style="visibility:hidden;margin-top: 5px;">
+
+	<label for='showTags'>Show tags:</label>
+	<input type='checkbox' id='showTags' checked/>
+	<div>
+		<label for='showAllTags'>Show all tags:</label>
+		<input type='checkbox' id='showAllTags' checked/>
+		<button id="tagDialogBtn" type='button' disabled>Select individual tags ...</button>
+	</div>
+		<div id="dialog" title="Select one or more tags">
+			<label class="tagsLabel">Tag:</label>
+			<select id="tags" multiple></select>
+		</div>
 </div>
 </div>
 <div class="topControls">
 <label for="refreshInterval" class="refreshLabel">Refresh interval:</label>
 <input id="refreshInterval" style='width: 40px;' type="number" min="3" max="20" step="1" value="5"/>
 <label style='margin-left: 5px; margin-right: 10px;'>seconds</label>
-<button id="toggleTimer" type="button" class="stop">Pause graph</button>
+<button id="toggleTimer" type="button">Pause graph</button>
 </div>
 
 <div style='width: 300px; margin-left: 30px; clear:both;'>
@@ -72,10 +86,14 @@
 </div>
 
 <script src="js/ext/d3.min.js" charset="utf-8"></script>
+<script src="js/ext/jquery-ui-1.11.4.custom/external/jquery/jquery.js"></script>
+<script src="js/ext/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
 <script src="js/ext/sankey_quarks.js"></script>
+<script src="js/streamtags.js"></script>
 <script src="js/ext/d3.legend.js"></script>
 <script src="js/graph.js"></script>
 <script src="js/metrics.js"></script>
+
 <script src="js/index.js"></script>
 
 </body>

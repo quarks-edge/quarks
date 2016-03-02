@@ -63,11 +63,6 @@ div.tooltip {
 	margin-top: -85px;
 }
 
-button {
-	background-color: silver;
-	border-radius: 10px;
-}
-
 .topControls {
 	margin-top:15px;
 	float: left;
@@ -119,18 +114,28 @@ label.refreshLabel {
 	margin-right: 5px;
 }
 
-#toggleTimer {
+#toggleTimer, #tagDialogBtn {
 	margin-right: 15px;
 	height: 25px;
 	font-size: 0.7em;
 }
 
-#toggleTimer.stop {
-	background-color: indianred;
+.no-close-dialog .ui-dialog-titlebar-close {
+	display: none;
 }
 
-#toggleTimer.start {
-	background-color: lightgreen;
+.ui-dialog .ui-dialog-titlebar {
+	font-size: 0.8em;
+}
+
+.ui-dialog .ui-dialog-buttonpane {
+	font-size: 0.8em;
+}
+
+.ui-widget-overlay {
+	opacity: 0.2;
+	background-color: steelblue;
+	background-image: none;
 }
 
 #metrics {
