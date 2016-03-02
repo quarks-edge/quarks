@@ -14,6 +14,7 @@ import static quarks.window.Policies.processOnInsert;
 import static quarks.window.Policies.scheduleEvictIfEmpty;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -342,6 +343,7 @@ public class WindowTest {
     public void timeBatchWindowTest() throws InterruptedException{
         List<Long> numBatches = new LinkedList();
         
+        ScheduledExecutorService ses = new ScheduledThreadPoolExecutor(5);
         Window<Integer, Integer, List<Integer>> window =
                 Windows.window(
                         alwaysInsert(),
@@ -360,17 +362,65 @@ public class WindowTest {
         });
         
         window.registerScheduledExecutorService(new ScheduledThreadPoolExecutor(5));
-        
-        for(int i = 0; i < 1000; i++){
-            window.insert(i);
-            Thread.sleep(10);
-        }
-        Thread.sleep(10);
+
+        ses.scheduleAtFixedRate(() -> {
+            window.insert(1);
+        }, 0, 10, TimeUnit.MILLISECONDS);
+
+        Thread.sleep(11000);
         double tolerance = .08;
         for(int i = 0; i < numBatches.size(); i++){
             assertTrue("Values:" + numBatches.toString(), withinTolerance(100.0, numBatches.get(i).doubleValue(), tolerance));
+        }    
+    }
+    
+    @Test
+    public void timeBatchEnsureUnique() throws InterruptedException{
+        List<List<Integer>> batches = new LinkedList<>();
+
+        ScheduledExecutorService ses = new ScheduledThreadPoolExecutor(5);
+        Window<Integer, Integer, List<Integer>> window =
+                Windows.window(
+                        alwaysInsert(),
+                        Policies.scheduleEvictOnFirstInsert(1, TimeUnit.SECONDS),
+                        Policies.evictAllAndScheduleEvictWithProcess(1, TimeUnit.SECONDS),
+                        (partiton, tuple) -> {},
+                        tuple -> 0,
+                        () -> new ArrayList<Integer>());
+        
+        window.registerPartitionProcessor(new BiConsumer<List<Integer>, Integer>() {
+            int count = 0;
+            @Override
+            public void accept(List<Integer> t, Integer u) {
+                batches.add(new ArrayList<Integer>(t));
+            }
+        });
+        
+        window.registerScheduledExecutorService(new ScheduledThreadPoolExecutor(5));
+
+        ses.scheduleAtFixedRate(new Runnable(){
+            private int count = 0;
+            @Override
+            public void run() {
+                if(count < 1000){
+                    window.insert(count++);
+                }
+            }
+            
+        }, 0, 10, TimeUnit.MILLISECONDS);
+
+        Thread.sleep(11000);
+        int numTuples = 0;
+        for(int i = 0; i < batches.size() - 1; i++){
+            List<Integer> batch = batches.get(i);
+            numTuples += batch.size();
+            for(int j = i + 1; j < batches.size(); j++){
+                assertTrue("Batches have overlapping tuples", Collections.disjoint(batches.get(i), batches.get(j)));
+            }
         }
         
+        numTuples += batches.get(batches.size() -1).size();
+        assertTrue("Number of tuples submitted (1000) != number of tuples processed in batch (" + numTuples + ")", numTuples == 1000);
     }
     
     private void assertOnTimeEvictions(List<Long> diffs) {
