@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import quarks.function.Supplier;
 import quarks.topology.TStream;
 import quarks.topology.TWindow;
 import quarks.topology.Topology;
