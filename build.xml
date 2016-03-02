@@ -43,6 +43,7 @@
   <target name="copy">
      <!-- copy README.md -->
      <copy todir="${target.dir}" file="README.md"/>
+     <copy todir="${target.dir}" file="LICENSE"/>
 
      <!-- copy scripts -->
      <mkdir dir="${target.dir}/java8/scripts"/>
