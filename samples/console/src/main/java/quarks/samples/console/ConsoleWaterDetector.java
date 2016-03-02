@@ -1,3 +1,7 @@
+/*
+# Licensed Materials - Property of IBM
+# Copyright IBM Corp. 2016 
+*/
 package quarks.samples.console;
 
 import java.util.HashSet;
@@ -163,10 +167,11 @@ public class ConsoleWaterDetector {
 		individualAlerts1.get(3).tag(LEAD_ALERT_TAG, "well1").sink(tuple -> System.out.println(formatAlertOutput(tuple, "1", "lead")));
 		
 		List<TStream<JsonObject>> individualAlerts2 = splitAlert(filteredReadings2, 2);
-		individualAlerts2.get(0).tag(TEMP_ALERT_TAG, "well2").sink(tuple -> System.out.println("\n" + formatAlertOutput(tuple, "2", "temp")));
-		individualAlerts2.get(1).tag(ACIDITY_ALERT_TAG, "well2").sink(tuple -> System.out.println(formatAlertOutput(tuple, "2", "acidity")));
-		individualAlerts2.get(2).tag(ECOLI_ALERT_TAG, "well2").sink(tuple -> System.out.println(formatAlertOutput(tuple, "2", "ecoli")));
-		individualAlerts2.get(3).tag(LEAD_ALERT_TAG, "well2").sink(tuple -> System.out.println(formatAlertOutput(tuple, "2", "lead")));
+		
+		individualAlerts2.get(0).tag("well2").sink(tuple -> System.out.println("\n" + formatAlertOutput(tuple, "2", "temp")));
+		individualAlerts2.get(1).tag("well2").sink(tuple -> System.out.println(formatAlertOutput(tuple, "2", "acidity")));
+		individualAlerts2.get(2).tag("well2").sink(tuple -> System.out.println(formatAlertOutput(tuple, "2", "ecoli")));
+		individualAlerts2.get(3).tag("well2").sink(tuple -> System.out.println(formatAlertOutput(tuple, "2", "lead")));
 		
 		List<TStream<JsonObject>> individualAlerts3 = splitAlert(filteredReadings3, 3);
 		

@@ -79,21 +79,36 @@ d3.legend = function(g, chartSvg, pItems, legendTitle) {
     var legendOpacity = 0.7;
     if (legendTitle && legendTitle === "Stream tags") {
     	legendOpacity = 1.0;
-    }
-    li.selectAll("circle")
+	    li.selectAll("rect")
         .data(items,function(d) { 
         	return d.key}
         )
-        .call(function(d) { d.enter().append("circle")})
+        .call(function(d) { d.enter().append("rect")})
         .call(function(d) { d.exit().remove()})
-        .attr("cy",function(d,i) { return i-0.25+"em"})
-        .attr("cx",0)
-        .attr("r","0.4em")
+        .attr("y", function(d,i) { 
+        	return i-0.75+ "em"}) 
+        .attr("width", 8)                          
+        .attr("height", 8)
         .style("fill",function(d) {
         	return d.value.color
         	})
-         .style("fill-opacity", legendOpacity);
-    
+        .style("stroke", "none")
+        .style("fill-opacity", legendOpacity);
+    } else {
+	    li.selectAll("circle")
+	        .data(items,function(d) { 
+	        	return d.key}
+	        )
+	        .call(function(d) { d.enter().append("circle")})
+	        .call(function(d) { d.exit().remove()})
+	        .attr("cy",function(d,i) { return i-0.25+"em"})
+	        .attr("cx",0)
+	        .attr("r","0.4em")
+	        .style("fill",function(d) {
+	        	return d.value.color
+	        	})
+	         .style("fill-opacity", legendOpacity);
+    }
     // Reposition and resize the box
     var lbbox = li[0][0].getBBox();
     lb.attr("x",(lbbox.x-legendPadding))

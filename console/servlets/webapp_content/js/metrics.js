@@ -13,6 +13,7 @@ stopLineChart = function() {
 };
 
 getCounterMetricsForJob = function(callback, jobId, bIsNewJob) {
+
 	var queryString = "metrics?job=" + jobId + "&metric=name:Count,type:counter";
 	var metricData = [];
 		

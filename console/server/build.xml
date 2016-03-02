@@ -16,6 +16,7 @@
 		<pathelement location="${component.ext}/jetty-9.3.6/jetty-webapp-9.3.6.v20151106.jar" />
 		<pathelement location="${component.ext}/jetty-9.3.6/jetty-xml-9.3.6.v20151106.jar" />
 		<pathelement location="${component.ext}/jetty-9.3.6/servlet-api-3.1.jar" />
+		<pathelement location="${ext}/slf4j-api-1.7.12.jar"/>
 	</path>
 
 	<path id="test.compile.classpath">
