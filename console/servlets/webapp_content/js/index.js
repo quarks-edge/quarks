@@ -8,65 +8,45 @@ var run = null;
 var refreshedRowValues = [];
 var stateTooltip = null;
 var rowsTooltip = null;
-var tagsArray = [];
+
 var tagsColors = {};
-var selectedTag = null;
-var newGraph = false;
 var propWindow;
 
-var resetAll = function() {
+var resetAll = function(bNew) {
     clearInterval(run);
     clearTableGraphs();
 	d3.select("#graphLoading").style("display", "none");
 	var selectedJob = d3.select("#jobs").node().value;
-	getCounterMetricsForJob(renderGraph, selectedJob, newGraph);
-	if (newGraph) {
+	getCounterMetricsForJob(renderGraph, selectedJob, bNew);
+	if (bNew) {
 		startGraph(refreshInt);
 	}
 };
 
 d3.select("#jobs")
 .on("change", function() {
-  newGraph = true;
   tagsArray = [];
   streamsTags = {};
 
-  resetAll();
+  resetAll(true);
 });
 
 d3.select("#tags")
 .on("change", function(){
-	newGraph = true;
-	resetAll();
+	resetAll(false);
 });
 
 d3.select("#layers")
 .on("change", function() {
     layerVal = this.value;
-    if (layerVal === "stags") {
-		d3.select("#tagsDiv")
-		.style("display", "block");
-		
-		var tagsSelect = d3.select("#tags");
-		tagsSelect.selectAll("option").remove();
-		tagsArray.forEach(function(t){
-	        tagsSelect
-	        .append("option")
-	        .text(t)
-	        .attr("value", t);
-		});
-
-	} else {
-		d3.select("#tagsDiv")
-		.style("display", "none");
-	}
+	
     clearInterval(run);
     clearTableGraphs();
 
 	d3.select("#graphLoading").style("display", "none");
 	var selectedJob = d3.select("#jobs").node().value;
+	//getCounterMetricsForJob(renderGraph, selectedJob, true);
 	getCounterMetricsForJob(renderGraph, selectedJob);
-	newGraph = true;
 	startGraph(refreshInt);
 });
 
@@ -157,7 +137,7 @@ var margin = {top: 30, right: 5, bottom: 6, left: 30},
 	width = 860 - margin.left - margin.right,
     height = 600 - margin.top - margin.bottom;
 
-var legend;
+
 var svgLegend = d3.select("#graphLegend")
 	.append("svg")
 	.attr("height", 600)
@@ -210,9 +190,7 @@ var formatNumber = d3.format(",.0f"),
     var hideTooltip = function(d, i)  {
 		clearHideTimeout();
     	hideTimeout = setTimeout(function(){  
- 
     		hideTimeout = null;
-    		
     		if(showTimeout){
     			clearTimeout(showTimeout);
     		}
@@ -298,10 +276,10 @@ var displayRowsTooltip = function(newRequest) {
 		content += "<tr>";
 		for (var newKey in row) {
 			if (firstTime) {
-				if (newKey === "Tuple count" || newKey === "Oplet kind" || newKey === "Sources" || newKey === "Targets") {
-					headerStr += "<th style='width: 150px;'>" + newKey + "</th>";
+				if (newKey === "Name") {
+					headerStr += "<th style='width: 100px;'>" + newKey + "</th>";
 				} else {
-					headerStr += "<th style='width: 100px;'>" + newKey + "</th>"; // only name
+					headerStr += "<th style='width: 150px;'>" + newKey + "</th>";
 				}
 			}
 
@@ -380,23 +358,33 @@ var makeRows = function() {
 	var nodes = refreshedRowValues !== null ? refreshedRowValues : sankey.nodes();
 	var theRows = [];
 	 nodes.forEach(function(n) {
-		 //var metrics = makeRandomMetrics();
 		 var sources = [];
+	   	 var sourceStreams = [];
 		 n.targetLinks.forEach(function(trg){
 			sources.push(trg.sourceIdx.id);
+ 	  		if (trg.tags && trg.tags.length > 0) {
+   	  			sourceStreams = trg.tags;
+   	  		}
 		 });
 		 var targets = [];
+		 var targetStreams = [];
 		 n.sourceLinks.forEach(function(src){
 			 targets.push(src.targetIdx.id);
+	   	  		if (src.tags && src.tags.length > 0) {
+	   	  			targetStreams = src.tags;
+	   	  		}
 		 });
    	  	var kind = parseOpletKind(n.invocation.kind);
    	  	var sourceKinds = [];
+   	  	
    	  	sources.forEach(function (source){
    	  		sourceKinds.push(parseOpletKind(source));
+
    	  	});
    	  	var targetKinds = [];
    	  	targets.forEach(function (target){
    	  		targetKinds.push(parseOpletKind(target));
+
    	  	});
    	  	var value = "";
    	  	if (n.derived === true) {
@@ -406,7 +394,11 @@ var makeRows = function() {
    	  	} else {
    	  		value = formatNumber(n.value);
    	  	}
-   	  	var rowObj = {"Name": n.id, "Oplet kind": kind, "Tuple count": formatNumber(n.value), "Sources": sourceKinds.toString(), "Targets": targetKinds.toString()};
+   	  	
+   	  	var rowObj = {"Name": n.id, "Oplet kind": kind, "Tuple count": formatNumber(n.value), 
+   	  			"Sources": sourceKinds.toString(), "Targets": targetKinds.toString(), 
+   	  			"Source stream tags": sourceStreams.toString() === "" ? "None" : sourceStreams.toString(), 
+   	  			"Target stream tags": targetStreams.toString() === "" ? "None" : targetStreams.toString()};
 		theRows.push(rowObj);
 	 });
 	return theRows;
@@ -466,52 +458,20 @@ var renderGraph = function(jobId, counterMetrics, bIsNewJob) {
 			edge.sourceIdx = vertexMap[edge.sourceId].idx;
 			edge.targetIdx = vertexMap[edge.targetId].idx;
 			i++;
-			// when generatedFlowValues goes away, keep this
 			if (edge.tags && edge.tags.length > 0) {
-				var ts = edge.tags;
-				ts.forEach(function(t){
-					if (!streamsTags[t]) {
-						streamsTags[t] = t;
-						tagsArray.push(streamsTags[t]);
-					}
-				});
-				
-				tagsArray.sort();
+				setAvailableTags(edge.tags);
 			}
 		});
 		var layers = d3.select("#layers");
-		var selectedL = d3.select("#layers").node().value;
-		var selectedTag = d3.select("#tags").node().value;
-		var tagOption = layers.selectAll("option")
-			.filter(function (d, i){
-				return this.value === "stags";
-			});
-		
-		if (tagsArray.length > 0) {
-			tagOption.property("disabled", false);
-			
-			var tagsSelect = d3.select("#tags");
-			tagsSelect.selectAll("option").remove();
-			tagsArray.forEach(function(t){
-		        tagsSelect
-		        .append("option")
-		        .text(t)
-		        .attr("value", t);
-				if (t === selectedTag) {
-					tagsSelect.node().value = t;
-				}
-			});	
-			
-		} else {
-			tagOption.property("disabled", true);
-			// set tbe layers select to the static view
-			if (selectedL === "stags") {
-				layers.node().value = "static";
-			}
-			d3.select("#tagsDiv")
-			.style("display", "none");
+		var selectedL = layers.node().value;
+
+		showTagDiv(bIsNewJob);
+		selectedTags = [];
+		if (d3.select("#showTags").property("checked") === true) {
+			// fetch the selected tags, and modify the graph
+			selectedTags = getSelectedTags();
 		}
-		
+
 		refreshedRowValues = graph.vertices;
 		
 		sankey
@@ -527,15 +487,32 @@ var renderGraph = function(jobId, counterMetrics, bIsNewJob) {
   			.enter().append("path")
   			.attr("class", "link")
   			.style("stroke", function(d){
-  				var matchedTag = [];
-  				if (d.tags && layer === "stags") {
+  				var matchedTags = [];
+  				
+  				if (d.tags && selectedTags.length > 0 && layer !== "flow") {
   					var tags = d.tags;
-  					matchedTag = tags.filter(function(t){
-  						return t === selectedTag;
+  					/*
+  					 * if this stream has multiple tags on it
+  					 * and if the number of selectedTags is greater
+  					 * than zero, find the matches
+  					 */
+  					tags.sort();
+  					
+  					tags.forEach(function(t){
+  						selectedTags.forEach(function(sTag) {
+  							if (t === sTag) {
+  								matchedTags.push(sTag);
+  							}
+  						});
   					});
  
-  					if (matchedTag.length > 0) {	
-  						return d.color = color20(streamsTags[selectedTag]);
+  					if (matchedTags.length > 0) {
+  						if (matchedTags.length === 1) {
+  							return d.color = color20(streamsTags[matchedTags[0]]);
+  						} else {
+  							// more than one tag is on this stream
+  							return d.color = MULTIPLE_TAGS_COLOR;	
+  						}
   						
   					} else {
   						return d.color = "#d3d3d3";
@@ -554,12 +531,13 @@ var renderGraph = function(jobId, counterMetrics, bIsNewJob) {
   					var myScale = d3.scale.linear().domain([0,tupleBucketsIdx.buckets.length -1]).range(tupleColorRange);
   					return d.color = myScale(tupleBucketsIdx.bucketIdx); 
   				} else {
+  					// layer is not flow, but no stream tags available
   					return d.color = "#d3d3d3";
   				}
   				
   			})
   			.style("stroke-opacity", function(d){
-  				if (d.tags && layer === "stags") {
+  				if (d.tags && selectedTags.length > 0) {
   					// if the link has this color it is not the selected tag, make it more transparent
   					if (d.color === "#d3d3d3") {
   						return 0.2;
@@ -589,6 +567,10 @@ var renderGraph = function(jobId, counterMetrics, bIsNewJob) {
     	  if (layerVal === "flow") {
     		  retString += "\n" + value; 
     	  }
+    	  if (d.tags && d.tags.length > 0) {
+    		  retString += "\nStream tags: " + d.tags.toString();
+    	  }
+    	  
     	  return retString;
     	  });
   
@@ -620,33 +602,48 @@ var renderGraph = function(jobId, counterMetrics, bIsNewJob) {
   		return getVertexFillColor(layer, d);  		
   	})
   	.attr("data-legend", function(d) {
-  		if (layer !== "stags") {
-  			return getLegendText(layer, d);
-  		}
+  		return getLegendText(layer, d);
   	 })
   	.style("stroke", function(d) {
-  		if (layer !== "stags") {
-  			return getLegendColor(layer, d);
-  		}
+  		return getLegendColor(layer, d);
+
   	});
   
+  	// to do - add tags
   	var rects = svg.selectAll("circle")
 	.on("mouseover", function(d, i) {
   	  	var kind = parseOpletKind(d.invocation.kind);
-		var headStr =  "<div><table style='table-layout:fixed;word-wrap: break-word;'><tr><th class='smaller'>Name</th><th class='smaller'>Oplet kind</th><th class='smaller'>Tuple count</th><th class='smaller'>Sources</th><th class='smaller'>Targets</th></tr>";
-		var valueStr = "<tr><td class='smallCenter'>" + d.id.toString() + "</td><td class='smallLeft'>" + kind + "</td><td class='smallRight'>" + formatNumber(d.value) + "</td>";
-		
+		var headStr =  "<div><table style='table-layout:fixed;word-wrap: break-word;'><tr><th class='smaller'>Name</th>" +
+			"<th class='smaller'>Oplet kind</th><th class='smaller'>Tuple count</th><th class='smaller'>Sources</th>" +
+			"<th class='smaller'>Targets</th><th class='smaller'>Source stream tags</th><th class='smaller'>Target stream tags</th></tr>";
+		var valueStr = "<tr><td class='smallCenter'>" + d.id.toString() + "</td><td class='smallLeft'>" + kind + "</td><td class='smallRight'>" 
+			+ formatNumber(d.value) + "</td>";
+
 		var sources = [];
+		var sourceStreams = [];
 		d.targetLinks.forEach(function(trg){
 			sources.push(trg.sourceIdx.id.toString());
+ 	  		if (trg.tags && trg.tags.length > 0) {
+   	  			sourceStreams = trg.tags;
+   	  		}
 		});
 		var targets = [];
+		var targetStreams = [];
+
 		d.sourceLinks.forEach(function(src){
 			targets.push(src.targetIdx.id.toString());
+			targets.push(src.targetIdx.id);
+	   	  		if (src.tags && src.tags.length > 0) {
+	   	  			targetStreams = src.tags;
+	   	  		}
 		});
 
 		valueStr += "<td class='smallCenter'>" + sources.toString() + "</td>";
 		valueStr += "<td class='smallCenter'>" + targets.toString() + "</td>";
+		var sStreamString = sourceStreams.toString() === "" ? "None" : sourceStreams.toString();
+		valueStr += "<td class='smallCenter'>" + sStreamString + "</td>";
+		var tStreamString = targetStreams.toString() === "" ? "None" : targetStreams.toString();
+		valueStr += "<td class='smallCenter'>" + tStreamString + "</td>";
 
 		valueStr += "</tr></table></div>";
 		var str = headStr + valueStr;
@@ -686,14 +683,37 @@ var renderGraph = function(jobId, counterMetrics, bIsNewJob) {
 
   d3.selectAll(".legend").remove();
   
-  if (layer === "stags" && tagsArray.length > 0) {
+  if (layer === "opletColor"){
+		 svgLegend
+		  .append("g")
+		  .attr("class","legend")
+		  .attr("transform","translate(10,10)")
+		  .style("font-size","11px")
+		  .call(d3.legend, svg, null, "Oplet kind"); 
+ }
+  
+  var showTagsChecked = $("#showTags").prop("checked");
+  // add a second legend for tags, even if opletColor has been chosen
+  if (tagsArray.length > 0 && layer !== "flow" && showTagsChecked) {
 	  var tItems = getFormattedTagLegend(tagsArray);
-	  legend = svgLegend
-	  .append("g")
-	  .attr("class","legend")
-	  .attr("transform","translate(10,10)")
-	  .style("font-size","11px")
-	  .call(d3.legend, svg, tItems, "Stream tags");
+	  if (!svgLegend.select("g").empty()) {
+		  // get the dimensions of the other legend and append this one after it
+		  var otherLegend = svgLegend.select("g")[0][0];
+		  var translateY = otherLegend.getBBox().height + 10 + 10;
+		  svgLegend
+		  .append("g")
+		  .attr("class","legend")
+		  .attr("transform","translate(10," + translateY + ")")
+		  .style("font-size","11px")
+		  .call(d3.legend, svg, tItems, "Stream tags");
+	  } else {
+		  svgLegend
+		  .append("g")
+		  .attr("class","legend")
+		  .attr("transform","translate(10,10)")
+		  .style("font-size","11px")
+		  .call(d3.legend, svg, tItems, "Stream tags");
+  	}
   } else if (layer === "flow" && counterMetrics.length > 0) {
 	  var bucketScale = d3.scale.linear().domain([0,tupleMaxBucketsIdx.buckets.length - 1]).range(tupleColorRange);
 	  var flowItems = getFormattedTupleLegend(tupleMaxBucketsIdx, bucketScale);
@@ -703,14 +723,7 @@ var renderGraph = function(jobId, counterMetrics, bIsNewJob) {
 	  .attr("transform","translate(10,10)")
 	  .style("font-size","11px")
 	  .call(d3.legend, svg, flowItems, "Tuple count");
-  } else if (layer === "opletColor"){
-	 legend = svgLegend
-	  .append("g")
-	  .attr("class","legend")
-	  .attr("transform","translate(10,10)")
-	  .style("font-size","11px")
-	  .call(d3.legend, svg, null, "Oplet kind"); 
-  }
+  } 
   if (bIsNewJob !== undefined) {
 	  fetchAvailableMetricsForJob(bIsNewJob);
   } else {
@@ -845,17 +858,17 @@ var fetchJobsInfo = function() {
 	};
 
 fetchJobsInfo();
-var firstTime = true;
+var first = true;
 
 var startGraph = function(restartInterval) {
 	run = setInterval(function() {
 			if (!stopTimer) {
-				if (!firstTime) {
+				if (first) {
 					fetchJobsInfo();
-					firstTime = false;
+					first = false;
 				}
 				var selectedJob = d3.select("#jobs").node().value;
-				getCounterMetricsForJob(renderGraph, selectedJob);
+				getCounterMetricsForJob(renderGraph, selectedJob, first);
 				if (propWindow) {
 					displayRowsTooltip(false);
 				}

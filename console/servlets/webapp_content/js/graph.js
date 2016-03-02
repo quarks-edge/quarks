@@ -7,7 +7,6 @@ opletColor = {"quarks.metrics.oplets.CounterOp": "#1f77b4", "quarks.metrics.ople
 		"quarks.oplet.functional.Mapper": "#17becf", "quarks.oplet.functional.SupplierPeriodicSource": "#9edae5", "quarks.oplet.functional.SupplierSource": "#b5cf6b", 
 		"quarks.oplet.plumbing.PressureReliever": "#e7cb94", "quarks.oplet.plumbing.TextFileReader": "#ad494a", "quarks.oplet.plumbing.UnorderedIsolate": "#de9ed6"};
 colorMap = {};
-streamsTags = {};
 
 addValuesToEdges = function(graph, counterMetrics) {
 	var edges = graph.edges;
@@ -57,8 +56,13 @@ getFormattedTagLegend = function(tArray) {
 	tArray.forEach(function(t){
 		var obj = {};
 		obj.name = t;
-		obj.fill = color20(t);
-		obj.stroke = color20(t);
+		if (t === MULTIPLE_TAGS_TEXT) {
+			obj.fill = MULTIPLE_TAGS_COLOR;
+			obj.stroke = MULTIPLE_TAGS_COLOR;
+		} else {
+			obj.fill = color20(t);
+			obj.stroke = color20(t);
+		}
 		items.push(obj);
 	});
 	return items;
