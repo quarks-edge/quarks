@@ -86,7 +86,7 @@
     <retro7 qjar="quarks.runtime.jmxcontrol.jar" />
     <retro7 qjar="quarks.utils.metrics.jar" qdir="utils/metrics/lib" />
     <retro7 qjar="quarks.providers.direct.jar" />
-    <retro7 qjar="quarks.connectors.common.jar" />
+    <retro7 qjar="quarks.connectors.common.jar"  qdir="connectors/common/lib" />
     <retro7 qjar="quarks.connectors.iot.jar" qdir="connectors/iot/lib" />
     <retro7 qjar="quarks.connectors.iotf.jar" qdir="connectors/iotf/lib" />
     <retro7 qjar="quarks.connectors.http.jar" qdir="connectors/http/lib" />
@@ -180,7 +180,7 @@
     <retro7.test tdir="runtime/jmxcontrol" />
     <retro7.test tdir="utils/metrics"  ldir="utils/metrics/lib"/>
     <retro7.test tdir="providers/direct" />
-    <retro7.test tdir="connectors/common"/>
+    <retro7.test tdir="connectors/common" ldir="connectors/common/lib"/>
     <retro7.test tdir="connectors/iotf"  ldir="connectors/iotf/lib"/>
     <retro7.test tdir="connectors/http"  ldir="connectors/http/lib"/>
   </target>
