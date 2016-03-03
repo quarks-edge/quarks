@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import com.google.gson.JsonObject;
 
+import quarks.execution.Configs;
 import quarks.execution.Job;
 import quarks.graph.Vertex;
 import quarks.oplet.Oplet;
@@ -30,8 +31,6 @@ import quarks.test.topology.TopologyAbstractTest;
 import quarks.topology.TStream;
 import quarks.topology.Topology;
 
-// TODO factor out job submission, waiting for completion
-// TODO create test in quarks.test.runtime.embedded 
 public class DirectJobTest extends TopologyAbstractTest implements DirectTestSetup {
     @Test
     public void jobName0() throws Exception {
@@ -49,7 +48,9 @@ public class DirectJobTest extends TopologyAbstractTest implements DirectTestSet
         String topologyName = "topoName";
         Topology t = newTopology(topologyName);
         t.strings(data);
-        Job job = awaitCompleteExecution(t, new Configuration().addProperty(DirectProvider.CONFIGURATION_JOB_NAME, (String)null).json());
+        JsonObject config = new JsonObject();
+        config.addProperty(Configs.JOB_NAME, (String)null);
+        Job job = awaitCompleteExecution(t, config);
         assertTrue(job.getName().startsWith(topologyName));
     }
 
@@ -59,7 +60,9 @@ public class DirectJobTest extends TopologyAbstractTest implements DirectTestSet
         String jobName = "testJob";
         Topology t = newTopology();
         t.strings(data);
-        Job job = awaitCompleteExecution(t, new Configuration().addProperty(DirectProvider.CONFIGURATION_JOB_NAME, jobName).json());
+        JsonObject config = new JsonObject();
+        config.addProperty(Configs.JOB_NAME, jobName);
+        Job job = awaitCompleteExecution(t, config);
         assertEquals(jobName, job.getName());
     }
 
@@ -294,19 +297,6 @@ public class DirectJobTest extends TopologyAbstractTest implements DirectTestSet
             catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        }
-    }
-    
-    private static class Configuration {
-        private final JsonObject values = new JsonObject();
-
-        Configuration addProperty(String name, String value) {
-            values.addProperty(name, value);
-            return this;
-        }
-        
-        JsonObject json() {
-            return values;
         }
     }
 }

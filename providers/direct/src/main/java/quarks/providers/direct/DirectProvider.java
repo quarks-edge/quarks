@@ -38,13 +38,6 @@ public class DirectProvider extends AbstractTopologyProvider<DirectTopology>
 
     private final ServiceContainer services;
     
-    /**
-     * CONFIGURATION_JOB_NAME is used to identify the submission configuration property containing the job name.
-     * The value is {@value}.
-     * @see #submit(Topology, JsonObject)
-     */
-    public static final String CONFIGURATION_JOB_NAME = "jobName";
-
     public DirectProvider() {
         this.services = new ServiceContainer();
     }
@@ -71,26 +64,6 @@ public class DirectProvider extends AbstractTopologyProvider<DirectTopology>
         return submit(topology, new JsonObject());
     }
     
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The configuration JSON representation is summarized in the following table:
-     * 
-     * <table border=1 cellpadding=3 cellspacing=1>
-     * <caption>Summary of configuration properties</caption>
-     * <tr>
-     *    <td align=center><b>Attribute</b></td>
-     *    <td align=center><b>Type</b></td>
-     *    <td align=center><b>Description</b></td>
-     *  </tr>
-     * <tr>
-     *    <td>jobName</td>
-     *    <td>String</td>
-     *    <td>The name of the job.</td>
-     *  </tr>
-     * </table>
-     * 
-     */
     @Override
     public Future<Job> submit(Topology topology, JsonObject config) {
         return ((DirectTopology) topology).executeCallable(config);

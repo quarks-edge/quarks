@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
+import quarks.execution.Configs;
 import quarks.execution.Job;
 import quarks.execution.services.RuntimeServices;
 import quarks.execution.services.ServiceContainer;
@@ -75,7 +76,7 @@ public class DirectTopology extends GraphTopology<DirectTester> {
         
         JsonElement value = null;
         if (config != null) 
-            value = config.get(DirectProvider.CONFIGURATION_JOB_NAME);
+            value = config.get(Configs.JOB_NAME);
         if (value != null && !(value instanceof JsonNull))
             ((EtiaoJob)getJob()).setName(value.getAsString()); 
         return getExecutable().getScheduler().submit(getCallable());
