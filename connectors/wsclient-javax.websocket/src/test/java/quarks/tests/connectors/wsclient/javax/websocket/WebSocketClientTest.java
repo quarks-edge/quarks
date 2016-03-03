@@ -67,6 +67,9 @@ public class WebSocketClientTest extends ConnectorTestBase {
             throw new RuntimeException("startEchoer",e );
         }
     }
+    private void restartEchoer(int secDelay) {
+        wsServer.restart(secDelay);
+    }
     
     Properties getConfig() {
         return getWsConfig();
@@ -281,6 +284,21 @@ public class WebSocketClientTest extends ConnectorTestBase {
         startEchoer();  // before getConfig() so it gets the port
         
         // TODO
+        restartEchoer(2);
+    }
+    
+    @Test
+    public void testSslReconnect() throws Exception {
+
+        assumeTrue(false); // TODO
+        
+        Topology t = newTopology("testSslReconnect");
+        System.out.println("===== "+t.getName());
+
+        startEchoer();  // before getConfig() so it gets the port
+        
+        // TODO
+        restartEchoer(2);
     }
 
     private class SslSystemPropMgr {

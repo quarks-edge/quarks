@@ -129,6 +129,11 @@ public class WebSocketServerEcho {
         return connector.getLocalPort();
     }
     
+    /** restart a running server on the same port, etc: stop, delay, start */
+    public void restart(int secDelay) {
+        // TODO
+    }
+    
     public void stop() {
         if (connector != null) {
             try {

@@ -201,7 +201,6 @@ public class WebSocketClientConnector extends Connector<Session> implements Seri
     void sendText(String msg) {
         try {
             client().getBasicRemote().sendText(msg);
-getLogger().info("{} sendText {}", id(), msg);
             getLogger().trace("{} sendText {}", id(), msg);
         }
         catch (RuntimeException e) {
