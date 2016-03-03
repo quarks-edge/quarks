@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import quarks.function.Supplier;
 import quarks.topology.TStream;
 import quarks.topology.TWindow;
 import quarks.topology.Topology;
@@ -65,7 +64,7 @@ public abstract class TWindowTest extends TopologyAbstractTest{
         complete(top, contents);
         System.out.println(contents.getResult());
         for(Integer size : contents.getResult()){
-            assertTrue(size >= 95 && size <= 105);
+            assertTrue(size >= 90 && size <= 110);
         }
     }
     

@@ -8,11 +8,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 import static quarks.function.Functions.unpartitioned;
 import static quarks.window.Policies.alwaysInsert;
-import static quarks.window.Policies.evictOlderWithProcess;
-import static quarks.window.Policies.insertionTimeList;
-import static quarks.window.Policies.processOnInsert;
-import static quarks.window.Policies.scheduleEvictIfEmpty;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -28,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 import quarks.function.BiConsumer;
-import quarks.function.BiFunction;
 import quarks.window.InsertionTimeList;
 import quarks.window.Policies;
 import quarks.window.Window;
@@ -313,9 +307,10 @@ public class WindowTest {
         
     }
     
+    @SuppressWarnings("serial")
     @Test
     public void countBatchWindowTest(){
-        List<Integer> numBatches = new LinkedList();
+        List<Integer> numBatches = new LinkedList<>();
         Window<Integer, Integer, List<Integer>> window =
                 Windows.window(
                         alwaysInsert(),
@@ -325,10 +320,8 @@ public class WindowTest {
                         tuple -> 0,
                         () -> new ArrayList<Integer>());
         window.registerPartitionProcessor(new BiConsumer<List<Integer>, Integer>() {
-            int count = 0;
             @Override
             public void accept(List<Integer> t, Integer u) {
-                count++;
                 numBatches.add(1);
             }
         });
@@ -339,9 +332,10 @@ public class WindowTest {
         assertTrue(numBatches.size() == 8);
     }
 
+    @SuppressWarnings("serial")
     @Test
     public void timeBatchWindowTest() throws InterruptedException{
-        List<Long> numBatches = new LinkedList();
+        List<Long> numBatches = new LinkedList<>();
         
         ScheduledExecutorService ses = new ScheduledThreadPoolExecutor(5);
         Window<Integer, Integer, List<Integer>> window =
@@ -354,7 +348,6 @@ public class WindowTest {
                         () -> new ArrayList<Integer>());
         
         window.registerPartitionProcessor(new BiConsumer<List<Integer>, Integer>() {
-            int count = 0;
             @Override
             public void accept(List<Integer> t, Integer u) {
                 numBatches.add((long)t.size());
@@ -374,6 +367,7 @@ public class WindowTest {
         }    
     }
     
+    @SuppressWarnings("serial")
     @Test
     public void timeBatchEnsureUnique() throws InterruptedException{
         List<List<Integer>> batches = new LinkedList<>();
@@ -389,7 +383,6 @@ public class WindowTest {
                         () -> new ArrayList<Integer>());
         
         window.registerPartitionProcessor(new BiConsumer<List<Integer>, Integer>() {
-            int count = 0;
             @Override
             public void accept(List<Integer> t, Integer u) {
                 batches.add(new ArrayList<Integer>(t));
