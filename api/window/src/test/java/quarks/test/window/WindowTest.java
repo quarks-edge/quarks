@@ -320,11 +320,8 @@ public class WindowTest {
                         tuple -> 0,
                         () -> new ArrayList<Integer>());
         window.registerPartitionProcessor(new BiConsumer<List<Integer>, Integer>() {
-            @SuppressWarnings("unused")
-            int count = 0;
             @Override
             public void accept(List<Integer> t, Integer u) {
-                count++;
                 numBatches.add(1);
             }
         });
