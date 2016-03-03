@@ -11,6 +11,7 @@ import java.util.List;
 
 import quarks.execution.services.ServiceContainer;
 import quarks.graph.Edge;
+import quarks.graph.Graph;
 import quarks.graph.Vertex;
 import quarks.graph.spi.AbstractGraph;
 import quarks.oplet.Oplet;
@@ -18,21 +19,41 @@ import quarks.runtime.etiao.EtiaoJob;
 import quarks.runtime.etiao.Executable;
 import quarks.runtime.etiao.Invocation;
 
+/**
+ * {@code DirectGraph} is a {@link Graph} that
+ * is executed in the current virtual machine.
+ * 
+ */
 public class DirectGraph extends AbstractGraph<Executable> {
 
     private final EtiaoJob job;
     private final Executable executable;
     private final List<ExecutableVertex<? extends Oplet<?, ?>, ?, ?>> vertices = new ArrayList<>();
 
+    /**
+     * Creates a new {@code DirectGraph} instance underlying the specified 
+     * topology.
+     * 
+     * @param topologyName name of the topology
+     * @param container service container
+     */
     public DirectGraph(String topologyName, ServiceContainer container) {
         this.job = new EtiaoJob(this, topologyName, container);
         this.executable = new Executable(job);
     }
 
+    /**
+     * Returns the {@code Executable} running this graph.
+     * @return the executable
+     */
     public Executable executable() {
         return executable;
     }
 
+    /**
+     * Returns the {@code EtiaoJob} controlling the execution.
+     * @return the executable
+     */
     public EtiaoJob job() {
         return job;
     }

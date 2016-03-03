@@ -20,9 +20,8 @@ import quarks.oplet.core.Source;
  * {@link Edge} objects connect an output connector to
  * an input connector.
  * <p>
- * A vertex has an associated {@link Oplet} instance that will be executed at runtime..
- * <p>
- * 
+ * A vertex has an associated {@link Oplet} instance that will be executed
+ * at runtime.
  */
 public interface Graph {
 
@@ -40,8 +39,6 @@ public interface Graph {
     /**
      * Create a new unconnected {@link Vertex} associated with the
      * specified source {@link Oplet}.
-     * 
-     * 
      * <p>
      * The {@code Vertex} for the oplet has 0 input connectors and one output connector.
      * @param oplet the source oplet
