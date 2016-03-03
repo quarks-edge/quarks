@@ -121,10 +121,7 @@ public class WebSocketServerEcho {
     }
     
     private String getStorePath(String storeLeaf) {
-        // path to project in repo: <repo>/connectors
-        String path = System.getProperty("user.dir");
-        path += "/wsclient-javax.websocket/src/test/keystores/" + storeLeaf;
-        return path;
+        return KeystorePath.getStorePath(storeLeaf);
     }
     
     public int getPort() {

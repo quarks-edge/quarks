@@ -9,6 +9,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assume.assumeTrue;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -98,10 +100,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
     }
     
     private String getStorePath(String storeLeaf) {
-        // path to project in repo: <repo>/connectors
-        String path = System.getProperty("user.dir");
-        path += "/wsclient-javax.websocket/src/test/keystores/" + storeLeaf;
-        return path;
+        return KeystorePath.getStorePath(storeLeaf);
     }
     
     @Test
@@ -283,6 +282,36 @@ public class WebSocketClientTest extends ConnectorTestBase {
         
         // TODO
     }
+
+    private class SslSystemPropMgr {
+        private final Map<String,String> origProps = new HashMap<>();
+        
+        public void set() {
+            set("javax.net.ssl.trustStore", getStorePath("clientTrustStore.jks"));
+            set("javax.net.ssl.trustStorePassword", "passw0rd");
+            set("javax.net.ssl.keyStore", getStorePath("clientKeyStore.jks"));
+            set("javax.net.ssl.keyStorePassword", "passw0rd");
+        }
+        
+        private void set(String prop, String defaultVal) {
+            origProps.put(prop, System.setProperty(prop, defaultVal));
+        }
+        
+        public void restore() {
+            restore("javax.net.ssl.trustStore");
+            restore("javax.net.ssl.trustStorePassword");
+            restore("javax.net.ssl.keyStore");
+            restore("javax.net.ssl.keyStorePassword");
+        }
+        
+        private void restore(String prop) {
+            String origValue = origProps.get(prop);
+            if (origValue == null)
+                System.getProperties().remove(prop);
+            else
+                System.setProperty(prop, origValue);
+        }
+    }
     
     @Test
     public void testSslSystemProperty() throws Exception {
@@ -294,12 +323,10 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Properties config = getConfig();  // no SSL config stuff
         config.setProperty("ws.uri", getWssUri());
 
-        String origTrustStore = null;
-        String origTrustStorePassword = null;
+        SslSystemPropMgr sslProps = new SslSystemPropMgr();
         try {
             // a trust store that contains the server's cert
-            origTrustStore = System.setProperty("javax.net.ssl.trustStore", getStorePath("clientTrustStore.jks"));
-            origTrustStorePassword = System.setProperty("javax.net.ssl.trustStorePassword", "passw0rd");
+            sslProps.set();
     
             // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
             
@@ -316,10 +343,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
             completeAndValidate("", t, rcvd, SEC_TMO, expected);
         }
         finally {
-            if (origTrustStore != null)
-                System.setProperty("javax.net.ssl.trustStore", origTrustStore);
-            if (origTrustStorePassword != null)
-                System.setProperty("javax.net.ssl.trustStorePassword", origTrustStorePassword);
+            sslProps.restore();
         }
     }
     
@@ -333,16 +357,10 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Properties config = getConfig();  // no SSL config stuff
         config.setProperty("ws.uri", getWssUri());
 
-        String origTrustStore = null;
-        String origTrustStorePassword = null;
-        String origKeyStore = null;
-        String origKeyStorePassword = null;
+        SslSystemPropMgr sslProps = new SslSystemPropMgr();
         try {
             // a trust store that contains the server's cert
-            origTrustStore = System.setProperty("javax.net.ssl.trustStore", getStorePath("clientTrustStore.jks"));
-            origTrustStorePassword = System.setProperty("javax.net.ssl.trustStorePassword", "passw0rd");
-            origKeyStore = System.setProperty("javax.net.ssl.keyStore", getStorePath("clientKeyStore.jks"));
-            origKeyStorePassword = System.setProperty("javax.net.ssl.keyStorePassword", "passw0rd");
+            sslProps.set();
     
             // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
             
@@ -359,14 +377,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
             completeAndValidate("", t, rcvd, SEC_TMO, expected);
         }
         finally {
-            if (origTrustStore != null)
-                System.setProperty("javax.net.ssl.trustStore", origTrustStore);
-            if (origTrustStorePassword != null)
-                System.setProperty("javax.net.ssl.trustStorePassword", origTrustStorePassword);
-            if (origKeyStore != null)
-                System.setProperty("javax.net.ssl.keyStore", origKeyStore);
-            if (origKeyStorePassword != null)
-                System.setProperty("javax.net.ssl.keyStorePassword", origKeyStorePassword);
+            sslProps.restore();
         }
     }
     
@@ -636,11 +647,9 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Properties config = getConfig();
         config.setProperty("ws.uri", "wss://echo.websocket.org");
 
-        String origTrustStore = null;
-        String origTrustStorePassword = null;
+        SslSystemPropMgr sslProps = new SslSystemPropMgr();
         try {
-            origTrustStore = System.setProperty("javax.net.ssl.trustStore", getStorePath("clientTrustStore.jks"));
-            origTrustStorePassword = System.setProperty("javax.net.ssl.trustStorePassword", "passw0rd");
+            sslProps.set();
     
             // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
             
@@ -657,10 +666,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
             completeAndValidate("", t, rcvd, SEC_TMO, new String[0]);  //rcv nothing
         }
         finally {
-            if (origTrustStore != null)
-                System.setProperty("javax.net.ssl.trustStore", origTrustStore);
-            if (origTrustStorePassword != null)
-                System.setProperty("javax.net.ssl.trustStorePassword", origTrustStorePassword);
+            sslProps.restore();
         }
     }
 }
