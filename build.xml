@@ -89,6 +89,7 @@
         <ant dir="spi/topology" target="@{target}" useNativeBasedir="true"/>
         <ant dir="runtime/etiao" target="@{target}" useNativeBasedir="true"/>
         <ant dir="runtime/jmxcontrol" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="runtime/jsoncontrol" target="@{target}" useNativeBasedir="true"/>
         <ant dir="utils/metrics" target="@{target}" useNativeBasedir="true"/>
 
         <ant dir="providers/direct" target="@{target}" useNativeBasedir="true"/>
