@@ -112,6 +112,7 @@
 
 	<target name="init">
 	    <mkdir dir="${classes}"/>
+        <mkdir dir="${resources}"/>
 	    <mkdir dir="${test.classes}"/>
 	    <mkdir dir="${target.java8.dir}"/>
 	    <mkdir dir="${target.java8.ext}"/>
@@ -146,7 +147,7 @@
 	        <attribute name="Class-Path" value="${jar.classpath}"/>
 	      </manifest>
 	      <fileset dir="${classes}"/>
-          <fileset dir="src/main" includes="resources/"/>
+          <fileset dir="${resources}"/>
 	    </jar>	    
 	  </target>
 	

@@ -64,7 +64,7 @@
   <target name="test"
      description="Run all JUnit tests. Requires Java 8"
      >
-     <echo message="HINT: to include tests for connectors do: ant -Dtest.base.pattern='**/*TestManual.java' test"/>
+     <echo message="HINT: to include tests for some connectors do: ant -Dtest.base.pattern='**/*TestManual.java' test"/>
      <subprojects target="test"/>
   </target>
   <target name="clean">
