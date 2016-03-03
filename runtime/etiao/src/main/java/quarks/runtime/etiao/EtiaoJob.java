@@ -28,16 +28,24 @@ public class EtiaoJob extends AbstractGraphJob implements JobContext {
     
     private final DirectGraph graph;
     private final String id;
-    private final String applicationName;
+    private final String topologyName;
     private String name;
     private final ServiceContainer containerServices;
 
     private static final AtomicInteger jobID = new AtomicInteger(0);
 
-    public EtiaoJob(DirectGraph graph, String applicationName, ServiceContainer container) {
+    /**
+     * Creates a new {@code EtiaoJob} instance which controls the lifecycle 
+     * of the specified graph.
+     * 
+     * @param graph graph representation of the topology
+     * @param topologyName name of the topology
+     * @param container service container
+     */
+    public EtiaoJob(DirectGraph graph, String topologyName, ServiceContainer container) {
         this.graph = graph;
         this.id = ID_PREFIX + String.valueOf(jobID.getAndIncrement());
-        this.applicationName = applicationName;
+        this.topologyName = topologyName;
         this.containerServices = container;
 
         ControlService cs = container.getService(ControlService.class);
@@ -45,9 +53,16 @@ public class EtiaoJob extends AbstractGraphJob implements JobContext {
             cs.registerControl(JobMXBean.TYPE, getId(), null, JobMXBean.class, new EtiaoJobBean(this));
     }
 
+    /**
+     * {@inheritDoc}
+     * <P>
+     * If a job name is not specified at submit time, this implementation 
+     * creates a job name with the following format: {@code topologyName_jobId}.
+     * </P>
+     */
     @Override
     public String getName() {
-        return name != null ? name : applicationName + "_" + this.id;
+        return name != null ? name : topologyName + "_" + this.id;
     }
 
     @Override

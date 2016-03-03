@@ -94,8 +94,9 @@ public interface Job {
     void stateChange(Action action) throws IllegalArgumentException;
     
     /**
-     * Returns the name of this job. The name is set when the job is 
-     * {@link quarks.execution.Submitter#submit(java.lang.Object,com.google.gson.JsonObject) submitted}.
+     * Returns the name of this job. The name may be set when the job is 
+     * {@linkplain quarks.execution.Submitter#submit(java.lang.Object,com.google.gson.JsonObject) submitted}.
+     * Implementations may create a job name if one is not specified at submit time.
      *
      * @return the job name.
      */
