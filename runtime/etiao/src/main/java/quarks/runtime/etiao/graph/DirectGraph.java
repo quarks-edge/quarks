@@ -24,8 +24,8 @@ public class DirectGraph extends AbstractGraph<Executable> {
     private final Executable executable;
     private final List<ExecutableVertex<? extends Oplet<?, ?>, ?, ?>> vertices = new ArrayList<>();
 
-    public DirectGraph(String name, ServiceContainer container) {
-        this.job = new EtiaoJob(this, name, container);
+    public DirectGraph(String topologyName, ServiceContainer container) {
+        this.job = new EtiaoJob(this, topologyName, container);
         this.executable = new Executable(job);
     }
 

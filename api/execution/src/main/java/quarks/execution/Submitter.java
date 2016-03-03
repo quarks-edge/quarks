@@ -35,7 +35,7 @@ public interface Submitter<E, J extends Job> {
      * Submit an executable.
      * 
      * @param executable executable to submit
-     * @param config reserved for future use: context information for the submission.
+     * @param config context information for the submission
      * @return a future for the submitted executable
      */
     Future<J> submit(E executable, JsonObject config);

@@ -18,6 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
+import com.google.gson.JsonObject;
+
 import quarks.execution.Job;
 import quarks.graph.Vertex;
 import quarks.oplet.Oplet;
@@ -31,6 +33,36 @@ import quarks.topology.Topology;
 // TODO factor out job submission, waiting for completion
 // TODO create test in quarks.test.runtime.embedded 
 public class DirectJobTest extends TopologyAbstractTest implements DirectTestSetup {
+    @Test
+    public void jobName0() throws Exception {
+        String[] data = new String[] {};
+        String topologyName = "topoName";
+        Topology t = newTopology(topologyName);
+        t.strings(data);
+        Job job = awaitCompleteExecution(t);
+        assertTrue(job.getName().startsWith(topologyName));
+    }
+
+    @Test
+    public void jobName1() throws Exception {
+        String[] data = new String[] {};
+        String topologyName = "topoName";
+        Topology t = newTopology(topologyName);
+        t.strings(data);
+        Job job = awaitCompleteExecution(t, new Configuration().addProperty(DirectProvider.CONFIGURATION_JOB_NAME, (String)null).json());
+        assertTrue(job.getName().startsWith(topologyName));
+    }
+
+    @Test
+    public void jobName2() throws Exception {
+        String[] data = new String[] {};
+        String jobName = "testJob";
+        Topology t = newTopology();
+        t.strings(data);
+        Job job = awaitCompleteExecution(t, new Configuration().addProperty(DirectProvider.CONFIGURATION_JOB_NAME, jobName).json());
+        assertEquals(jobName, job.getName());
+    }
+
     @Test
     public void jobDone0() throws Exception {
         String[] data = new String[] {};
@@ -203,7 +235,11 @@ public class DirectJobTest extends TopologyAbstractTest implements DirectTestSet
     }
 
     private Job awaitCompleteExecution(Topology t) throws InterruptedException, ExecutionException {
-        Future<Job> fj = ((DirectProvider)getTopologyProvider()).submit(t);
+        return awaitCompleteExecution(t, null);
+    }
+
+    private Job awaitCompleteExecution(Topology t, JsonObject config) throws InterruptedException, ExecutionException {
+        Future<Job> fj = ((DirectProvider)getTopologyProvider()).submit(t, config);
         Job job = fj.get();
         job.complete();
         return job;
@@ -258,6 +294,19 @@ public class DirectJobTest extends TopologyAbstractTest implements DirectTestSet
             catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+        }
+    }
+    
+    private static class Configuration {
+        private final JsonObject values = new JsonObject();
+
+        Configuration addProperty(String name, String value) {
+            values.addProperty(name, value);
+            return this;
+        }
+        
+        JsonObject json() {
+            return values;
         }
     }
 }
