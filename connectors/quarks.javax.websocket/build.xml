@@ -1,19 +1,19 @@
-<project name="javax.websocket-client" default="all" 
+<project name="quarks.javax.websocket" default="all" 
     xmlns:jacoco="antlib:org.jacoco.ant"
     >
     <description>
-        Build Jetty supplied jsr356 WebSocket Client Implementation package.
+        Build Special Quarks javax.websocket bundle.
     </description>
 
-  <property name="component.path" value="connectors/javax.websocket-client"/>
+  <property name="component.path" value="connectors/quarks.javax.websocket"/>
   <import file="../../common-build.xml"/>
 
   <property name="ext" location="../../ext"/>
 
   <path id="compile.classpath">
-    <fileset dir="${component.ext}" includes="*.jar"/>
-    <pathelement location="${quarks.connectors}/quarks.javax.websocket/lib/quarks.javax.websocket.jar"/>
+    <pathelement location="${component.ext}/javax.websocket-api-1.0.jar" />
   </path>
+
 
   <path id="test.compile.classpath">
     <pathelement location="${jar}" />

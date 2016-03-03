@@ -1,3 +1,7 @@
+/*
+# Licensed Materials - Property of IBM
+# Copyright IBM Corp. 2015,2016 
+*/
 package quarks.tests.connectors.wsclient.javax.websocket;
 
 import java.io.IOException;
@@ -13,28 +17,48 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
 /**
  * Simple WebSocket server program to echo received messages.
- * Following info from https://github.com/jetty-project/embedded-jetty-websocket-examples
+ * <p>
+ * See https://github.com/jetty-project/embedded-jetty-websocket-examples
  */
 @ServerEndpoint(value="/echo")
 public class WebSocketServerEcho {
+    String svrName = this.getClass().getSimpleName();
     Server server;
     ServerConnector connector;
     
     public static void main(String[] args) throws Exception {
         URI uri = new URI("ws://localhost:0");
+        boolean needClientAuth = false;
+        if (args.length > 0)
+            uri = new URI(args[0]);
+        if (args.length > 1)
+            needClientAuth = "needClientAuth".equals(args[1]);
         WebSocketServerEcho srvr = new WebSocketServerEcho();
-        srvr.start(uri);
+        srvr.start(uri, needClientAuth);
     }
     
     public void start(URI endpointURI) {
-        server = new Server(endpointURI.getPort());
+        start(endpointURI, false);
+    }
+    
+    public void start(URI endpointURI, boolean needClientAuth) {
+
+        System.out.println(svrName+" "+endpointURI + " needClientAuth="+needClientAuth);
+
+        server = createServer(endpointURI, needClientAuth);
         connector = (ServerConnector)server.getConnectors()[0];
 
         // Setup the basic application "context" for this application at "/"
@@ -49,14 +73,58 @@ public class WebSocketServerEcho {
             // Add WebSocket endpoint to javax.websocket layer
             wscontainer.addEndpoint(this.getClass());
 
+            // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
+
             server.start();
-            System.out.println("WsServerEcho started "+connector);
+            System.out.println(svrName+" started "+connector);
             // server.dump(System.err);            
         }
         catch (Exception e) {
             // TODO Auto-generated catch block
             throw new RuntimeException("start", e);
         }
+    }
+    
+    private Server createServer(URI endpointURI, boolean needClientAuth) {
+        if ("ws".equals(endpointURI.getScheme())) {
+            return new Server(endpointURI.getPort());
+        }
+        else if ("wss".equals(endpointURI.getScheme())) {
+            // see http://git.eclipse.org/c/jetty/org.eclipse.jetty.project.git/tree/examples/embedded/src/main/java/org/eclipse/jetty/embedded/ManyConnectors.java
+            //     http://git.eclipse.org/c/jetty/org.eclipse.jetty.project.git/tree/examples/embedded/src/main/java/org/eclipse/jetty/embedded/LikeJettyXml.java
+            
+            Server server = new Server();
+            
+            SslContextFactory sslContextFactory = new SslContextFactory();
+            sslContextFactory.setKeyStorePath(getStorePath("serverKeyStore.jks"));
+            sslContextFactory.setKeyStorePassword("passw0rd");
+            sslContextFactory.setKeyManagerPassword("passw0rd");
+            sslContextFactory.setCertAlias("default");
+            sslContextFactory.setNeedClientAuth(needClientAuth);
+            sslContextFactory.setTrustStorePath(getStorePath("serverTrustStore.jks"));
+            sslContextFactory.setTrustStorePassword("passw0rd");
+            
+            HttpConfiguration httpsConfig = new HttpConfiguration();
+            httpsConfig.addCustomizer(new SecureRequestCustomizer());
+            
+            ServerConnector https= new ServerConnector(server,
+                    new SslConnectionFactory(sslContextFactory,
+                            HttpVersion.HTTP_1_1.asString()),
+                    new HttpConnectionFactory(httpsConfig));
+            https.setPort(endpointURI.getPort());
+            
+            server.addConnector(https);
+            return server;
+        }
+        else
+            throw new IllegalArgumentException("unrecognized uri: "+endpointURI);
+    }
+    
+    private String getStorePath(String storeLeaf) {
+        // path to project in repo: <repo>/connectors
+        String path = System.getProperty("user.dir");
+        path += "/wsclient-javax.websocket/src/test/keystores/" + storeLeaf;
+        return path;
     }
     
     public int getPort() {
@@ -67,7 +135,7 @@ public class WebSocketServerEcho {
     public void stop() {
         if (connector != null) {
             try {
-                System.out.println("WsServerEcho stop "+connector);
+                System.out.println(svrName+" stop "+connector);
                 connector.stop();
             } catch (Exception e) {
                 // TODO Auto-generated catch block
@@ -81,17 +149,17 @@ public class WebSocketServerEcho {
     
     @OnOpen
     public void opOpen(Session session) {
-        System.out.println("WsServerEcho onOpen ");
+        System.out.println(svrName+" onOpen ");
     }
     
     @OnClose
     public void onClose(Session session, CloseReason reason) {
-        System.out.println("WsServerEcho onClose reason="+reason);
+        System.out.println(svrName+" onClose reason="+reason);
     }
     
     @OnMessage
     public void onStringMessage(Session session, String message) {
-        System.out.println("WsServerEcho onStringMessage msg="+message);
+        System.out.println(svrName+" onStringMessage msg="+message);
         try {
             session.getBasicRemote().sendText(message);
         } catch (IOException e) {
@@ -102,7 +170,7 @@ public class WebSocketServerEcho {
     
     @OnMessage
     public void onByteMessage(Session session, ByteBuffer message) {
-        System.out.println("WsServerEcho onByteMessage "+message.array().length+" bytes");
+        System.out.println(svrName+" onByteMessage "+message.array().length+" bytes");
         try {
             session.getBasicRemote().sendBinary(message);
         } catch (IOException e) {
@@ -113,7 +181,7 @@ public class WebSocketServerEcho {
     
     @OnError
     public void onError(Throwable cause) {
-        System.err.println("WsServerEcho onError " + cause);
+        System.err.println(svrName+" onError " + cause);
         cause.printStackTrace(System.err);
     }
 
