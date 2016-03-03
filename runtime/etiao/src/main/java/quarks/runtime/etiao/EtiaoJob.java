@@ -28,7 +28,8 @@ public class EtiaoJob extends AbstractGraphJob implements JobContext {
     
     private final DirectGraph graph;
     private final String id;
-    private final String name;
+    private final String applicationName;
+    private String name;
     private final ServiceContainer containerServices;
 
     private static final AtomicInteger jobID = new AtomicInteger(0);
@@ -36,9 +37,9 @@ public class EtiaoJob extends AbstractGraphJob implements JobContext {
     public EtiaoJob(DirectGraph graph, String applicationName, ServiceContainer container) {
         this.graph = graph;
         this.id = ID_PREFIX + String.valueOf(jobID.getAndIncrement());
-        this.name = applicationName + "_" + this.id;
+        this.applicationName = applicationName;
         this.containerServices = container;
-        
+
         ControlService cs = container.getService(ControlService.class);
         if (cs != null)
             cs.registerControl(JobMXBean.TYPE, getId(), null, JobMXBean.class, new EtiaoJobBean(this));
@@ -46,7 +47,7 @@ public class EtiaoJob extends AbstractGraphJob implements JobContext {
 
     @Override
     public String getName() {
-        return name;
+        return name != null ? name : applicationName + "_" + this.id;
     }
 
     @Override
@@ -161,5 +162,9 @@ public class EtiaoJob extends AbstractGraphJob implements JobContext {
     
     public DirectGraph graph() {
         return graph;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
