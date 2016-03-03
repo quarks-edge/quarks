@@ -6,6 +6,10 @@ package quarks.graph.spi.execution;
 
 import quarks.execution.Job;
 
+/**
+ * Placeholder for a skeletal implementation of the {@link Job} interface,
+ * to minimize the effort required to implement the interface.
+ */
 public abstract class AbstractGraphJob implements Job {
     private State currentState;
     private State nextState;

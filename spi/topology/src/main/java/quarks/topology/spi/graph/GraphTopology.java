@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import quarks.function.Consumer;
 import quarks.function.Functions;
 import quarks.function.Supplier;
+import quarks.graph.Graph;
 import quarks.oplet.core.Source;
 import quarks.oplet.functional.Events;
 import quarks.oplet.functional.SupplierPeriodicSource;
@@ -18,6 +19,10 @@ import quarks.topology.plumbing.PlumbingStreams;
 import quarks.topology.spi.AbstractTopology;
 import quarks.topology.tester.Tester;
 
+/**
+ * Topology implementation that provides basic functions for implementing
+ * source streams backed by a {@link Graph}.
+ */
 public abstract class GraphTopology<X extends Tester> extends AbstractTopology<X> {
 
     protected GraphTopology(String name) {

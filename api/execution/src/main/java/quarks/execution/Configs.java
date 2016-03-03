@@ -3,7 +3,8 @@ package quarks.execution;
 /**
  * Configuration property names.
  * 
- * Configuration is passed as a JSON collection of name/value pairs when an executable is 
+ * Configuration is passed as a JSON collection of name/value
+ * pairs when an executable is 
  * {@linkplain quarks.execution.Submitter#submit(Object, com.google.gson.JsonObject) submitted}.
  * <p>
  * The configuration JSON representation is summarized in the following table:
@@ -29,5 +30,5 @@ public interface Configs {
      * containing the job name.
      * The value is {@value}.
      */
-    public static final String JOB_NAME = "jobName";
+    static final String JOB_NAME = "jobName";
 }

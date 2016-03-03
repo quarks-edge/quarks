@@ -22,12 +22,26 @@ import quarks.runtime.etiao.Executable;
 import quarks.runtime.etiao.graph.DirectGraph;
 import quarks.topology.spi.graph.GraphTopology;
 
+/**
+ * {@code DirectTopology} is a {@link GraphTopology} that
+ * is executed in threads in the current virtual machine.
+ * <P> 
+ * The topology is backed by a {@code DirectGraph} and its
+ * execution is controlled and monitored by a {@code EtiaoJob}.
+ * </P>
+ */
 public class DirectTopology extends GraphTopology<DirectTester> {
 
     private final DirectGraph eg;
     private final Executable executable;
     private final Job job;
 
+    /**
+     * Creates a {@code DirectTopology} instance.
+     * 
+     * @param name topology name
+     * @param container container which provides runtime services
+     */
     DirectTopology(String name, ServiceContainer container) {
         super(name);
 
