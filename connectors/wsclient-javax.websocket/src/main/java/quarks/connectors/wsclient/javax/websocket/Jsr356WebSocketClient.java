@@ -58,7 +58,7 @@ import quarks.topology.json.JsonFunctions;
  * {@code javax.websockets} uses the {@link java.util.ServiceLoader} to load
  * an implementation of {@code javax.websocket.ContainerProvider}.
  * <p>
- * The supplied {@code connectors/javax.websocket.client} provides one
+ * The supplied {@code connectors/javax.websocket-client} provides one
  * such implementation. To use it, include
  * {@code connectors/javax.websocket-client/lib/javax.websocket-client.jar}
  * on your classpath.

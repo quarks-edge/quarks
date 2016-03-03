@@ -36,7 +36,8 @@ public abstract class QuarksSslContainerProvider {
      * <p>
      * The Java {@link ServiceLoader} is used to locate an implementation
      * of {@code quarks.javax.websocket.Quarks.SslContainerProvider}.
-     * @param config  SSL configuration info. 
+     * @param config  SSL configuration info as described by
+     * {@code quarks.containers.wsclient.javax.websocket.Jsr356WebSocketClient}.
      * @return the WebSocketContainer
      * @throws RuntimeException upon failure
      */
