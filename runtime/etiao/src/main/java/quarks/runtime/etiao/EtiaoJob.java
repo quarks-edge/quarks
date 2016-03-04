@@ -50,7 +50,7 @@ public class EtiaoJob extends AbstractGraphJob implements JobContext {
 
         ControlService cs = container.getService(ControlService.class);
         if (cs != null)
-            cs.registerControl(JobMXBean.TYPE, getId(), null, JobMXBean.class, new EtiaoJobBean(this));
+            cs.registerControl(JobMXBean.TYPE, getId(), getName(), JobMXBean.class, new EtiaoJobBean(this));
     }
 
     /**
