@@ -65,7 +65,7 @@
   <target name="test"
      description="Run all JUnit tests. Requires Java 8"
      >
-     <echo message="HINT: to include tests for connectors do: ant -Dtest.base.pattern='**/*TestManual.java' test"/>
+     <echo message="HINT: to include tests for some connectors do: ant -Dtest.base.pattern='**/*TestManual.java' test"/>
      <subprojects target="test"/>
   </target>
   <target name="clean">
@@ -101,6 +101,7 @@
         <ant dir="connectors/jdbc" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/kafka" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/mqtt" target="@{target}" useNativeBasedir="true"/>
+        <ant dir="connectors/quarks.javax.websocket" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/javax.websocket-client" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/javax.websocket-server" target="@{target}" useNativeBasedir="true"/>
         <ant dir="connectors/wsclient" target="@{target}" useNativeBasedir="true"/>

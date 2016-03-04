@@ -12,6 +12,7 @@
 
   <path id="compile.classpath">
     <fileset dir="${component.ext}" includes="*.jar"/>
+    <pathelement location="${quarks.connectors}/javax.websocket-client/lib/javax.websocket-client.jar"/>
   </path>
 
   <path id="test.compile.classpath">

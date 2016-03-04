@@ -1,11 +1,16 @@
+/*
+# Licensed Materials - Property of IBM
+# Copyright IBM Corp. 2015,2016 
+*/
 package quarks.tests.connectors.wsclient.javax.websocket;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +32,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
     private final static int SEC_TMO = 5;
     WebSocketServerEcho wsServer;
     boolean isExternalServer;// = true;
-    int wsServerPort = !isExternalServer ? 0 : 52224;
+    int wsServerPort = !isExternalServer ? 0 : 49460;
     String wsUriPath = "/echo";  // match what WsServerEcho is using
     
     @After
@@ -53,7 +58,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
                     uri = new URI("wss://localhost:0");
                     wsServer = new WebSocketServerEcho();
                 }
-                wsServer.start(uri);
+                wsServer.start(uri, mode==ServerMode.SSL_CLIENT_AUTH);
                 wsServerPort = wsServer.getPort();
             }
         } catch (Exception e) {
@@ -61,6 +66,9 @@ public class WebSocketClientTest extends ConnectorTestBase {
             e.printStackTrace();
             throw new RuntimeException("startEchoer",e );
         }
+    }
+    private void restartEchoer(int secDelay) {
+        wsServer.restart(secDelay);
     }
     
     Properties getConfig() {
@@ -76,7 +84,11 @@ public class WebSocketClientTest extends ConnectorTestBase {
     Properties getWssConfig() {
         Properties config = new Properties();
         config.setProperty("ws.uri", getWssUri());
-        // TODO key/trust store stuff
+        config.setProperty("ws.trustStore", getStorePath("clientTrustStore.jks"));
+        config.setProperty("ws.trustStorePassword", "passw0rd");
+        config.setProperty("ws.keyStore", getStorePath("clientKeyStore.jks"));
+        config.setProperty("ws.keyStorePassword", "passw0rd");
+        // default: expect key to have the default alias
         return config;
     }
     
@@ -88,6 +100,10 @@ public class WebSocketClientTest extends ConnectorTestBase {
     String getWssUri() {
         int port = wsServerPort==0 ? 443 : wsServerPort;
         return "wss://localhost:"+port+wsUriPath;
+    }
+    
+    private String getStorePath(String storeLeaf) {
+        return KeystorePath.getStorePath(storeLeaf);
     }
     
     @Test
@@ -134,21 +150,22 @@ public class WebSocketClientTest extends ConnectorTestBase {
     }
     
     @Test(expected = IllegalArgumentException.class)
-    public void testWssTrustStorePathNeg() {
-        Topology t = newTopology("testWssTrustStorePathNeg");
-        Properties config = new Properties();
-        config.setProperty("ws.uri", getWssUri());
-        // missing trustStorePath
-        new Jsr356WebSocketClient(t, config);
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
     public void testWssTrustStorePasswordNeg() {
         Topology t = newTopology("testWssTrustStorePasswordNeg");
         Properties config = new Properties();
         config.setProperty("ws.uri", getWssUri());
-        config.setProperty("ws.trustStorePath", "xyzzy"); // not checked till runtime
-        // missing truststorePassword
+        config.setProperty("ws.trustStore", "xyzzy"); // not checked till runtime
+        // missing trustStorePassword
+        new Jsr356WebSocketClient(t, config);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testWssKeyStorePasswordNeg() {
+        Topology t = newTopology("testWssKeyStorePasswordNeg");
+        Properties config = new Properties();
+        config.setProperty("ws.uri", getWssUri());
+        config.setProperty("ws.keyStore", "xyzzy"); // not checked till runtime
+        // missing keyStorePassword
         new Jsr356WebSocketClient(t, config);
     }
     
@@ -157,7 +174,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
         Topology t = newTopology("testWssConfig");
         Properties config = new Properties();
         config.setProperty("ws.uri", getWssUri());
-        config.setProperty("ws.trustStorePath", "xyzzy"); // not checked till runtime
+        config.setProperty("ws.trustStore", "xyzzy"); // not checked till runtime
         config.setProperty("ws.trustStorePassword", "xyzzy"); // not checked till runtime
         new Jsr356WebSocketClient(t, config);
     }
@@ -258,7 +275,8 @@ public class WebSocketClientTest extends ConnectorTestBase {
     
     @Test
     public void testReconnect() throws Exception {
-        assumeTrue(false);
+
+        assumeTrue(false); // TODO
         
         Topology t = newTopology("testReconnect");
         System.out.println("===== "+t.getName());
@@ -266,20 +284,132 @@ public class WebSocketClientTest extends ConnectorTestBase {
         startEchoer();  // before getConfig() so it gets the port
         
         // TODO
+        restartEchoer(2);
+    }
+    
+    @Test
+    public void testSslReconnect() throws Exception {
+
+        assumeTrue(false); // TODO
+        
+        Topology t = newTopology("testSslReconnect");
+        System.out.println("===== "+t.getName());
+
+        startEchoer();  // before getConfig() so it gets the port
+        
+        // TODO
+        restartEchoer(2);
+    }
+
+    private class SslSystemPropMgr {
+        private final Map<String,String> origProps = new HashMap<>();
+        
+        public void set() {
+            set("javax.net.ssl.trustStore", getStorePath("clientTrustStore.jks"));
+            set("javax.net.ssl.trustStorePassword", "passw0rd");
+            set("javax.net.ssl.keyStore", getStorePath("clientKeyStore.jks"));
+            set("javax.net.ssl.keyStorePassword", "passw0rd");
+        }
+        
+        private void set(String prop, String defaultVal) {
+            origProps.put(prop, System.setProperty(prop, defaultVal));
+        }
+        
+        public void restore() {
+            restore("javax.net.ssl.trustStore");
+            restore("javax.net.ssl.trustStorePassword");
+            restore("javax.net.ssl.keyStore");
+            restore("javax.net.ssl.keyStorePassword");
+        }
+        
+        private void restore(String prop) {
+            String origValue = origProps.get(prop);
+            if (origValue == null)
+                System.getProperties().remove(prop);
+            else
+                System.setProperty(prop, origValue);
+        }
+    }
+    
+    @Test
+    public void testSslSystemProperty() throws Exception {
+        Topology t = newTopology("testSslSystemProperty");
+        System.out.println("===== "+t.getName());
+        
+        startEchoer(ServerMode.SSL);  // before getConfig() so it gets the port
+        
+        Properties config = getConfig();  // no SSL config stuff
+        config.setProperty("ws.uri", getWssUri());
+
+        SslSystemPropMgr sslProps = new SslSystemPropMgr();
+        try {
+            // a trust store that contains the server's cert
+            sslProps.set();
+    
+            // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
+            
+            WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
+            
+            String[] expected = new String[] { "one", "two" };
+            
+            TStream<String> s = t.strings(expected);
+            s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+            wsClient.sendString(s);
+            
+            TStream<String> rcvd = wsClient.receiveString();
+            
+            completeAndValidate("", t, rcvd, SEC_TMO, expected);
+        }
+        finally {
+            sslProps.restore();
+        }
+    }
+    
+    @Test
+    public void testSslClientAuthSystemProperty() throws Exception {
+        Topology t = newTopology("testSslClientAuthSystemProperty");
+        System.out.println("===== "+t.getName());
+        
+        startEchoer(ServerMode.SSL_CLIENT_AUTH);  // before getConfig() so it gets the port
+        
+        Properties config = getConfig();  // no SSL config stuff
+        config.setProperty("ws.uri", getWssUri());
+
+        SslSystemPropMgr sslProps = new SslSystemPropMgr();
+        try {
+            // a trust store that contains the server's cert
+            sslProps.set();
+    
+            // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
+            
+            WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
+            
+            String[] expected = new String[] { "one", "two" };
+            
+            TStream<String> s = t.strings(expected);
+            s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+            wsClient.sendString(s);
+            
+            TStream<String> rcvd = wsClient.receiveString();
+            
+            completeAndValidate("", t, rcvd, SEC_TMO, expected);
+        }
+        finally {
+            sslProps.restore();
+        }
     }
     
     @Test
     public void testSsl() throws Exception {
 
-        assumeTrue(false); // TODO
-        
         Topology t = newTopology("testSsl");
         System.out.println("===== "+t.getName());
 
         startEchoer(ServerMode.SSL);  // before getConfig() so it gets the port
         
         Properties config = getWssConfig();
-        assertTrue(config.getProperty("ws.uri").startsWith("wss:"));
+
+        // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
         
         WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
@@ -297,17 +427,45 @@ public class WebSocketClientTest extends ConnectorTestBase {
     @Test
     public void testSslNeg() throws Exception {
 
-        assumeTrue(false); // TODO
-        
         Topology t = newTopology("testSslNeg");
         System.out.println("===== "+t.getName());
 
-        startEchoer();  // before getConfig() so it gets the port
+        startEchoer(ServerMode.SSL);  // before getConfig() so it gets the port
+        
+        // since our server uses a self-signed cert, if we don't have
+        // a truststore setup with it in it, the client will fail to connect
+        // and ultimately the connect will fail and the test will
+        // receive nothing.
+
+        Properties config = getConfig();  // no SSL config stuff
+        config.setProperty("ws.uri", getWssUri());
+
+        // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
+        
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
+        
+        String[] expected = new String[] { "one", "two" };
+        
+        TStream<String> s = t.strings(expected);
+        s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+        wsClient.sendString(s);
+        
+        TStream<String> rcvd = wsClient.receiveString();
+        
+        completeAndValidate("", t, rcvd, SEC_TMO, new String[0]);  //rcv nothing
+    }
+    
+    @Test
+    public void testSslClientAuth() throws Exception {
+
+        Topology t = newTopology("testSslClientAuth");
+        System.out.println("===== "+t.getName());
+
+        startEchoer(ServerMode.SSL_CLIENT_AUTH);  // before getConfig() so it gets the port
         
         Properties config = getWssConfig();
-        assertTrue(config.getProperty("ws.uri").startsWith("wss:"));
-        String emptyTrustStorePath = "path-to-empty-trust-store"; // TODO
-        config.setProperty("ws.trustStorePath", emptyTrustStorePath); // so we don't recognize server cert
+
+        // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
         
         WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
@@ -323,17 +481,72 @@ public class WebSocketClientTest extends ConnectorTestBase {
     }
     
     @Test
-    public void testSslClientAuth() throws Exception {
+    public void testSslClientAuthDefault() throws Exception {
 
-        assumeTrue(false); // TODO
-        
-        Topology t = newTopology("testSslClientAuth");
+        Topology t = newTopology("testSslClientAuthDefault");
         System.out.println("===== "+t.getName());
 
         startEchoer(ServerMode.SSL_CLIENT_AUTH);  // before getConfig() so it gets the port
         
+        // explicitly specify client's "default" certificate
         Properties config = getWssConfig();
-        assertTrue(config.getProperty("ws.uri").startsWith("wss:"));
+        config.setProperty("ws.keyCertificateAlias", "default");
+
+        // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
+        
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
+        
+        String[] expected = new String[] { "one", "two" };
+        
+        TStream<String> s = t.strings(expected);
+        s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+        wsClient.sendString(s);
+        
+        TStream<String> rcvd = wsClient.receiveString();
+        
+        completeAndValidate("", t, rcvd, SEC_TMO, expected);
+    }
+    
+    @Test
+    public void testSslClientAuthMy2ndCertNeg() throws Exception {
+
+        Topology t = newTopology("testSslClientAuthMy2ndCertNeg");
+        System.out.println("===== "+t.getName());
+
+        startEchoer(ServerMode.SSL_CLIENT_AUTH);  // before getConfig() so it gets the port
+        
+        // explicitly specify client's "my2ndcert" certificate - unknown to server
+        Properties config = getWssConfig();
+        config.setProperty("ws.keyCertificateAlias", "my2ndcert");
+
+        // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
+        
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
+        
+        String[] expected = new String[] { "one", "two" };
+        
+        TStream<String> s = t.strings(expected);
+        s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+        wsClient.sendString(s);
+        
+        TStream<String> rcvd = wsClient.receiveString();
+        
+        completeAndValidate("", t, rcvd, SEC_TMO, new String[0]); // rcv nothing
+    }
+    
+    @Test
+    public void testSslClientAuthMy3rdCert() throws Exception {
+
+        Topology t = newTopology("testSslClientAuthMy3rdCert");
+        System.out.println("===== "+t.getName());
+
+        startEchoer(ServerMode.SSL_CLIENT_AUTH);  // before getConfig() so it gets the port
+        
+        // explicitly specify client's "my3rdcert" certificate
+        Properties config = getWssConfig();
+        config.setProperty("ws.keyCertificateAlias", "my3rdcert");
+
+        // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
         
         WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
@@ -351,16 +564,45 @@ public class WebSocketClientTest extends ConnectorTestBase {
     @Test
     public void testSslClientAuthNeg() throws Exception {
 
-        assumeTrue(false); // TODO
-        
         Topology t = newTopology("testSslClientAuthNeg");
         System.out.println("===== "+t.getName());
 
         startEchoer(ServerMode.SSL_CLIENT_AUTH);  // before getConfig() so it gets the port
+
+        // since our server will require client auth, if we don't have
+        // a keystore setup with it in it, the client will fail to connect
+        // and ultimately the connect will fail and the test will
+        // receive nothing.
+
+        Properties config = getConfig();  // no SSL config stuff
+        config.setProperty("ws.uri", getWssUri());
         
-        Properties config = getWssConfig();
-        assertTrue(config.getProperty("ws.uri").startsWith("wss:"));
-        config.remove("ws.keyStorePath");  // so we can't supply client cert
+        // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
+        
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
+        
+        String[] expected = new String[] { "one", "two" };
+        
+        TStream<String> s = t.strings(expected);
+        s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+        wsClient.sendString(s);
+        
+        TStream<String> rcvd = wsClient.receiveString();
+        
+        completeAndValidate("", t, rcvd, SEC_TMO, new String[0]);  //rcv nothing
+    }
+    
+    @Test
+    public void testPublicServer() throws Exception {
+        Topology t = newTopology("testPublicServer");
+        System.out.println("===== "+t.getName());
+        
+        // startEchoer();  // before getConfig() so it gets the port
+        
+        Properties config = getConfig();
+        config.setProperty("ws.uri", "ws://echo.websocket.org");
+
+        // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
         
         WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
@@ -373,5 +615,76 @@ public class WebSocketClientTest extends ConnectorTestBase {
         TStream<String> rcvd = wsClient.receiveString();
         
         completeAndValidate("", t, rcvd, SEC_TMO, expected);
+    }
+    
+    @Test
+    public void testSslPublicServer() throws Exception {
+        Topology t = newTopology("testSslPublicServer");
+        System.out.println("===== "+t.getName());
+        
+        // startEchoer();  // before getConfig() so it gets the port
+        
+        // Check operation against a trusted CA signed server certificate.
+        //
+        // this public wss echo server should "just work" if you have
+        // connectivity.  no additional ssl trustStore config is needed
+        // as the site has a certificate signed by a recognized CA.
+        
+        Properties config = getConfig();
+        config.setProperty("ws.uri", "wss://echo.websocket.org");
+
+        // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
+        
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
+        
+        String[] expected = new String[] { "one", "two" };
+        
+        TStream<String> s = t.strings(expected);
+        s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+        wsClient.sendString(s);
+        
+        TStream<String> rcvd = wsClient.receiveString();
+        
+        completeAndValidate("", t, rcvd, SEC_TMO, expected);
+    }
+    
+    public void testSslPublicServerBadTrustStoreSystemPropertyNeg() throws Exception {
+        Topology t = newTopology("testSslPublicServerBadTrustStoreSystemPropertyNeg");
+        System.out.println("===== "+t.getName());
+        
+        // startEchoer();  // before getConfig() so it gets the port
+        
+        // this public wss echo server should "just work" if you have
+        // connectivity.  no additional ssl trustStore config is needed
+        // as the site has a certificate signed by a recognized CA.
+        
+        // Set a trust store that doesn't contain the public server's cert nor CAs
+        // and ultimately the connect will fail and the test will
+        // receive nothing.
+
+        Properties config = getConfig();
+        config.setProperty("ws.uri", "wss://echo.websocket.org");
+
+        SslSystemPropMgr sslProps = new SslSystemPropMgr();
+        try {
+            sslProps.set();
+    
+            // System.setProperty("javax.net.debug", "ssl"); // or "all"; "help" for full list
+            
+            WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
+            
+            String[] expected = new String[] { "one", "two" };
+            
+            TStream<String> s = t.strings(expected);
+            s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+            wsClient.sendString(s);
+            
+            TStream<String> rcvd = wsClient.receiveString();
+            
+            completeAndValidate("", t, rcvd, SEC_TMO, new String[0]);  //rcv nothing
+        }
+        finally {
+            sslProps.restore();
+        }
     }
 }

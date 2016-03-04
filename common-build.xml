@@ -40,6 +40,7 @@
    <property name="quarks.samples" location="${target.java8.dir}/samples"/>
 
     <property name="src" location="src/main/java"/>
+    <property name="resources" location="src/main/resources"/>
     <property name="classes" location="classes"/>
     <property name="jarname" value="${ant.project.name}.jar"/>
     <property name="jar" location="${lib}/${jarname}"/>
@@ -111,6 +112,7 @@
 
 	<target name="init">
 	    <mkdir dir="${classes}"/>
+        <mkdir dir="${resources}"/>
 	    <mkdir dir="${test.classes}"/>
 	    <mkdir dir="${target.java8.dir}"/>
 	    <mkdir dir="${target.java8.ext}"/>
@@ -145,6 +147,7 @@
 	        <attribute name="Class-Path" value="${jar.classpath}"/>
 	      </manifest>
 	      <fileset dir="${classes}"/>
+          <fileset dir="${resources}"/>
 	    </jar>	    
 	  </target>
 	
@@ -156,7 +159,7 @@
 	  </target>
 
 	  <!-- Allow the pattern of tests to run be set
-	       ant -Dtest.base.pattern='**/*TestManual.java'
+	       ant -Dtest.base.pattern='**/*TestManual.java test'
 	  -->
 	  <property name="test.base.pattern" value="**/*Test.java"/>
 

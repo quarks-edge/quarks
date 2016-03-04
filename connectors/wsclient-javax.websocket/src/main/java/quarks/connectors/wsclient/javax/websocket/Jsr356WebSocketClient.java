@@ -7,6 +7,8 @@ package quarks.connectors.wsclient.javax.websocket;
 import java.util.Objects;
 import java.util.Properties;
 
+import javax.websocket.WebSocketContainer;
+
 import com.google.gson.JsonObject;
 
 import quarks.connectors.wsclient.WebSocketClient;
@@ -16,6 +18,7 @@ import quarks.connectors.wsclient.javax.websocket.runtime.WebSocketClientConnect
 import quarks.connectors.wsclient.javax.websocket.runtime.WebSocketClientReceiver;
 import quarks.connectors.wsclient.javax.websocket.runtime.WebSocketClientSender;
 import quarks.function.Function;
+import quarks.function.Supplier;
 import quarks.topology.TSink;
 import quarks.topology.TStream;
 import quarks.topology.Topology;
@@ -55,7 +58,7 @@ import quarks.topology.json.JsonFunctions;
  * {@code javax.websockets} uses the {@link java.util.ServiceLoader} to load
  * an implementation of {@code javax.websocket.ContainerProvider}.
  * <p>
- * The supplied {@code connectors/javax.websocket.client} provides one
+ * The supplied {@code connectors/javax.websocket-client} provides one
  * such implementation. To use it, include
  * {@code connectors/javax.websocket-client/lib/javax.websocket-client.jar}
  * on your classpath.
@@ -69,31 +72,55 @@ public class Jsr356WebSocketClient implements WebSocketClient{
     /**
      * Create a new Web Socket Client connector.
      * <p>
-     * !!! At this moment only "ws" is supported !!!
-     * <br>
-     * TODO support for "wss" and associated params.
-     * <p>
      * Configuration parameters:
      * <ul>
      * <li>ws.uri - "ws://host[:port][/path]", "wss://host[:port][/path]"
      *   the default port is 80 and 443 for "ws" and "wss" respectively.
-     *   The optional path must match the server's configuration (including
-     *   whether or not it ends with a '/').</li>
-     * <li>ws.trustStorePath - required for "wss:"</li>
-     * <li>ws.trustStorePassword - required for "wss:"</li>
-     * <li>ws.keyStorePath - required for "wss:" if server does client auth</li>
-     * <li>ws.keyStorePassword - required for "wss:" if server does client auth</li>
+     *   The optional path must match the server's configuration.</li>
+     * <li>ws.trustStore - optional. Only used with "wss:".
+     *     Path to trust store file in JKS format.
+     *     If not set, the standard JRE and javax.net.ssl system properties
+     *     control the SSL behavior.
+     *     Generally not required if server has a CA-signed certificate.</li>
+     * <li>ws.trustStorePassword - required if ws.trustStore is set</li>
+     * <li>ws.keyStore - optional. Only used with "wss:" when the
+     *     server is configured for client auth.
+     *     Path to key store file in JKS format.
+     *     If not set, the standard JRE and javax.net.ssl system properties
+     *     control the SSL behavior.</li>
+     * <li>ws.keyStorePassword - required if ws.keyStore is set.</li>
      * <li>ws.keyPassword - defaults to ws.keyStorePassword value</li>
      * <li>ws.keyCertificateAlias - alias for certificate in key store. defaults to "default"</li>
      * </ul>
      * Additional keys in {@code config} are ignored.
+     * @param t the topology to add the connector to
      * @param config the connector's configuration
      */
     public Jsr356WebSocketClient(Topology t, Properties config) {
+        this(t, config, null);
+    }
+    
+    /**
+     * Create a new Web Socket Client connector.
+     * <p>
+     * This constructor is made available in case the container created
+     * by {@link Jsr356WebSocketClient#Jsr356WebSocketClient(Topology, Properties)}
+     * lacks the configuration needed for a particular use case.
+     * <p>
+     * At topology runtime {@code containerFn.get()} will be called to
+     * get a {@code javax.websocket.WebSocketContainer} that will be used to
+     * connect to the WebSocket server.
+     * <p>
+     * Only the "ws.uri" {@code config} parameter is used.
+     * @param t the topology to add the connector to
+     * @param config the connector's configuration
+     * @param containerFn supplier for a {@code WebSocketContainer}.  May be null.
+     */
+    public Jsr356WebSocketClient(Topology t, Properties config, Supplier<WebSocketContainer> containerFn) {
         Objects.requireNonNull(t, "t");
         Objects.requireNonNull(config, "config");
         this.t = t;
-        connector = new WebSocketClientConnector(config);
+        this.connector = new WebSocketClientConnector(config, containerFn);
     }
 
     /**

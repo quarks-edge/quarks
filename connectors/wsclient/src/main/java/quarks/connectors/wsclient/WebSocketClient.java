@@ -45,12 +45,19 @@ import quarks.topology.TopologyElement;
  * <ul>
  * <li>ws.uri - "ws://host[:port][/path]", "wss://host[:port][/path]"
  *   the default port is 80 and 443 for "ws" and "wss" respectively.
- *   The optional path must match the server's configuration (including
- *   whether or not it ends with a '/').</li>
- * <li>ws.trustStorePath - required for "wss:"</li>
- * <li>ws.trustStorePassword - required for "wss:"</li>
- * <li>ws.keyStorePath - required for "wss:" if server does client auth</li>
- * <li>ws.keyStorePassword - required for "wss:" if server does client auth</li>
+ *   The optional path must match the server's configuration.</li>
+ * <li>ws.trustStore - optional. Only used with "wss:".
+ *     Path to trust store file in JKS format.
+ *     If not set, the standard JRE and javax.net.ssl system properties
+ *     control the SSL behavior.
+ *     Generally not required if server has a CA-signed certificate.</li>
+ * <li>ws.trustStorePassword - required if ws.trustStore is set</li>
+ * <li>ws.keyStore - optional. Only used with "wss:" when the
+ *     server is configured for client auth.
+ *     Path to key store file in JKS format.
+ *     If not set, the standard JRE and javax.net.ssl system properties
+ *     control the SSL behavior.</li>
+ * <li>ws.keyStorePassword - required if ws.keyStore is set.</li>
  * <li>ws.keyPassword - defaults to ws.keyStorePassword value</li>
  * <li>ws.keyCertificateAlias - alias for certificate in key store. defaults to "default"</li>
  * </ul>

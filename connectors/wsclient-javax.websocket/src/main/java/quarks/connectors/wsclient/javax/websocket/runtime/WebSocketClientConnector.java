@@ -23,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import quarks.connectors.runtime.Connector;
+import quarks.function.Supplier;
+import quarks.javax.websocket.QuarksSslContainerProvider;
 
 @ClientEndpoint
 public class WebSocketClientConnector extends Connector<Session> implements Serializable {
@@ -32,27 +34,27 @@ public class WebSocketClientConnector extends Connector<Session> implements Seri
     private volatile String id;
     private volatile String sid;
     private WebSocketClientReceiver<?> msgReceiver;
+    private volatile WebSocketContainer container; 
+    private final Supplier<WebSocketContainer> containerFn;
     
-    public WebSocketClientConnector(Properties config) {
+    public WebSocketClientConnector(Properties config, Supplier<WebSocketContainer> containerFn) {
         Objects.requireNonNull(config, "config");
         this.config = config;
         checkConfig();
+        this.containerFn = containerFn!=null
+                ? containerFn
+                : () -> getWebSocketContainer();
     }
     
     private void checkConfig() {
         requireConfig("ws.uri");
-        URI uri;
-        try {
-            uri = getEndpointURI();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("ws.uri", e);
-        }
+        URI uri = getEndpointURI();
         if (!("ws".equals(uri.getScheme()) || "wss".equals(uri.getScheme())))
             throw new IllegalArgumentException("ws.uri");
-        if ("wss".equals(uri.getScheme())) {
-            requireConfig("ws.trustStorePath");
+        if (optionalConfig("ws.trustStore"))
             requireConfig("ws.trustStorePassword");
-        }
+        if (optionalConfig("ws.keyStore"))
+            requireConfig("ws.keyStorePassword");
     }
     
     void setReceiver(WebSocketClientReceiver<?> msgReceiver) {
@@ -69,8 +71,8 @@ public class WebSocketClientConnector extends Connector<Session> implements Seri
         if (session == null || !session.isOpen()) {
             if (session != null)
                 doClose(session);
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            // TODO SSL support and trust/key store config props
+            if (container == null)
+                container = containerFn.get();
             URI uri = getEndpointURI();
             getLogger().info("{} connecting uri={}", id(), uri);
             session = container.connectToServer(this, uri);
@@ -79,15 +81,51 @@ public class WebSocketClientConnector extends Connector<Session> implements Seri
         }
         return session;
     }
+
+    private WebSocketContainer getWebSocketContainer() throws RuntimeException {
+        
+        // Ugh. Turns out there are some serious issues w/JSR356
+        // as well as Jetty client impl of it wrt SSL and
+        // trust and key store configurations.
+        //
+        // "wss" is OK unless: you need **programatic** trustStore
+        // OR need clientAuth at all.
+        //
+        // https://github.com/eclipse/jetty.project/issues/155
+
+        URI uri = getEndpointURI();
+        
+        // Use the std code for the non-problematic cases
+        if ("ws".equals(uri.getScheme())
+            || (config.getProperty("ws.trustStore") == null
+                && config.getProperty("ws.keyStore") == null
+                && System.getProperty("javax.net.ssl.keyStore") == null))
+        {
+            return ContainerProvider.getWebSocketContainer();
+        }
+        else {
+            getLogger().info("##### Using ContainerProvider.getWebSocketContainer() workaround for SSL #####");
+            
+            return QuarksSslContainerProvider.getSslWebSocketContainer(config);
+        }
+    }
     
-    private URI getEndpointURI() throws URISyntaxException {
+    private URI getEndpointURI() throws RuntimeException {
         String uriStr = config.getProperty("ws.uri");
-        return new URI(uriStr);
+        try {
+            return new URI(uriStr);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("ws.uri", e);
+        }
     }
     
     private void requireConfig(String id) {
         if (config.getProperty(id) == null)
             throw new IllegalArgumentException(id);
+    }
+    
+    private boolean optionalConfig(String id) {
+        return config.getProperty(id) != null;
     }
 
     @Override
@@ -99,7 +137,6 @@ public class WebSocketClientConnector extends Connector<Session> implements Seri
     @Override
     protected void doClose(Session session) throws Exception {
         getLogger().debug("{} doClose {}", id(), session);
-//        WebSocketContainer container = session.getContainer();
         try {
             session.close();
         }

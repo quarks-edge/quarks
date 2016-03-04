@@ -4,8 +4,10 @@ based on Eclipse Jetty supplied jars.
 The javax.websocket API uses the java.util.ServiceLoader to load a server
 implementation.
 
-This server implementation is dependent on a client implementation. 
-
 To use this implementation, add the following to your classpath:
   connectors/javax.websocket-server/lib/javax.websocket-server.jar
+  
+As captured in the jar's manifest's classpath, the implementation dependents on
   connectors/javax.websocket-client/lib/javax.websocket-client.jar
+
+  
