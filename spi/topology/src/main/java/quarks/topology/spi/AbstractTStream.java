@@ -6,7 +6,10 @@ package quarks.topology.spi;
 
 import java.util.Collections;
 
+import quarks.function.Consumer;
+import quarks.function.Functions;
 import quarks.function.UnaryOperator;
+import quarks.oplet.core.Sink;
 import quarks.topology.TSink;
 import quarks.topology.TStream;
 import quarks.topology.Topology;
@@ -120,5 +123,10 @@ public abstract class AbstractTStream<G extends Topology, T> implements TStream<
     @Override
     public TStream<T> union(TStream<T> other) {
         return union(Collections.singleton(other));
+    }
+    
+    @Override
+    public TSink<T> sink(Consumer<T> sinker) {
+        return sink(new Sink<>(Functions.synchronizedConsumer(sinker)));
     }
 }

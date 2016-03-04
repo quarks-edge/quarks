@@ -14,6 +14,7 @@ import quarks.function.Predicate;
 import quarks.function.ToIntFunction;
 import quarks.function.UnaryOperator;
 import quarks.oplet.core.Pipe;
+import quarks.oplet.core.Sink;
 
 /**
  * A {@code TStream} is a declaration of a continuous sequence of tuples. A
@@ -208,7 +209,7 @@ public interface TStream<T> extends TopologyElement {
     TStream<T> peek(Consumer<T> peeker);
 
     /**
-     * Sink (terminate) this stream. For each tuple {@code t} on this stream
+     * Sink (terminate) this stream using a function. For each tuple {@code t} on this stream
      * {@link Consumer#accept(Object) sinker.accept(t)} will be called. This is
      * typically used to send information to external systems, such as databases
      * or dashboards.
@@ -233,6 +234,18 @@ public interface TStream<T> extends TopologyElement {
      * @return sink element representing termination of this stream.
      */
     TSink<T> sink(Consumer<T> sinker);
+    
+    /**
+     * Sink (terminate) this stream using a oplet.
+     * This provides a richer api for a sink than
+     * {@link #sink(Consumer)} with a full life-cycle of
+     * the oplet as well as easy access to
+     * {@link quarks.execution.services.RuntimeServices runtime services}.
+     * 
+     * @param oplet Oplet processes each tuple without producing output.
+     * @return sink element representing termination of this stream.
+     */
+    TSink<T> sink(Sink<T> oplet);
 
     /**
      * Declare a stream that contains the output of the specified {@link Pipe}

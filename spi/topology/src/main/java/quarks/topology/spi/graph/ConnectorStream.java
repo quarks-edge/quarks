@@ -101,11 +101,10 @@ public class ConnectorStream<G extends Topology, T> extends AbstractTStream<G, T
         connector.peek(new Peek<T>(peeker));
         return this;
     }
-
+    
     @Override
-    public TSink<T> sink(Consumer<T> sinker) {
-        sinker = Functions.synchronizedConsumer(sinker);
-        Vertex<Sink<T>, T, Void> sinkVertex = graph().insert(new Sink<>(sinker), 1, 0);
+    public TSink<T> sink(Sink<T> oplet) {
+        Vertex<Sink<T>, T, Void> sinkVertex = graph().insert(oplet, 1, 0);
         connector.connect(sinkVertex, 0);
         return new ConnectorSink<>(this);
     }
