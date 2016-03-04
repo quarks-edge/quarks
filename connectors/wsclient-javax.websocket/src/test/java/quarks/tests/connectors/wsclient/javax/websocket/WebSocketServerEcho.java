@@ -39,11 +39,11 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
  */
 @ServerEndpoint(value="/echo")
 public class WebSocketServerEcho {
-    String svrName = this.getClass().getSimpleName();
-    Server server;
-    ServerConnector connector;
-    URI curEndpointURI;
-    boolean curNeedClientAuth;
+    private final String svrName = this.getClass().getSimpleName();
+    private Server server;
+    private ServerConnector connector;
+    private URI curEndpointURI;
+    private boolean curNeedClientAuth;
     private final ScheduledExecutorService schedExecutor = Executors.newScheduledThreadPool(0);
     
     public static void main(String[] args) throws Exception {
