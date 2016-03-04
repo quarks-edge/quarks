@@ -185,22 +185,6 @@ public class WebSocketClientConnector extends Connector<Session> implements Seri
             msgReceiver.onBinaryMessage(message);
         }
     }
-    
-    private Session getConnectedSession() {
-        try { 
-            return client();
-        }
-        catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Interrupted", e);
-        }
-        catch (RuntimeException e) {
-            throw e;
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Unexpected condition", e);
-        }
-    }
 
     void sendBinary(byte[] bytes) {
         while (true) {
@@ -212,12 +196,12 @@ public class WebSocketClientConnector extends Connector<Session> implements Seri
             }
             catch (IOException e) {
                 if (!session.isOpen()) {
-                    connectionLost(e);  // logs
+                    connectionLost(e);  // logs error
                     // retry
                 }
                 else {
                     getLogger().error("{} sendBinary failed", id(), e);
-                    throw new RuntimeException("Unexpected condition", e);
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -233,14 +217,30 @@ public class WebSocketClientConnector extends Connector<Session> implements Seri
             }
             catch (IOException e) {
                 if (!session.isOpen()) {
-                    connectionLost(e);  // logs
+                    connectionLost(e);  // logs error
                     // retry
                 }
                 else {
                     getLogger().error("{} sendText failed", id(), e);
-                    throw new RuntimeException("Unexpected condition", e);
+                    throw new RuntimeException(e);
                 }
             }
+        }
+    }
+    
+    private Session getConnectedSession() {
+        try { 
+            return client();
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted", e);
+        }
+        catch (RuntimeException e) {
+            throw e;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
     

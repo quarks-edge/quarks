@@ -44,6 +44,7 @@ public class WebSocketServerEcho {
     ServerConnector connector;
     URI curEndpointURI;
     boolean curNeedClientAuth;
+    private final ScheduledExecutorService schedExecutor = Executors.newScheduledThreadPool(0);
     
     public static void main(String[] args) throws Exception {
         URI uri = new URI("ws://localhost:0");
@@ -88,7 +89,6 @@ public class WebSocketServerEcho {
             // server.dump(System.err);            
         }
         catch (Exception e) {
-            // TODO Auto-generated catch block
             throw new RuntimeException("start", e);
         }
     }
@@ -138,7 +138,6 @@ public class WebSocketServerEcho {
     }
     
     /** restart a running server on the same port, etc: stop, delay, start */
-    private final ScheduledExecutorService schedExecutor = Executors.newScheduledThreadPool(0);
     public void restart(int secDelay) {
         // stop, schedule delay&start and return
         URI endpointURI = setPort(curEndpointURI, getPort());
@@ -146,8 +145,7 @@ public class WebSocketServerEcho {
             System.out.println(svrName+" restart: stop "+connector);
             connector.stop();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException("restart", e);
         }
         System.out.println(svrName+" restart: scheduling start after "+secDelay+"sec");
         schedExecutor.schedule(() -> {
