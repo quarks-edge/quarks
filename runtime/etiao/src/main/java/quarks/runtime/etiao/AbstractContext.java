@@ -47,7 +47,7 @@ public abstract class AbstractContext<I, O> implements OpletContext<I, O> {
     public String uniquify(String name) {
         return new StringBuilder(name).
                 append('.').append(OpletContext.class.getPackage().getName()).
-                append('.').append(getJobContext().getJobId()).
+                append('.').append(getJobContext().getId()).
                 append('.').append(getId()).toString();
     }
 }

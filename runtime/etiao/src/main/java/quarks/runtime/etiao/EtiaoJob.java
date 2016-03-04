@@ -165,16 +165,6 @@ public class EtiaoJob extends AbstractGraphJob implements JobContext {
         }
     }
 
-    @Override
-    public String getJobId() {
-        return getId();
-    }
-
-    @Override
-    public String getJobName() {
-        return getName();
-    }
-    
     public DirectGraph graph() {
         return graph;
     }

@@ -12,11 +12,11 @@ public interface JobContext {
      * Get the runtime identifier for the job containing this {@link Oplet}.
      * @return The job identifier for the application being executed.
      */
-    String getJobId();
+    String getId();
     
     /**
      * Get the name of the job containing this {@link Oplet}.
      * @return The job name for the application being executed.
      */
-    String getJobName();
+    String getName();
 }
