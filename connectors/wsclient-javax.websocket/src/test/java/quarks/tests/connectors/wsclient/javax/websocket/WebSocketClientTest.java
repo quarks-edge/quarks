@@ -296,7 +296,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
                 return true;
             else {
                 // delay so we rcv the prior echo'd tuple
-                try { Thread.sleep(500); } catch (Exception e) {};
+                try { Thread.sleep(2000); } catch (Exception e) {};
                 restartEchoer(2/*secDelay*/);
                 return true;
             }
@@ -331,7 +331,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
                 return true;
             else {
                 // delay so we rcv the prior echo'd tuple
-                try { Thread.sleep(500); } catch (Exception e) {};
+                try { Thread.sleep(2000); } catch (Exception e) {};
                 restartEchoer(2/*secDelay*/);
                 return true;
             }
@@ -490,7 +490,7 @@ public class WebSocketClientTest extends ConnectorTestBase {
                  return true;
              else {
                  // delay so we rcv the prior echo'd tuple
-                 try { Thread.sleep(500); } catch (Exception e) {};
+                 try { Thread.sleep(2000); } catch (Exception e) {};
                  restartEchoer(2/*secDelay*/);
                  return true;
              }
