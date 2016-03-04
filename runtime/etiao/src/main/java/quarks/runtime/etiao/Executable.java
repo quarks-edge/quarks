@@ -170,8 +170,8 @@ public class Executable implements RuntimeServices {
                 // TODO log, don't rethrow
                 t.printStackTrace();
             } finally {
-                jobServices.cleanOplet(job.getJobId(), invocation.getId());
-                job.getContainerServices().cleanOplet(job.getJobId(), invocation.getId());
+                jobServices.cleanOplet(job.getId(), invocation.getId());
+                job.getContainerServices().cleanOplet(job.getId(), invocation.getId());
             }
         });
 
