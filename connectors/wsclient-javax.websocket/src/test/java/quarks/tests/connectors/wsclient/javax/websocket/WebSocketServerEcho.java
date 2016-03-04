@@ -125,7 +125,7 @@ public class WebSocketServerEcho {
             return server;
         }
         else
-            throw new IllegalArgumentException("unrecognized curEndpointURI: "+endpointURI);
+            throw new IllegalArgumentException("unrecognized uri: "+endpointURI);
     }
     
     private String getStorePath(String storeLeaf) {
