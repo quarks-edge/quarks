@@ -54,6 +54,10 @@ import quarks.topology.json.JsonFunctions;
  * r.print();
  * }</pre>
  * <p>
+ * Note, the WebSocket protocol differentiates between text/String and 
+ * binary/byte messages.
+ * A receiver only receives the messages of the type that it requests.
+ * <p>
  * The connector is written against the JSR356 {@code javax.websockets} API.
  * {@code javax.websockets} uses the {@link java.util.ServiceLoader} to load
  * an implementation of {@code javax.websocket.ContainerProvider}.
@@ -183,6 +187,10 @@ public class Jsr356WebSocketClient implements WebSocketClient{
     
     /**
      * Create a stream of String tuples from received WebSocket text messages.
+     * <p>
+     * Note, the WebSocket protocol differentiates between text/String and
+     * binary/byte messages.  This method only receives messages sent as text.
+     * 
      * @return the stream
      */
     public TStream<String> receiveString() {
@@ -196,6 +204,10 @@ public class Jsr356WebSocketClient implements WebSocketClient{
 
     /**
      * Create a stream of byte[] tuples from received WebSocket binary messages.
+     * <p>
+     * Note, the WebSocket protocol differentiates between text/String and
+     * binary/byte messages.  This method only receives messages sent as bytes.
+     * 
      * @return the stream
      */
     public TStream<byte[]> receiveBytes() {

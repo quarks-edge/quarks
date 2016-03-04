@@ -6,7 +6,11 @@ package quarks.tests.connectors.wsclient.javax.websocket;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
@@ -38,6 +42,8 @@ public class WebSocketServerEcho {
     String svrName = this.getClass().getSimpleName();
     Server server;
     ServerConnector connector;
+    URI curEndpointURI;
+    boolean curNeedClientAuth;
     
     public static void main(String[] args) throws Exception {
         URI uri = new URI("ws://localhost:0");
@@ -55,6 +61,8 @@ public class WebSocketServerEcho {
     }
     
     public void start(URI endpointURI, boolean needClientAuth) {
+        curEndpointURI = endpointURI;
+        curNeedClientAuth = needClientAuth;
 
         System.out.println(svrName+" "+endpointURI + " needClientAuth="+needClientAuth);
 
@@ -117,7 +125,7 @@ public class WebSocketServerEcho {
             return server;
         }
         else
-            throw new IllegalArgumentException("unrecognized uri: "+endpointURI);
+            throw new IllegalArgumentException("unrecognized curEndpointURI: "+endpointURI);
     }
     
     private String getStorePath(String storeLeaf) {
@@ -130,8 +138,36 @@ public class WebSocketServerEcho {
     }
     
     /** restart a running server on the same port, etc: stop, delay, start */
+    private final ScheduledExecutorService schedExecutor = Executors.newScheduledThreadPool(0);
     public void restart(int secDelay) {
-        // TODO
+        // stop, schedule delay&start and return
+        URI endpointURI = setPort(curEndpointURI, getPort());
+        try {
+            System.out.println(svrName+" restart: stop "+connector);
+            connector.stop();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        System.out.println(svrName+" restart: scheduling start after "+secDelay+"sec");
+        schedExecutor.schedule(() -> {
+            System.out.println(svrName+" restart: starting...");
+            start(endpointURI, curNeedClientAuth);
+        }, secDelay, TimeUnit.SECONDS);
+    }
+    
+    private URI setPort(URI endpointURI, int port) {
+        try {
+            URI uri = endpointURI;
+            if (uri.getPort() != port) {
+                uri = new URI(uri.getScheme(), uri.getUserInfo(),
+                        uri.getHost(), port,
+                        uri.getPath(), uri.getQuery(), uri.getFragment());
+            }
+            return uri;
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Unable to create URI", e);
+        }
     }
     
     public void stop() {
