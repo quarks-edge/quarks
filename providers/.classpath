@@ -12,5 +12,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/console"/>
-	<classpathentry kind="output" path="development/classes"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

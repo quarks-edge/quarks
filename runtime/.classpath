@@ -11,5 +11,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ext"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spi"/>
-	<classpathentry kind="output" path="etiao/classes"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

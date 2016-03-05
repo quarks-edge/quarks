@@ -67,5 +67,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ext"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spi"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/providers"/>
-	<classpathentry kind="output" path="common/classes"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

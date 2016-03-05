@@ -6,5 +6,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ext"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="output" path="metrics/classes"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>
