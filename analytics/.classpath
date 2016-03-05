@@ -11,5 +11,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ext"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/providers"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spi"/>
-	<classpathentry kind="output" path="math3/classes"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>
