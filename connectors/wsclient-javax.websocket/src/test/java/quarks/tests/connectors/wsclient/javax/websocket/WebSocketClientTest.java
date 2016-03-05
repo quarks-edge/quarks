@@ -6,13 +6,13 @@ package quarks.tests.connectors.wsclient.javax.websocket;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assume.assumeTrue;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Test;
@@ -276,29 +276,72 @@ public class WebSocketClientTest extends ConnectorTestBase {
     @Test
     public void testReconnect() throws Exception {
 
-        assumeTrue(false); // TODO
-        
         Topology t = newTopology("testReconnect");
         System.out.println("===== "+t.getName());
 
         startEchoer();  // before getConfig() so it gets the port
+
+        Properties config = getConfig();
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
-        // TODO
-        restartEchoer(2);
+        String[] expected = new String[] { "one", "two", "three-post-reconnect", "four" };
+        
+        TStream<String> s = t.strings(expected);
+        s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+        
+        // send one, two, restart the server to force reconnect, send the next
+        AtomicInteger cnt = new AtomicInteger();
+        s = s.filter(tuple -> {
+            if (cnt.getAndIncrement() != 2)
+                return true;
+            else {
+                // delay so we rcv the prior echo'd tuple
+                try { Thread.sleep(2000); } catch (Exception e) {};
+                restartEchoer(2/*secDelay*/);
+                return true;
+            }
+        });
+        wsClient.sendString(s);
+        
+        TStream<String> rcvd = wsClient.receiveString();
+        
+        completeAndValidate("", t, rcvd, SEC_TMO + 10, expected);
     }
     
     @Test
-    public void testSslReconnect() throws Exception {
+    public void testReconnectBytes() throws Exception {
 
-        assumeTrue(false); // TODO
-        
-        Topology t = newTopology("testSslReconnect");
+        Topology t = newTopology("testReconnectBytes");
         System.out.println("===== "+t.getName());
 
         startEchoer();  // before getConfig() so it gets the port
+
+        Properties config = getConfig();
+        WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
         
-        // TODO
-        restartEchoer(2);
+        String[] expected = new String[] { "one", "two", "three-post-reconnect", "four" };
+        
+        TStream<byte[]> s = t.strings(expected).map(tup -> tup.getBytes());
+        s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+        
+        // send one, two, restart the server to force reconnect, send the next
+        AtomicInteger cnt = new AtomicInteger();
+        s = s.filter(tuple -> {
+            if (cnt.getAndIncrement() != 2)
+                return true;
+            else {
+                // delay so we rcv the prior echo'd tuple
+                try { Thread.sleep(2000); } catch (Exception e) {};
+                restartEchoer(2/*secDelay*/);
+                return true;
+            }
+        });
+        wsClient.sendBytes(s);
+        
+        TStream<String> rcvd = wsClient.receiveBytes()
+                                .map(tup -> new String(tup));
+        
+        completeAndValidate("", t, rcvd, SEC_TMO + 10, expected);
     }
 
     private class SslSystemPropMgr {
@@ -423,6 +466,41 @@ public class WebSocketClientTest extends ConnectorTestBase {
         
         completeAndValidate("", t, rcvd, SEC_TMO, expected);
     }
+    
+     @Test
+     public void testSslReconnect() throws Exception {
+    
+         Topology t = newTopology("testSslReconnect");
+         System.out.println("===== "+t.getName());
+    
+         startEchoer(ServerMode.SSL);  // before getConfig() so it gets the port
+    
+         Properties config = getWssConfig();
+         WebSocketClient wsClient = new Jsr356WebSocketClient(t, config);
+         
+         String[] expected = new String[] { "one", "two", "three-post-reconnect", "four" };
+         
+         TStream<String> s = t.strings(expected);
+         s = PlumbingStreams.blockingOneShotDelay(s, 2, TimeUnit.SECONDS);
+         
+         // send one, two, restart the server to force reconnect, send the next
+         AtomicInteger cnt = new AtomicInteger();
+         s = s.filter(tuple -> {
+             if (cnt.getAndIncrement() != 2)
+                 return true;
+             else {
+                 // delay so we rcv the prior echo'd tuple
+                 try { Thread.sleep(2000); } catch (Exception e) {};
+                 restartEchoer(2/*secDelay*/);
+                 return true;
+             }
+         });
+         wsClient.sendString(s);
+         
+         TStream<String> rcvd = wsClient.receiveString();
+         
+         completeAndValidate("", t, rcvd, SEC_TMO + 10, expected);
+     }
     
     @Test
     public void testSslNeg() throws Exception {

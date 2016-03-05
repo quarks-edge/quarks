@@ -39,7 +39,11 @@ import quarks.topology.TopologyElement;
  * TStream<JsonObject> r = wsclient.receive();
  * r.print();
  * }</pre>
- * 
+ * <p>
+ * Note, the WebSocket protocol differentiates between text/String and 
+ * binary/byte messages.
+ * A receiver only receives the messages of the type that it requests.
+ * <p> 
  * Implementations are strongly encouraged to support construction from
  * Properties with the following configuration parameters:
  * <ul>
@@ -93,12 +97,20 @@ public interface WebSocketClient extends TopologyElement {
     
     /**
      * Create a stream of String tuples from received WebSocket text messages.
+     * <p>
+     * Note, the WebSocket protocol differentiates between text/String and
+     * binary/byte messages.  This method only receives messages sent as text.
+     * 
      * @return the stream
      */
     TStream<String> receiveString();
 
     /**
      * Create a stream of byte[] tuples from received WebSocket binary messages.
+     * <p>
+     * Note, the WebSocket protocol differentiates between text/String and
+     * binary/byte messages.  This method only receives messages sent as bytes.
+     * 
      * @return the stream
      */
     TStream<byte[]> receiveBytes();
