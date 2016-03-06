@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="apps/src/main/java"/>
-	<classpathentry kind="src" path="apps/src/test/java"/>
 	<classpathentry kind="src" path="connectors/src/main/java"/>
-	<classpathentry kind="src" path="connectors/src/test/java"/>
 	<classpathentry kind="src" path="console/src/main/java"/>
-	<classpathentry kind="src" path="console/src/test/java"/>
 	<classpathentry kind="src" path="topology/src/main/java"/>
-	<classpathentry kind="src" path="topology/src/test/java"/>
 	<classpathentry kind="src" path="utils/src/main/java"/>
-	<classpathentry kind="src" path="utils/src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/analytics"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/api"/>
