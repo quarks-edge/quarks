@@ -16,6 +16,8 @@
 	<classpathentry kind="src" path="kafka/src/test/java"/>
 	<classpathentry kind="src" path="mqtt/src/main/java"/>
 	<classpathentry kind="src" path="mqtt/src/test/java"/>
+	<classpathentry kind="src" path="pubsub/src/main/java"/>
+	<classpathentry kind="src" path="pubsub/src/test/java"/>
 	<classpathentry kind="src" path="serial/src/main/java"/>
 	<classpathentry kind="src" path="serial/src/test/java"/>
 	<classpathentry kind="src" path="quarks.javax.websocket/src/main/java"/>
