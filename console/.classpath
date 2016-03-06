@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="server/src/main/java"/>
 	<classpathentry kind="src" path="server/src/test/java"/>
 	<classpathentry kind="src" path="servlets/src/main/java"/>
-	<classpathentry kind="src" path="servlets/src/test/java"/>
 	<classpathentry kind="lib" path="server/ext/jetty-9.3.6/jetty-http-9.3.6.v20151106.jar"/>
 	<classpathentry kind="lib" path="server/ext/jetty-9.3.6/jetty-io-9.3.6.v20151106.jar"/>
 	<classpathentry kind="lib" path="server/ext/jetty-9.3.6/jetty-security-9.3.6.v20151106.jar"/>
