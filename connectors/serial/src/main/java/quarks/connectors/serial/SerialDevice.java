@@ -6,8 +6,8 @@ package quarks.connectors.serial;
 
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
+import quarks.function.Consumer;
 import quarks.function.Function;
 import quarks.function.Supplier;
 import quarks.topology.TopologyElement;

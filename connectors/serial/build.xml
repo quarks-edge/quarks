@@ -5,7 +5,7 @@
         Build serial api.
     </description>
 
-  <property name="component.path" value="connectors/iot"/>
+  <property name="component.path" value="connectors/serial"/>
   <import file="../../common-build.xml"/>
 
   <path id="compile.classpath">
