@@ -13,7 +13,12 @@ addons:
 
 install: true
 
-script: apache-ant-1.9.4/bin/ant -Dquarks.build.ci=true -lib /usr/share/java/junit4.jar -lib jacoco-0.7.5/lib clean all test release
+script:
+  - jdk_switcher use oraclejdk8
+  - apache-ant-1.9.4/bin/ant -Dquarks.build.ci=true -lib /usr/share/java/junit4.jar -lib jacoco-0.7.5/lib clean all test release
+  - jdk_switcher use oraclejdk7
+  - cd platform/java7 && apache-ant-1.9.4/bin/ant -Dquarks.build.ci=true -lib /usr/share/java/junit4.jar -lib jacoco-0.7.5/lib test
+
 
 jdk:
   - oraclejdk8
