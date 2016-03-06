@@ -111,6 +111,8 @@
 	<target name="all" depends="jar,test.compile"/>
 
 	<target name="init">
+        <mkdir dir="${src}"/>
+        <mkdir dir="${test.src}"/>
 	    <mkdir dir="${classes}"/>
         <mkdir dir="${resources}"/>
 	    <mkdir dir="${test.classes}"/>
