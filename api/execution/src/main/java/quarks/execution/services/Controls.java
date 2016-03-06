@@ -1,7 +1,6 @@
 package quarks.execution.services;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 
 /**
  * Utilities for the control service.
@@ -47,8 +46,7 @@ public class Controls {
                     && !validType(cim.getReturnType()))
                 return false;
             
-            for (Parameter pt : cim.getParameters()) {
-                Class<?> ptt = pt.getType();
+            for (Class<?> ptt : cim.getParameterTypes()) {
                 if (!validType(ptt))
                     return false;
             }
