@@ -37,7 +37,7 @@ public class ActivityStreams {
     
     /**
     * Map tuples on a stream executing the mapper function on the
-    * activity's UI thread. The value ret
+    * activity's UI thread.
     * <BR>
     * For each tuple {@code t} on {@code stream}
     * the method {@code mapper.apply(t)} will be
