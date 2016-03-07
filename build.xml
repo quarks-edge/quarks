@@ -7,6 +7,8 @@
 	
   <property name="release.base" location="release-${ant.project.name}"/>
 
+  <property name="quarks.version" value="0.4.0"/>
+
   <property name="report.dir" location="reports"/>
   <property name="target.dir" location="target"/>
   <property name="javadoc.dir" location="${target.dir}/docs/javadoc"/>
@@ -262,7 +264,7 @@
       author="true"
       version="true"
       use="true"
-      windowtitle="Quarks v0.3"
+      windowtitle="Quarks v${quarks.version}"
       additionalparam="-Xdoclint:none"
       Overview="quarks_overview.html"
       failonwarning="true"
@@ -286,7 +288,7 @@
         </fileset>
       </classpath>
 
-       <doctitle>Quarks v0.3</doctitle>
+       <doctitle>Quarks v${quarks.version}</doctitle>
        <footer><![CDATA[<a href="http://quarks-edge.github.io">quarks-edge community @ github.com</a>]]></footer>
        <bottom>Copyright IBM 2015,2016 - ${commithash}-${DSTAMP}-${TSTAMP}</bottom>
        <group title="Quarks API" packages="quarks.execution,quarks.function,quarks.topology,quarks.topology.*,quarks.execution.*"/>
@@ -308,7 +310,7 @@
       <ant dir="platform/android" target="all" useNativeBasedir="true"/>
 
       <mkdir dir="${release.dir}" />
-      <property name="releasefilename" value="${release.dir}/quarks-v0.3.0-${DSTAMP}-${TSTAMP}.tgz"/>
+      <property name="releasefilename" value="${release.dir}/quarks-v${quarks.version}-${DSTAMP}-${TSTAMP}.tgz"/>
       <tar compression="gzip" longfile="gnu" destfile="${releasefilename}">
         <tarfileset dir="${target.dir}" prefix="quarks"
          excludes="**/*.sh"/>
