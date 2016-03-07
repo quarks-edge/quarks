@@ -35,6 +35,7 @@
     <mkdir dir="${target.dir}"/>
     <echoproperties destfile="${target.dir}/version.txt">
        <propertyset>
+          <propertyref name="quarks.version"/>
           <propertyref name="DSTAMP"/>
           <propertyref name="TSTAMP"/>
           <propertyref name="commithash"/>
