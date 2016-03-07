@@ -1,5 +1,6 @@
 quarks.analytics.math3.json
 quarks.analytics.math3.stat
+quarks.analytics.sensors
 quarks.connectors.file
 quarks.connectors.http
 quarks.connectors.iot
@@ -8,11 +9,20 @@ quarks.connectors.jdbc
 quarks.connectors.kafka
 quarks.connectors.mqtt
 quarks.connectors.mqtt.iot
+quarks.connectors.pubsub
+quarks.connectors.pubsub.oplets
+quarks.connectors.pubsub.service
+quarks.connectors.serial
+quarks.connectors.wsclient
+quarks.connectors.wsclient.javax.websocket
+quarks.connectors.wsclient.javax.websocket.runtime
 quarks.execution
 quarks.execution.mbeans
 quarks.execution.services
 quarks.function
 quarks.graph
+quarks.javax.websocket
+quarks.javax.websocket.impl
 quarks.metrics
 quarks.metrics.oplets
 quarks.oplet
@@ -28,6 +38,7 @@ quarks.runtime.etiao.graph
 quarks.runtime.etiao.graph.model
 quarks.runtime.etiao.mbeans
 quarks.runtime.jmxcontrol
+quarks.runtime.jsoncontrol
 quarks.samples.apps
 quarks.samples.apps.mqtt
 quarks.samples.apps.sensorAnalytics
