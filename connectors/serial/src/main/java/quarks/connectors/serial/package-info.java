@@ -4,7 +4,7 @@
 */
 
 /**
- * Publish subscribe model between jobs.
+ * Serial port connector API.
  */
-package quarks.connectors.pubsub;
+package quarks.connectors.serial;
 

@@ -13,6 +13,8 @@ import quarks.oplet.core.Sink;
  * If no such service exists then no tuples are published.
  *
  * @param <T> Type of the tuples.
+ * 
+ * @see quarks.connectors.pubsub.PublishSubscribe#publish(quarks.topology.TStream, String, Class)
  */
 public class Publish<T> extends Sink<T> {
     

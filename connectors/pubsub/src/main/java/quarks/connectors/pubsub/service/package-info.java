@@ -4,7 +4,7 @@
 */
 
 /**
- * Publish subscribe model between jobs.
+ * Publish subscribe service.
  */
-package quarks.connectors.pubsub;
+package quarks.connectors.pubsub.service;
 

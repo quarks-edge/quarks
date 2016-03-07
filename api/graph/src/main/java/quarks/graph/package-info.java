@@ -4,7 +4,7 @@
 */
 
 /**
- * Publish subscribe model between jobs.
+ * Low-level graph building API.
  */
-package quarks.connectors.pubsub;
+package quarks.graph;
 
