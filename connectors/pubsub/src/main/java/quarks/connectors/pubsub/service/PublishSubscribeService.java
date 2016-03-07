@@ -7,7 +7,7 @@ package quarks.connectors.pubsub.service;
 import quarks.function.Consumer;
 
 /**
- * Publish subscribe model for streams.
+ * Publish subscribe service.
  * <BR>
  * Service that allows jobs to subscribe to 
  * streams published by other jobs.

@@ -9,6 +9,10 @@ import java.util.Map;
 
 import quarks.function.Consumer;
 
+/**
+ * Publish subscribe service allowing exchange of streams between jobs in a provider.
+ *
+ */
 public class ProviderPubSub implements PublishSubscribeService {
     
     private final Map<String,TopicHandler<?>> topicHandlers = new HashMap<>();
