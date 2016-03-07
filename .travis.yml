@@ -1,5 +1,8 @@
 language: java
 
+matrix:
+   fast_finish: true
+
 before_install:
   - wget http://archive.apache.org/dist/ant/binaries/apache-ant-1.9.4-bin.tar.gz
   - tar xzf apache-ant-1.9.4-bin.tar.gz
